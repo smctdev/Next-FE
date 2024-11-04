@@ -99,7 +99,7 @@ export default function Register() {
               />
             </div>
             {error.email && (
-              <small className="text-red-500">{error.email.isNotEmpty}</small>
+              <small className="text-red-500">{error.email.message}</small>
             )}
           </div>
 
@@ -115,7 +115,7 @@ export default function Register() {
               />
             </div>
             {error.name && (
-              <small className="text-red-500">{error.name.isNotEmpty}</small>
+              <small className="text-red-500">{error.name.message}</small>
             )}
           </div>
 
@@ -132,7 +132,7 @@ export default function Register() {
             </div>
             {error.username && (
               <small className="text-red-500">
-                {error.username.isNotEmpty}
+                {error.username.message}
               </small>
             )}
           </div>
@@ -149,7 +149,7 @@ export default function Register() {
               />
             </div>
             {error.address && (
-              <small className="text-red-500">{error.address.isNotEmpty}</small>
+              <small className="text-red-500">{error.address.message}</small>
             )}
           </div>
 
@@ -166,7 +166,7 @@ export default function Register() {
             </div>
             {error.phone_number && (
               <small className="text-red-500">
-                {error.phone_number.isNotEmpty}
+                {error.phone_number.message}
               </small>
             )}
           </div>
@@ -184,7 +184,7 @@ export default function Register() {
             </div>
             {error.date_of_birth && (
               <small className="text-red-500">
-                {error.date_of_birth.isNotEmpty}
+                {error.date_of_birth.message}
               </small>
             )}
           </div>
@@ -201,7 +201,7 @@ export default function Register() {
               />
               {error.password && (
                 <small className="text-red-500">
-                  {error.password.isNotEmpty}
+                  {error.password.message}
                 </small>
               )}
             </div>
@@ -219,7 +219,7 @@ export default function Register() {
               />
               {error.confirmPassword && (
                 <small className="text-red-500">
-                  {error.confirmPassword.isNotEmpty}
+                  {error.confirmPassword.message}
                 </small>
               )}
             </div>
