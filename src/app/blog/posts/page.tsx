@@ -1,23 +1,45 @@
+"use client";
+
+import { Post } from "@/app/types/post";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import api from "@/app/utils/axiosCall";
 
 export default function posts() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await api.get("/posts");
+        setPosts(response.data.posts);
+      } catch (error: any) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   return (
     <>
       <h1>Posts</h1>
-      <ul>
-        <li>
-          <Link href="/blog/posts/1">Post 1</Link>
-        </li>
-        <li>
-          <Link href="/blog/posts/2">Post 2</Link>
-        </li>
-        <li>
-          <Link href="/blog/posts/3">Post 3</Link>
-        </li>
-        <li>
-          <Link href="/blog/posts/4">Post 4</Link>
-        </li>
-      </ul>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        posts.map((post: any, index: any) => {
+          return (
+            <ul key={index}>
+              <li>
+                <Link href={`/blog/posts/${post.id}`}>{post.title}</Link>
+              </li>
+            </ul>
+          );
+        })
+      )}
     </>
   );
 }
