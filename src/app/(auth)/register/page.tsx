@@ -131,9 +131,7 @@ export default function Register() {
               />
             </div>
             {error.username && (
-              <small className="text-red-500">
-                {error.username.message}
-              </small>
+              <small className="text-red-500">{error.username.message}</small>
             )}
           </div>
 
@@ -200,9 +198,7 @@ export default function Register() {
                 placeholder="Enter your password"
               />
               {error.password && (
-                <small className="text-red-500">
-                  {error.password.message}
-                </small>
+                <small className="text-red-500">{error.password.message}</small>
               )}
             </div>
           </div>
@@ -227,9 +223,16 @@ export default function Register() {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full py-3 text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition"
           >
-            Register
+            {loading ? (
+              <span>
+                <i className="fas fa-spinner fa-pulse"></i> Registering...
+              </span>
+            ) : (
+              <span>Register</span>
+            )}
           </button>
         </form>
 

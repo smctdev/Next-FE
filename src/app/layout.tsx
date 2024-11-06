@@ -1,5 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
+import { Providers } from "./providers";
+import DropUpButton from "@/components/DropUpButton";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressContentEditableWarning>
       <head>
         <link
           rel="stylesheet"
@@ -58,7 +60,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Providers>
+          {children}
+          <DropUpButton />
+        </Providers>
       </body>
     </html>
   );

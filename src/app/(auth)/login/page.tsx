@@ -87,7 +87,7 @@ export default function Login() {
             </div>
             {error.usernameOrEmail && (
               <small className="text-red-500">
-                {error.usernameOrEmail.isNotEmpty}
+                {error.usernameOrEmail.message}
               </small>
             )}
           </div>
@@ -103,9 +103,7 @@ export default function Login() {
                 placeholder="Enter your password"
               />
               {error.password && (
-                <small className="text-red-500">
-                  {error.password.isNotEmpty}
-                </small>
+                <small className="text-red-500">{error.password.message}</small>
               )}
             </div>
           </div>
@@ -115,7 +113,13 @@ export default function Login() {
             disabled={loading}
             className="w-full py-3 text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition"
           >
-            {loading ? "Logging In..." : "Login"}
+            {loading ? (
+              <span>
+                <i className="fas fa-spinner fa-pulse"></i> Logging In...
+              </span>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
 
