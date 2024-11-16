@@ -1,9 +1,12 @@
 "use client";
 
-import { ValidationErrors } from "@/app/types/validation";
-import api from "@/app/utils/axiosCall";
+import { useAuth } from "@/app/context/AuthContext";
+import api from "@/app/lib/axiosCall";
+import { ValidationErrors } from "@/app/types/ValidationType";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 export default function Register() {
   const [flashError, setFlashError] = useState("");
@@ -17,12 +20,21 @@ export default function Register() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { isAuthenticated, loading: loadingAuth }: any = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      return router.push("/dashboard");
+    }
+  }, [isAuthenticated, loadingAuth, router]);
+
+  if (loadingAuth) return <div>Loading...</div>;
 
   const handleRegister = async (e: any) => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log("aaaa");
       const response = await api.post("/auth/register", {
         username: username,
         password: password,
@@ -35,11 +47,21 @@ export default function Register() {
       });
 
       if (response.status === 201) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          confirmButtonText: "Ok",
+          confirmButtonColor: "#1E90FF",
+          html: "You have successfully registered. You will be redirected to the login page. <br> Thank you!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push("/login");
+          }
+        });
       } else {
         setFlashError(response.data.message);
       }
     } catch (error: any) {
-      console.log(error.response);
       setError(error.response.data);
     } finally {
       setLoading(false);

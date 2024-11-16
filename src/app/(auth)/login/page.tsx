@@ -1,16 +1,28 @@
 "use client";
 
-import { ValidationErrors } from "@/app/types/validation";
-import api from "@/app/utils/axiosCall";
+import { useAuth } from "@/app/context/AuthContext";
+import api from "@/app/lib/axiosCall";
+import { ValidationErrors } from "@/app/types/ValidationType";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function Login() {
+export default function page() {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<ValidationErrors | any>("");
   const [flashError, setFlashError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { login, isAuthenticated, loading: loadingAuth }: any = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      return router.push("/dashboard");
+    }
+  }, [isAuthenticated, loadingAuth, router]);
+
+  if (loadingAuth) return <div>Loading...</div>;
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
@@ -21,7 +33,15 @@ export default function Login() {
         password,
       });
 
-      if (response.status === 200) {
+      if (response.data.statusCode === 200) {
+        setError("");
+
+        const token = response.data.accessToken;
+        const rememberToken = response.data.remember_token;
+
+        login(token, rememberToken);
+
+        router.push("/dashboard");
       } else {
         setFlashError(response.data.message);
         setError("");
@@ -37,6 +57,7 @@ export default function Login() {
   const handleCloseFlashError = () => {
     setFlashError("");
   };
+
   return (
     <div
       className="flex items-center justify-center min-h-screen"

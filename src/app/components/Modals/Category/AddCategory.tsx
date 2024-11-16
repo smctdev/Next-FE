@@ -17,7 +17,6 @@ export default function AddCategory({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ title, description, slug });
   };
 
   const handleCloseModal = () => {

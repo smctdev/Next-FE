@@ -1,15 +1,17 @@
 import localFont from "next/font/local";
-import "./globals.css";
+import "./assets/styles/globals.css";
 import { Providers } from "./providers";
-import DropUpButton from "@/components/DropUpButton";
+import DropUpButton from "@/app/components/DropUpButton";
+import { AuthProvider } from "./context/AuthContext";
+import Navbar from "./components/Navbar";
 
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
+  src: "./assets/fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
 const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
+  src: "./assets/fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
 });
@@ -56,14 +58,28 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://site-assets.fontawesome.com/releases/v6.6.0/css/sharp-light.css"
         />
+
+        <link
+          rel="shortcut icon"
+          href="https://cdn-icons-png.flaticon.com/128/2065/2065254.png"
+          type="image/x-icon"
+        />
+
+        <link
+          href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
+          rel="stylesheet"
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          {children}
-          <DropUpButton />
-        </Providers>
+        <AuthProvider>
+          <Providers>
+            <Navbar />
+            {children}
+            <DropUpButton />
+          </Providers>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import AddCategory from "@/components/Modals/Category/AddCategory";
 import Link from "next/link";
+import AddCategory from "@/app/components/Modals/Category/AddCategory";
 
 export default function Blog() {
   const [isOpen, setIsOpen] = useState(false);

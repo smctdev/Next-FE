@@ -17,9 +17,13 @@ export default function DropUpButton() {
   }, []);
 
   useEffect(() => {
+    const themeFromStorage = localStorage.getItem("theme");
     if (mounted) {
-      const themeFromStorage = localStorage.getItem("theme");
       setActiveTheme(themeFromStorage);
+    } else {
+      if (!themeFromStorage) {
+        setTheme("system");
+      }
     }
   }, [mounted, setTheme]);
 
@@ -41,8 +45,6 @@ export default function DropUpButton() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  console.log(resolvedTheme);
 
   return (
     <div className="fixed bottom-4 right-4">

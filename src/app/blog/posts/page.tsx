@@ -1,9 +1,9 @@
 "use client";
 
-import { Post } from "@/app/types/post";
+import { Post } from "@/app/types/PostType";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import api from "@/app/utils/axiosCall";
+import api from "@/lib/axiosCall";
 
 export default function posts() {
   const [posts, setPosts] = useState<Post[]>([]);

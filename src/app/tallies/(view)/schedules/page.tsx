@@ -1,0 +1,332 @@
+"use client";
+
+import Link from "next/link";
+import useFetch from "../../hooks/fetchData";
+import { useEffect, useState } from "react";
+import NbaLogo from "../../utils/NbaLogo";
+import YearSelect from "../../utils/YearDate";
+import SchedulesSkeleton from "../../components/loaders/SchedulesSkeleton";
+import OptionPerPage from "../../components/PerPage/OptionPerPage";
+import formatDate from "../../utils/DateFormat";
+import formatTime from "../../utils/TimeFormat";
+
+export default function page() {
+  const [selectedDate, setSelectedDate] = useState({
+    startDate: "",
+    endDate: "",
+    year: "",
+  });
+  const [filteredData, setFilteredData] = useState("");
+  const [cursor, setCursor] = useState<string | null>(null);
+  const { data, buttonLoading, error } = useFetch(filteredData);
+  const [isPickedFilter, setIsPickedFilter] = useState<{
+    dates: boolean;
+    years: boolean;
+  }>({
+    dates: false,
+    years: false,
+  });
+  const [perPage, setPerPage] = useState(25);
+
+  const handleFilter = () => {
+    if (isPickedFilter.dates === true) {
+      const data = `https://api.balldontlie.io/v1/games?dates[]=${selectedDate.startDate}&dates[]=${selectedDate.endDate}&&per_page=${perPage}`;
+      setFilteredData(data);
+    } else if (isPickedFilter.years === true) {
+      const data = `https://api.balldontlie.io/v1/games?seasons[]=${selectedDate.year}&&per_page=${perPage}`;
+      setFilteredData(data);
+    } else {
+      return console.log(error);
+    }
+  };
+  const handlePickedFilter = (name: "dates" | "years") => {
+    setIsPickedFilter({
+      dates: name === "dates",
+      years: name === "years",
+    });
+
+    setSelectedDate({
+      startDate: "",
+      endDate: "",
+      year: "",
+    });
+    setFilteredData("");
+    setPerPage(25);
+  };
+
+  const handlePerPage = (e: any) => {
+    setPerPage(e.target.value);
+  };
+  console.log(data);
+  return (
+    <div className="mt-2 p-2">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-5">
+        <div className="flex justify-center mb-5 w-full">
+          <Link
+            href={"/tallies"}
+            className="px-3 py-3 text-sm text-white hover:scale-105 bg-blue-600 rounded-lg shadow hover:bg-blue-800 hover:text-white transition"
+          >
+            <i className="far fa-arrow-left"></i> Back to Tallies
+          </Link>
+        </div>
+        <ul className="grid w-full gap-6 md:grid-cols-2 mb-5">
+          <li>
+            <input
+              type="radio"
+              id="dates"
+              checked={isPickedFilter.dates}
+              onChange={() => handlePickedFilter("dates")}
+              className="hidden peer"
+              required
+            />
+            <label
+              htmlFor="dates"
+              className="inline-flex items-center justify-between w-full p-5 text-gray-800 dark:text-white bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              <div className="block">
+                <div className="w-full text-lg font-semibold">Date</div>
+                <div className="w-full">Filter as date</div>
+              </div>
+              <i className="far fa-calendar w-5 h-5"></i>
+            </label>
+          </li>
+          <li>
+            <input
+              type="radio"
+              id="years"
+              checked={isPickedFilter.years}
+              onChange={() => handlePickedFilter("years")}
+              className="hidden peer"
+            />
+            <label
+              htmlFor="years"
+              className="inline-flex items-center justify-between w-full p-5 text-gray-800 dark:text-white bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              <div className="block">
+                <div className="w-full text-lg font-semibold">Year</div>
+                <div className="w-full">Filter as year</div>
+              </div>
+              <i className="far fa-calendar w-5 h-5"></i>
+            </label>
+          </li>
+        </ul>
+        {isPickedFilter.dates && (
+          <div>
+            <h1 className="md:text-3xl font-semibold text-gray-800 dark:text-white mb-4 text-center">
+              Select date of the game
+            </h1>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label
+                  htmlFor="startDate"
+                  className="block text-sm font-medium text-gray-700 dark:text-white"
+                >
+                  Start Date
+                </label>
+                <input
+                  id="startDate"
+                  type="date"
+                  onChange={(e) =>
+                    setSelectedDate({
+                      ...selectedDate,
+                      startDate: e.target.value,
+                    })
+                  }
+                  value={selectedDate.startDate}
+                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="endDate"
+                  className="block text-sm font-medium text-gray-700 dark:text-white"
+                >
+                  End Date
+                </label>
+                <input
+                  id="endDate"
+                  type="date"
+                  onChange={(e) =>
+                    setSelectedDate({
+                      ...selectedDate,
+                      endDate: e.target.value,
+                    })
+                  }
+                  value={selectedDate.endDate}
+                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="perPage"
+                  className="block text-sm font-medium text-gray-700 dark:text-white"
+                >
+                  Select Per Page
+                </label>
+                <select
+                  className="mt-1 px-4 py-2.5 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={handlePerPage}
+                >
+                  <OptionPerPage />
+                </select>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  disabled={buttonLoading}
+                  onClick={handleFilter}
+                  className="w-full mt-6 bg-blue-600 text-white py-2.5 rounded-md hover:bg-blue-700 transition duration-200 hover:scale-105"
+                >
+                  {buttonLoading ? "Filtering..." : "Filter"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {isPickedFilter.years && (
+          <div>
+            <h1 className="md:text-3xl font-semibold text-gray-800 dark:text-white mb-4 text-center">
+              Select year of the game
+            </h1>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div>
+                <label
+                  htmlFor="startDate"
+                  className="block text-sm font-medium text-gray-700 dark:text-white"
+                >
+                  Select year
+                </label>
+                <select
+                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) =>
+                    setSelectedDate({
+                      ...selectedDate,
+                      year: e.target.value,
+                    })
+                  }
+                >
+                  <option hidden defaultValue="">
+                    Select year
+                  </option>
+                  <option disabled>Select year</option>
+                  <YearSelect />
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="perPage"
+                  className="block text-sm font-medium text-gray-700 dark:text-white"
+                >
+                  Select Per Page
+                </label>
+                <select
+                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={handlePerPage}
+                >
+                  <OptionPerPage />
+                </select>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  disabled={buttonLoading}
+                  onClick={handleFilter}
+                  className="w-full mt-6 bg-blue-600 text-white py-2.5 rounded-md hover:bg-blue-700 transition duration-200 hover:scale-105"
+                >
+                  {buttonLoading ? "Filtering..." : "Filter"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-lg shadow-lg p-5 bg-white dark:bg-gray-900 mt-3 h-full">
+        {data.length !== 0 && (
+          <h2 className="text-xl text-gray-600 mb-6 dark:text-white">
+            Results: {data.length}
+          </h2>
+        )}
+        <div>
+          {buttonLoading ? (
+            <SchedulesSkeleton />
+          ) : (
+            <div>
+              {data.length === 0 ? (
+                <div className="flex items-center justify-center h-72">
+                  <div className="text-center">
+                    <i className="fas fa-calendar-times text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+                    <p className="text-lg font-semibold text-gray-500 dark:text-gray-300">
+                      {!filteredData
+                        ? "Filter date first to see results"
+                        : selectedDate.startDate && selectedDate.endDate
+                        ? `No game found between ${selectedDate.startDate} and ${selectedDate.endDate}`
+                        : selectedDate.year
+                        ? `No game in year ${selectedDate.year}`
+                        : "Filter date first to see results"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 p-3 overflow-x-hidden">
+                  {data.map((game, index) => (
+                    <div key={game.id} className="hover:scale-105">
+                      <div
+                        data-aos="zoom-in-left"
+                        className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-md hover:z-50 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-200"
+                      >
+                        <h3 className="text-xl font-semibold dark:text-white text-center text-gray-500">
+                          {game.home_team.abbreviation} {game.home_team_score} -{" "}
+                          {game.visitor_team.abbreviation}{" "}
+                          {game.visitor_team_score}
+                        </h3>
+                        <div className="flex space-x-2 items-center">
+                          <div>
+                            <NbaLogo teamName={game.home_team.full_name} />
+                          </div>
+                          <h3 className="text-4xl font-semibold dark:text-white">
+                            <strong>VS</strong>
+                          </h3>
+                          <div>
+                            <NbaLogo teamName={game.visitor_team.full_name} />
+                          </div>
+                        </div>
+                        <hr />
+                        <div className="text-center my-5">
+                          <p className="text-2xl font-semibold mb-3 dark:text-white text-gray-800">
+                            {game.season}{" "}
+                            {game.time === null ? "" : "- " + game.time}
+                          </p>
+                          <p className="dark:text-white text-gray-800">
+                            {formatDate(game.date)}
+                          </p>
+                          <p className="dark:text-white text-xs text-gray-800">
+                            {game.status === "Final"
+                              ? "Game is finished"
+                              : formatTime(game.status)}
+                          </p>
+                          <p className="dark:text-white text-xs text-gray-800">
+                            {game.period === 0
+                              ? "Game is not started"
+                              : `${game.period} Qtr.`}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

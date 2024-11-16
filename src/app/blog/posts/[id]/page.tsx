@@ -1,10 +1,10 @@
 "use client";
 
-import { Post } from "@/app/types/post";
+import { Post } from "@/app/types/PostType";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import api from "@/app/utils/axiosCall";
+import api from "@/lib/axiosCall";
 
 export default function postDetail() {
   const params = useParams();

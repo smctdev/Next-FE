@@ -11,3 +11,7 @@ body {
   background-color: #000;
   color: #fff;
 }
+
+::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+}
