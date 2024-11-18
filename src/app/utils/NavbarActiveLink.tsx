@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const ActiveLink = ({
   href,
@@ -8,9 +8,14 @@ const ActiveLink = ({
   href: string;
   children: React.ReactNode;
 }) => {
-  const router: any = useRouter();
+  const pathName = usePathname();
 
-  const isActive = router.pathname === href;
+  const normalizePath = (path: string) => path.replace(/\/$/, "");
+
+  const isActive =
+    href === "/"
+      ? pathName === href
+      : normalizePath(pathName).startsWith(normalizePath(href));
 
   return (
     <Link

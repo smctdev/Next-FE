@@ -1,13 +1,26 @@
 "use client";
 
-import { Post } from "@/app/types/PostType";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import api from "@/lib/axiosCall";
+import { Post } from "../../types/PostType";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
+import LoadingLoaders from "@/app/components/loaders/LoadingLoaders";
+import api from "@/app/lib/axiosCall";
+import Link from "next/link";
 
 export default function posts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated, loading: authLoading }: any = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) return <LoadingLoaders />;
 
   useEffect(() => {
     const fetchPosts = async () => {

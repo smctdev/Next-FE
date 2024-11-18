@@ -18,7 +18,7 @@ export default function page() {
   });
   const [filteredData, setFilteredData] = useState("");
   const [cursor, setCursor] = useState<string | null>(null);
-  const { data, buttonLoading, error } = useFetch(filteredData);
+  const { data, buttonLoading, error, meta } = useFetch(filteredData);
   const [isPickedFilter, setIsPickedFilter] = useState<{
     dates: boolean;
     years: boolean;
@@ -28,12 +28,35 @@ export default function page() {
   });
   const [perPage, setPerPage] = useState(25);
 
+  useEffect(() => {
+    if (cursor) {
+      handleFilter();
+    }
+
+    if (data) {
+      scrollToTop();
+    }
+  }, [cursor, data]);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   const handleFilter = () => {
     if (isPickedFilter.dates === true) {
-      const data = `https://api.balldontlie.io/v1/games?dates[]=${selectedDate.startDate}&dates[]=${selectedDate.endDate}&&per_page=${perPage}`;
+      const data = `https://api.balldontlie.io/v1/games?dates[]=${
+        selectedDate.startDate
+      }&dates[]=${selectedDate.endDate}&&per_page=${perPage}${
+        cursor ? `&cursor=${cursor}` : ""
+      }`;
       setFilteredData(data);
     } else if (isPickedFilter.years === true) {
-      const data = `https://api.balldontlie.io/v1/games?seasons[]=${selectedDate.year}&&per_page=${perPage}`;
+      const data = `https://api.balldontlie.io/v1/games?seasons[]=${
+        selectedDate.year
+      }&&per_page=${perPage}${cursor ? `&cursor=${cursor}` : ""}`;
       setFilteredData(data);
     } else {
       return console.log(error);
@@ -51,13 +74,20 @@ export default function page() {
       year: "",
     });
     setFilteredData("");
+    setCursor(null);
     setPerPage(25);
   };
 
   const handlePerPage = (e: any) => {
     setPerPage(e.target.value);
   };
-  console.log(data);
+
+  const handleNextPage = () => {
+    if (meta?.next_cursor) {
+      setCursor(meta?.next_cursor);
+    }
+  };
+  console.log(meta)
   return (
     <div className="mt-2 p-2">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-5">
@@ -134,7 +164,7 @@ export default function page() {
                     })
                   }
                   value={selectedDate.startDate}
-                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                 />
               </div>
 
@@ -155,7 +185,7 @@ export default function page() {
                     })
                   }
                   value={selectedDate.endDate}
-                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 px-4 py-2 w-full border border-gray-300 text-gray-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -167,7 +197,7 @@ export default function page() {
                   Select Per Page
                 </label>
                 <select
-                  className="mt-1 px-4 py-2.5 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 px-4 py-2.5 w-full border text-gray-900 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={handlePerPage}
                 >
                   <OptionPerPage />
@@ -202,7 +232,7 @@ export default function page() {
                   Select year
                 </label>
                 <select
-                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 px-4 py-2 w-full border text-gray-900 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={(e) =>
                     setSelectedDate({
                       ...selectedDate,
@@ -226,7 +256,7 @@ export default function page() {
                   Select Per Page
                 </label>
                 <select
-                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 px-4 py-2 w-full border text-gray-900 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onChange={handlePerPage}
                 >
                   <OptionPerPage />
@@ -277,7 +307,7 @@ export default function page() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 p-3 overflow-x-hidden">
                   {data.map((game, index) => (
-                    <div key={game.id} className="hover:scale-105">
+                    <div key={game.id} className="hover:scale-105 transition duration-300 ease-in-out">
                       <div
                         data-aos="zoom-in-left"
                         className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-md hover:z-50 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-200"
@@ -301,8 +331,7 @@ export default function page() {
                         <hr />
                         <div className="text-center my-5">
                           <p className="text-2xl font-semibold mb-3 dark:text-white text-gray-800">
-                            {game.season}{" "}
-                            {game.time === null ? "" : "- " + game.time}
+                            {game.season}
                           </p>
                           <p className="dark:text-white text-gray-800">
                             {formatDate(game.date)}
@@ -310,12 +339,21 @@ export default function page() {
                           <p className="dark:text-white text-xs text-gray-800">
                             {game.status === "Final"
                               ? "Game is finished"
+                              : game.status === "Postponed"
+                              ? "Game is postponed"
+                              : game.status === "Canceled"
+                              ? "Game is canceled"
+                              : game.status === "1st Qtr" ||
+                                game.status === "2nd Qtr" ||
+                                game.status === "3rd Qtr" ||
+                                game.status === "4th Qtr"
+                              ? game.status
                               : formatTime(game.status)}
                           </p>
                           <p className="dark:text-white text-xs text-gray-800">
-                            {game.period === 0
+                            {game.time === null
                               ? "Game is not started"
-                              : `${game.period} Qtr.`}
+                              : game.time}
                           </p>
                         </div>
                       </div>
@@ -323,6 +361,26 @@ export default function page() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+          {data.length !== 0 && meta.next_cursor && (
+            <div className="flex justify-center">
+              <button
+                type="button"
+                disabled={buttonLoading}
+                onClick={handleNextPage}
+                className="mt-6 bg-blue-600 text-white py-2 px-5 rounded-md hover:bg-blue-700 transition duration-200 hover:scale-105"
+              >
+                {buttonLoading ? (
+                  <>
+                    <i className="far fa-spinner animate-spin"></i>
+                  </>
+                ) : (
+                  <>
+                    Next Page <i className="far fa-arrow-right"></i>
+                  </>
+                )}
+              </button>
             </div>
           )}
         </div>

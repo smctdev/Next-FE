@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingLoaders from "@/app/components/loaders/LoadingLoaders";
 import { useAuth } from "@/app/context/AuthContext";
 import api from "@/app/lib/axiosCall";
 import { ValidationErrors } from "@/app/types/ValidationType";
@@ -22,7 +23,7 @@ export default function page() {
     }
   }, [isAuthenticated, loadingAuth, router]);
 
-  if (loadingAuth) return <div>Loading...</div>;
+  if (loadingAuth || isAuthenticated) return <LoadingLoaders />;
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
@@ -71,12 +72,12 @@ export default function page() {
       <div className="p-10 max-w-1/2.5 bg-opacity-50 bg-black rounded-lg shadow-lg">
         {flashError && (
           <div
-            className="flex items-center px-4 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded"
+            className="flex items-center px-3 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded"
             role="alert"
             aria-live="assertive"
           >
             <i className="w-6 h-6 mr-4 far fa-triangle-exclamation mt-2 text-red-500"></i>
-            <div>
+            <div className="flex">
               <strong className="font-bold">Error!</strong>
               <span className="block ml-2 sm:inline">{flashError}</span>
             </div>

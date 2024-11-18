@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingLoaders from "@/app/components/loaders/LoadingLoaders";
 import { useAuth } from "@/app/context/AuthContext";
 import api from "@/app/lib/axiosCall";
 import { ValidationErrors } from "@/app/types/ValidationType";
@@ -29,7 +30,7 @@ export default function Register() {
     }
   }, [isAuthenticated, loadingAuth, router]);
 
-  if (loadingAuth) return <div>Loading...</div>;
+  if (loadingAuth || isAuthenticated) return <LoadingLoaders />;
 
   const handleRegister = async (e: any) => {
     e.preventDefault();

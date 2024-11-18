@@ -27,7 +27,6 @@ export default function page() {
       setIsRefresh(false);
     }, 100);
   };
-  console.log(data);
   return (
     <div className="mt-2 p-2">
       <div className="rounded-lg shadow-lg p-5 bg-white dark:bg-gray-900 mt-3">
@@ -119,7 +118,10 @@ export default function page() {
                       : team.division && team.conference && team.city
                   )
                   .map((team, index) => (
-                    <div key={team.id} className="hover:scale-110">
+                    <div
+                      key={team.id}
+                      className="hover:scale-105 transition duration-300 ease-in-out"
+                    >
                       <div
                         className="bg-white dark:bg-gray-800 dark:hover:bg-gray-500 shadow-lg p-4 rounded-md transition duration-200 position-relative"
                         data-aos="zoom-in-left"

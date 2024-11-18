@@ -1,11 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import AddCategory from "@/app/components/Modals/Category/AddCategory";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/AuthContext";
+import LoadingLoaders from "../../components/loaders/LoadingLoaders";
+import AddCategory from "../components/modals/AddCategory";
 
 export default function Blog() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated }: any = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return router.push("/login");
+    }
+  }, [isAuthenticated, router]);
+
+  if (!isAuthenticated) return <LoadingLoaders />;
+
   const posts = [
     {
       title: "Understanding React",

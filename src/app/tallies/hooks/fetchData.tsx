@@ -3,6 +3,7 @@ import api from "../lib/axiosCall";
 
 const useFetch = (url: any) => {
   const [data, setData] = useState<any[]>([]);
+  const [meta, setMeta] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -18,6 +19,7 @@ const useFetch = (url: any) => {
       try {
         const response = await api.get(url);
         setData(response.data.data);
+        setMeta(response.data.meta);
       } catch (err: any) {
         setError(err);
       } finally {
@@ -29,7 +31,7 @@ const useFetch = (url: any) => {
     fetchData();
   }, [url, isRefresh]);
 
-  return { data, loading, error, buttonLoading, setIsRefresh };
+  return { data, loading, error, buttonLoading, setIsRefresh, meta };
 };
 
 export default useFetch;

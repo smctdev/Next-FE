@@ -64,11 +64,6 @@ export default function RootLayout({
           href="https://cdn-icons-png.flaticon.com/128/2065/2065254.png"
           type="image/x-icon"
         />
-
-        <link
-          href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
-          rel="stylesheet"
-        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

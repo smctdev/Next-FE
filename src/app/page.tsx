@@ -1,13 +1,30 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect } from "react";
+import { useAuth } from "./context/AuthContext";
+import LoadingLoaders from "./components/loaders/LoadingLoaders";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+  const { isAuthenticated, loading }: any = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      return router.push("/dashboard");
+    }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading || isAuthenticated) return <LoadingLoaders />;
   return (
-    <div 
+    <div
       className="flex items-center justify-center min-h-screen"
       style={{
-        backgroundImage: 'url("https://images.pexels.com/photos/269583/pexels-photo-269583.jpeg?cs=srgb&dl=pexels-pixabay-269583.jpg&fm=jpg")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundImage:
+          'url("https://images.pexels.com/photos/269583/pexels-photo-269583.jpeg?cs=srgb&dl=pexels-pixabay-269583.jpg&fm=jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
       <div className="text-center p-10 bg-black bg-opacity-40 rounded shadow-lg">
