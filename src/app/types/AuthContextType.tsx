@@ -4,4 +4,5 @@ export interface AuthContextType {
   logout: () => void;
   loading: boolean;
   user: any;
+  userRoles: any;
 }

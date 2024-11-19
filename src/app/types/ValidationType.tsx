@@ -5,8 +5,8 @@ export interface ValidationErrors {
   email: string;
   name: string;
   address: string;
-  date_of_birth: string;
-  phone_number: string;
-  email_verified_at: string;
-  remember_token: string;
+  dateOfBirth: string;
+  phoneNumber: string;
+  emailVerifiedAt: string;
+  rememberToken: string;
 }

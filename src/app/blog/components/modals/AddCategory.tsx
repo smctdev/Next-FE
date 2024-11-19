@@ -24,7 +24,7 @@ export default function AddCategory({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div className="bg-white dark:bg-gray-900 rounded-lg w-96 p-6 shadow-lg transition duration-300 ease-in-out">
         <h2 className="text-2xl font-semibold mb-4">Add New Category</h2>
         <form onSubmit={handleSubmit}>

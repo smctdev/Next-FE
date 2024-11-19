@@ -38,18 +38,19 @@ export default function page() {
         setError("");
 
         const token = response.data.accessToken;
-        const rememberToken = response.data.remember_token;
+        const rememberToken = response.data.rememberToken;
 
         login(token, rememberToken);
-
-        router.push("/dashboard");
       } else {
         setFlashError(response.data.message);
         setError("");
       }
     } catch (error: any) {
       console.error(error);
-      setError(error.response.data);
+      setError(error.response.data || `${error.message} or server error.`);
+      if(error.message === "Network Error") {
+        setFlashError(`${error.message} or server error.`);
+      }
     } finally {
       setLoading(false);
     }
@@ -69,21 +70,18 @@ export default function page() {
         backgroundPosition: "center",
       }}
     >
-      <div className="p-10 max-w-1/2.5 bg-opacity-50 bg-black rounded-lg shadow-lg">
+      <div className="p-10 bg-opacity-50 bg-black rounded-lg shadow-lg max-w-[26rem]">
         {flashError && (
           <div
-            className="flex items-center px-3 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded"
+            className="flex items-center space-x-2 px-3 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded"
             role="alert"
             aria-live="assertive"
           >
-            <i className="w-6 h-6 mr-4 far fa-triangle-exclamation mt-2 text-red-500"></i>
-            <div className="flex">
-              <strong className="font-bold">Error!</strong>
-              <span className="block ml-2 sm:inline">{flashError}</span>
-            </div>
+            <i className="w-6 h-6 far fa-triangle-exclamation mt-2 text-red-500"></i>
+            <span className="block ml-2 sm:inline">{flashError}</span>
             <button
               onClick={handleCloseFlashError}
-              className="ml-auto text-red-500 hover:text-red-700 focus:outline-none"
+              className="ml-auto justify-end text-red-500 hover:text-red-700 focus:outline-none"
               aria-label="Close alert"
             >
               &times;

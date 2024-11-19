@@ -16,6 +16,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import UnauthorizedPage from "../utils/UnauthorizedPage";
 
 ChartJS.register(
   CategoryScale,
@@ -29,16 +30,22 @@ ChartJS.register(
 );
 
 export default function Page() {
-  const { isAuthenticated }: any = useAuth();
+  const { isAuthenticated, loading, user }: any = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !loading) {
       return router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, loading, router]);
 
-  if (!isAuthenticated) return <LoadingLoaders />;
+  if (loading) {
+    return <LoadingLoaders />;
+  }
+
+  if (!isAuthenticated) {
+    return <UnauthorizedPage />;
+  }
 
   const dashboardData = {
     posts: 150,
@@ -107,7 +114,7 @@ export default function Page() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
               Posts
@@ -121,7 +128,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
               Likes
@@ -135,7 +142,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
               Comments
@@ -151,14 +158,14 @@ export default function Page() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg">
           <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
             Posts Growth Over Time
           </h3>
           <Line data={lineChartData} />
         </div>
 
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg">
           <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
             Posts, Likes, and Comments Distribution
           </h3>

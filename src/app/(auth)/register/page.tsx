@@ -42,8 +42,8 @@ export default function Register() {
         confirmPassword: confirmPassword,
         email: email,
         address: address,
-        date_of_birth: dateOfBirth,
-        phone_number: phoneNumber,
+        dateOfBirth: dateOfBirth,
+        phoneNumber: phoneNumber,
         name: name,
       });
 
@@ -59,11 +59,16 @@ export default function Register() {
             router.push("/login");
           }
         });
+        setError("");
       } else {
         setFlashError(response.data.message);
       }
     } catch (error: any) {
+      console.error(error);
       setError(error.response.data);
+      if (error.message === "Network Error") {
+        setFlashError(`${error.message} or server error.`);
+      }
     } finally {
       setLoading(false);
     }
@@ -83,7 +88,7 @@ export default function Register() {
         backgroundPosition: "center",
       }}
     >
-      <div className="p-10 max-w-1/2.5 bg-opacity-50 bg-black rounded-lg shadow-lg">
+      <div className="p-10 max-w-[26rem] bg-opacity-50 bg-black rounded-lg shadow-lg">
         {flashError && (
           <div
             className="flex items-center px-4 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded"
@@ -91,10 +96,7 @@ export default function Register() {
             aria-live="assertive"
           >
             <i className="w-6 h-6 mr-4 far fa-triangle-exclamation mt-2 text-red-500"></i>
-            <div>
-              <strong className="font-bold">Error!</strong>
-              <span className="block ml-2 sm:inline">{flashError}</span>
-            </div>
+            <span className="block ml-2 sm:inline">{flashError}</span>
             <button
               onClick={handleCloseFlashError}
               className="ml-auto text-red-500 hover:text-red-700 focus:outline-none"
@@ -185,9 +187,9 @@ export default function Register() {
                 placeholder="Enter your phone number"
               />
             </div>
-            {error.phone_number && (
+            {error.phoneNumber && (
               <small className="text-red-500">
-                {error.phone_number.message}
+                {error.phoneNumber.message}
               </small>
             )}
           </div>
@@ -203,9 +205,9 @@ export default function Register() {
                 placeholder="Enter your date of birth"
               />
             </div>
-            {error.date_of_birth && (
+            {error.dateOfBirth && (
               <small className="text-red-500">
-                {error.date_of_birth.message}
+                {error.dateOfBirth.message}
               </small>
             )}
           </div>

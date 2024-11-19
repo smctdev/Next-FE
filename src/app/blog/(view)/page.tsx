@@ -6,19 +6,26 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import LoadingLoaders from "../../components/loaders/LoadingLoaders";
 import AddCategory from "../components/modals/AddCategory";
+import UnauthorizedPage from "@/app/utils/UnauthorizedPage";
 
 export default function Blog() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isAuthenticated }: any = useAuth();
+  const { isAuthenticated, loading }: any = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !loading) {
       return router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, loading, router]);
 
-  if (!isAuthenticated) return <LoadingLoaders />;
+  if (loading) {
+    return <LoadingLoaders />;
+  }
+
+  if (!isAuthenticated) {
+    return <UnauthorizedPage />;
+  }
 
   const posts = [
     {

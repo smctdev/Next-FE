@@ -6,10 +6,11 @@ import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
 
 const Navbar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const { isAuthenticated, user, logout }: any = useAuth();
+  const { isAuthenticated, user, logout, userRoles }: any = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -33,11 +34,16 @@ const Navbar = () => {
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
-
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 shadow-xl">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+        <Link
+          href="/"
+          className="flex items-center space-x-3 rtl:space-x-reverse"
+        >
           <img
             src="https://cdn-icons-png.flaticon.com/128/2065/2065254.png"
             className="h-8"
@@ -46,7 +52,7 @@ const Navbar = () => {
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
             Blog App
           </span>
-        </a>
+        </Link>
         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse relative">
           {isAuthenticated && (
             <button
@@ -68,7 +74,7 @@ const Navbar = () => {
           {dropdownOpen && (
             <div
               ref={dropdownRef}
-              className="absolute z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 min-w-52 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 right-0 top-6"
+              className="absolute z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 min-w-52 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 right-12 top-9 md:right-0 md:top-6"
             >
               <div className="absolute right-3 top-[-4px] transform rotate-45 bg-white dark:bg-gray-700 w-2 h-2"></div>
               <div className="px-4 py-3">
@@ -114,6 +120,7 @@ const Navbar = () => {
           )}
           <button
             data-collapse-toggle="navbar-user"
+            onClick={toggleMenu}
             type="button"
             className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
             aria-controls="navbar-user"
@@ -138,7 +145,9 @@ const Navbar = () => {
           </button>
         </div>
         <div
-          className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+          className={`items-center justify-between ${
+            menuOpen ? "" : "hidden"
+          } w-full md:flex md:w-auto md:order-1`}
           id="navbar-user"
         >
           <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
@@ -158,9 +167,18 @@ const Navbar = () => {
             <li>
               <ActiveLink href="/tallies">Tallies</ActiveLink>
             </li>
-            <li>
-              <ActiveLink href="/blog">Blogs</ActiveLink>
-            </li>
+            {isAuthenticated && (
+              <li>
+                <ActiveLink href="/blog">Blogs</ActiveLink>
+              </li>
+            )}
+            {isAuthenticated &&
+              (userRoles?.includes("admin") ||
+                userRoles?.includes("superadmin")) && (
+                <li>
+                  <ActiveLink href="/users">Users</ActiveLink>
+                </li>
+              )}
           </ul>
         </div>
       </div>

@@ -3,7 +3,7 @@ import "./assets/styles/globals.css";
 import { Providers } from "./providers";
 import DropUpButton from "@/app/components/DropUpButton";
 import { AuthProvider } from "./context/AuthContext";
-import Navbar from "./components/Navbar";
+import BaseContent from "./components/BaseContent";
 
 const geistSans = localFont({
   src: "./assets/fonts/GeistVF.woff",
@@ -70,8 +70,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Providers>
-            <Navbar />
-            {children}
+            <BaseContent children={children} />
             <DropUpButton />
           </Providers>
         </AuthProvider>
