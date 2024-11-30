@@ -9,8 +9,12 @@ import SchedulesSkeleton from "../../components/loaders/SchedulesSkeleton";
 import OptionPerPage from "../../components/PerPage/OptionPerPage";
 import formatDate from "../../utils/DateFormat";
 import formatTime from "../../utils/TimeFormat";
+import { format, subDays } from "date-fns";
 
 export default function page() {
+  const today = format(subDays(new Date(), 1), "yyyy-MM-dd");
+  const yesterday = format(subDays(new Date(), 2), "yyyy-MM-dd");
+  const tomorrow = format(new Date(), "yyyy-MM-dd");
   const [selectedDate, setSelectedDate] = useState({
     startDate: "",
     endDate: "",
@@ -18,7 +22,11 @@ export default function page() {
   });
   const [filteredData, setFilteredData] = useState("");
   const [cursor, setCursor] = useState<string | null>(null);
-  const { data, buttonLoading, error, meta } = useFetch(filteredData);
+  const { data, buttonLoading, error, meta } = useFetch(
+    filteredData === ""
+      ? `https://api.balldontlie.io/v1/games?dates[]=${today}&dates[]=${today}&per_page=100`
+      : filteredData
+  );
   const [isPickedFilter, setIsPickedFilter] = useState<{
     dates: boolean;
     years: boolean;
@@ -48,8 +56,8 @@ export default function page() {
   const handleFilter = () => {
     if (isPickedFilter.dates === true) {
       const data = `https://api.balldontlie.io/v1/games?dates[]=${
-        selectedDate.startDate
-      }&dates[]=${selectedDate.endDate}&&per_page=${perPage}${
+        selectedDate.startDate && format(subDays(selectedDate.startDate, 1), "yyyy-MM-dd")
+      }&dates[]=${selectedDate.endDate && format(subDays(selectedDate.endDate, 1), "yyyy-MM-dd")}&&per_page=${perPage}${
         cursor ? `&cursor=${cursor}` : ""
       }`;
       setFilteredData(data);
@@ -59,7 +67,7 @@ export default function page() {
       }&&per_page=${perPage}${cursor ? `&cursor=${cursor}` : ""}`;
       setFilteredData(data);
     } else {
-      return console.log(error);
+      return console.error(error);
     }
   };
   const handlePickedFilter = (name: "dates" | "years") => {
@@ -87,7 +95,6 @@ export default function page() {
       setCursor(meta?.next_cursor);
     }
   };
-  console.log(meta)
   return (
     <div className="mt-2 p-2">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-5">
@@ -164,7 +171,7 @@ export default function page() {
                     })
                   }
                   value={selectedDate.startDate}
-                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                  className="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -185,7 +192,7 @@ export default function page() {
                     })
                   }
                   value={selectedDate.endDate}
-                  className="mt-1 px-4 py-2 w-full border border-gray-300 text-gray-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 px-4 py-2 w-full border border-gray-300 text-gray-900 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                 />
               </div>
 
@@ -211,7 +218,16 @@ export default function page() {
                   onClick={handleFilter}
                   className="w-full mt-6 bg-blue-600 text-white py-2.5 rounded-md hover:bg-blue-700 transition duration-200 hover:scale-105"
                 >
-                  {buttonLoading ? "Filtering..." : "Filter"}
+                  {buttonLoading ? (
+                    <>
+                      <i className="far fa-spinner animate-spin"></i>{" "}
+                      Filtering...
+                    </>
+                  ) : (
+                    <>
+                      <i className="far fa-calendar"></i> Filter
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -270,7 +286,16 @@ export default function page() {
                   onClick={handleFilter}
                   className="w-full mt-6 bg-blue-600 text-white py-2.5 rounded-md hover:bg-blue-700 transition duration-200 hover:scale-105"
                 >
-                  {buttonLoading ? "Filtering..." : "Filter"}
+                  {buttonLoading ? (
+                    <>
+                      <i className="far fa-spinner animate-spin"></i>{" "}
+                      Filtering...
+                    </>
+                  ) : (
+                    <>
+                      <i className="far fa-calendar"></i> Filter
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -307,56 +332,67 @@ export default function page() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 p-3 overflow-x-hidden">
                   {data.map((game, index) => (
-                    <div key={game.id} className="hover:scale-105 transition duration-300 ease-in-out">
-                      <div
-                        data-aos="zoom-in-left"
-                        className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-md hover:z-50 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-200"
-                      >
-                        <h3 className="text-xl font-semibold dark:text-white text-center text-gray-500">
-                          {game.home_team.abbreviation} {game.home_team_score} -{" "}
-                          {game.visitor_team.abbreviation}{" "}
-                          {game.visitor_team_score}
-                        </h3>
-                        <div className="flex space-x-2 items-center">
-                          <div>
-                            <NbaLogo teamName={game.home_team.full_name} />
-                          </div>
-                          <h3 className="text-4xl font-semibold dark:text-white">
-                            <strong>VS</strong>
+                    <div
+                      key={game.id}
+                      className="hover:scale-105 transition duration-300 ease-in-out"
+                    >
+                      <Link href={`/tallies/schedules/games/${game.id}`}>
+                        <div
+                          data-aos="zoom-in-left"
+                          className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-md hover:z-50 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-200"
+                        >
+                          <h3 className="text-xl font-semibold dark:text-white text-center text-gray-500">
+                            {game.home_team.abbreviation} {game.home_team_score}{" "}
+                            - {game.visitor_team.abbreviation}{" "}
+                            {game.visitor_team_score}
                           </h3>
-                          <div>
-                            <NbaLogo teamName={game.visitor_team.full_name} />
+                          <div className="flex space-x-2 items-center">
+                            <div>
+                              <NbaLogo teamName={game.home_team.full_name} />
+                            </div>
+                            <h3 className="text-4xl font-semibold dark:text-white">
+                              <strong>VS</strong>
+                            </h3>
+                            <div>
+                              <NbaLogo teamName={game.visitor_team.full_name} />
+                            </div>
+                          </div>
+                          <hr />
+                          <div className="text-center my-5">
+                            <p className="text-2xl font-semibold mb-3 dark:text-white text-gray-800">
+                              {game.season}
+                            </p>
+                            <p className="dark:text-white text-gray-800">
+                              {game.date === today
+                                ? "Today"
+                                : game.date === yesterday
+                                ? "Yesterday"
+                                : game.date === tomorrow
+                                ? "Tomorrow"
+                                : formatDate(game.date)}
+                            </p>
+                            <p className="dark:text-white text-xs text-gray-800">
+                              {game.status === "Final"
+                                ? "Game is finished"
+                                : game.status === "Postponed"
+                                ? "Game is postponed"
+                                : game.status === "Canceled"
+                                ? "Game is canceled"
+                                : game.status === "1st Qtr" ||
+                                  game.status === "2nd Qtr" ||
+                                  game.status === "3rd Qtr" ||
+                                  game.status === "4th Qtr"
+                                ? game.status
+                                : formatTime(game.status)}
+                            </p>
+                            <p className="dark:text-white text-xs text-gray-800">
+                              {game.time === null
+                                ? "Game is not started"
+                                : game.time}
+                            </p>
                           </div>
                         </div>
-                        <hr />
-                        <div className="text-center my-5">
-                          <p className="text-2xl font-semibold mb-3 dark:text-white text-gray-800">
-                            {game.season}
-                          </p>
-                          <p className="dark:text-white text-gray-800">
-                            {formatDate(game.date)}
-                          </p>
-                          <p className="dark:text-white text-xs text-gray-800">
-                            {game.status === "Final"
-                              ? "Game is finished"
-                              : game.status === "Postponed"
-                              ? "Game is postponed"
-                              : game.status === "Canceled"
-                              ? "Game is canceled"
-                              : game.status === "1st Qtr" ||
-                                game.status === "2nd Qtr" ||
-                                game.status === "3rd Qtr" ||
-                                game.status === "4th Qtr"
-                              ? game.status
-                              : formatTime(game.status)}
-                          </p>
-                          <p className="dark:text-white text-xs text-gray-800">
-                            {game.time === null
-                              ? "Game is not started"
-                              : game.time}
-                          </p>
-                        </div>
-                      </div>
+                      </Link>
                     </div>
                   ))}
                 </div>

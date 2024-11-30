@@ -10,7 +10,7 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const { isAuthenticated, user, logout, userRoles }: any = useAuth();
+  const { isAuthenticated, user, logout }: any = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -39,7 +39,7 @@ const Navbar = () => {
   };
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 shadow-xl">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <div className="flex flex-wrap items-center justify-between mx-auto p-4">
         <Link
           href="/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
@@ -54,7 +54,7 @@ const Navbar = () => {
           </span>
         </Link>
         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse relative">
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <button
               ref={buttonRef}
               type="button"
@@ -69,6 +69,13 @@ const Navbar = () => {
                 alt="user photo"
               />
             </button>
+          ) : (
+            <Link
+              href="/login"
+              className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md hover:scale-105 transition duration-300 ease-in-out"
+            >
+              Login
+            </Link>
           )}
 
           {dropdownOpen && (
@@ -77,7 +84,7 @@ const Navbar = () => {
               className="absolute z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 min-w-52 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 right-12 top-9 md:right-0 md:top-6"
             >
               <div className="absolute right-3 top-[-4px] transform rotate-45 bg-white dark:bg-gray-700 w-2 h-2"></div>
-              <div className="px-4 py-3">
+              <div className="px-4 py-3 rounded-lg">
                 <span className="block text-sm text-gray-900 dark:text-white">
                   {user?.name}
                 </span>
@@ -167,18 +174,14 @@ const Navbar = () => {
             <li>
               <ActiveLink href="/tallies">Tallies</ActiveLink>
             </li>
+            <li>
+              <ActiveLink href="/blog">Blogs</ActiveLink>
+            </li>
             {isAuthenticated && (
               <li>
-                <ActiveLink href="/blog">Blogs</ActiveLink>
+                <ActiveLink href="/todos">Todos</ActiveLink>
               </li>
             )}
-            {isAuthenticated &&
-              (userRoles?.includes("admin") ||
-                userRoles?.includes("superadmin")) && (
-                <li>
-                  <ActiveLink href="/users">Users</ActiveLink>
-                </li>
-              )}
           </ul>
         </div>
       </div>

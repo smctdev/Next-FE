@@ -69,6 +69,12 @@ export default function Register() {
       if (error.message === "Network Error") {
         setFlashError(`${error.message} or server error.`);
       }
+      if (error.response.status === 429) {
+        setFlashError(`${error.response.statusText}. Please try again later.`);
+      }
+      if (error.response.status === 400) {
+        setFlashError("");
+      }
     } finally {
       setLoading(false);
     }

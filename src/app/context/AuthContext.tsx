@@ -11,12 +11,12 @@ import Cookies from "js-cookie";
 import { AuthContextType } from "@/app/types/AuthContextType";
 import { useRouter } from "next/navigation";
 import api from "../lib/axiosCall";
-import Swal from "sweetalert2";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLogout, setIsLogout] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
   const [userRoles, setUserRoles] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -48,7 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const response = await api.get("/auth/profile");
-      console.log(response);
       if (
         response.data.statusCode === 200 &&
         response.data.user.rememberToken === rememberToken
@@ -80,16 +79,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
+    setIsLogout(true);
     setUserRoles(null);
     Cookies.remove("APP-TOKEN");
     Cookies.remove("APP-REMEMBER-TOKEN");
 
     router.push("/login");
+
+    setTimeout(() => {
+      setIsLogout(false);
+    }, 500);
   };
+
+  const hasHigherRole = userRoles?.some((role: any) =>
+    ["superadmin", "moderator", "admin"].includes(role)
+  );
+
+  const hasNormalRole = userRoles?.includes("user") || userRoles === null;
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, login, logout, loading, user, userRoles }}
+      value={{
+        isAuthenticated,
+        login,
+        logout,
+        loading,
+        user,
+        userRoles,
+        isLogout,
+        hasHigherRole,
+        hasNormalRole,
+      }}
     >
       {children}
     </AuthContext.Provider>

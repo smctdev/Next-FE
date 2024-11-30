@@ -38,13 +38,13 @@ export default function Home() {
         <div className="flex justify-center space-x-4">
           <Link
             href="/login"
-            className="px-3 py-3 text-white text-sm bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition"
+            className="px-3 py-3 text-white text-sm hover:scale-105 bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition"
           >
             <i className="far fa-rocket"></i> Get Started
           </Link>
           <Link
             href="/blog"
-            className="px-3 py-3 text-sm text-white-600 border border-blue-600 rounded-lg shadow hover:bg-blue-600 hover:text-white transition"
+            className="px-3 py-3 text-sm text-white-600 hover:scale-105 border border-blue-600 rounded-lg shadow hover:bg-blue-600 hover:text-white transition"
           >
             <i className="far fa-magnifying-glass"></i> Explore Blog
           </Link>

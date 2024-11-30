@@ -15,7 +15,7 @@ export default function posts() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !authLoading) {
       return router.push("/login");
     }
   }, [isAuthenticated, authLoading, router]);
@@ -42,7 +42,7 @@ export default function posts() {
       <h1>Posts</h1>
       {loading ? (
         <p>Loading...</p>
-      ) : (
+      ) : posts.length > 0 ? (
         posts.map((post: any, index: any) => {
           return (
             <ul key={index}>
@@ -52,6 +52,8 @@ export default function posts() {
             </ul>
           );
         })
+      ) : (
+        <p>No posts found</p>
       )}
     </>
   );

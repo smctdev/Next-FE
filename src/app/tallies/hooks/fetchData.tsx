@@ -10,7 +10,7 @@ const useFetch = (url: any) => {
   const [isRefresh, setIsRefresh] = useState(false);
 
   useEffect(() => {
-    if (!url) return;
+    if (!url) return ;
 
     setLoading(true);
     setButtonLoading(true);

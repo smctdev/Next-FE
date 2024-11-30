@@ -30,7 +30,7 @@ ChartJS.register(
 );
 
 export default function Page() {
-  const { isAuthenticated, loading, user }: any = useAuth();
+  const { isAuthenticated, loading, isLogout }: any = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function Page() {
     return <LoadingLoaders />;
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isLogout) {
     return <UnauthorizedPage />;
   }
 

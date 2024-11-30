@@ -4,6 +4,7 @@ import { Providers } from "./providers";
 import DropUpButton from "@/app/components/DropUpButton";
 import { AuthProvider } from "./context/AuthContext";
 import BaseContent from "./components/BaseContent";
+import "toastr/build/toastr.min.css";
 
 const geistSans = localFont({
   src: "./assets/fonts/GeistVF.woff",

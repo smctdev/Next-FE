@@ -1,31 +1,69 @@
+import api from "@/app/lib/axiosCall";
 import React, { Dispatch, SetStateAction, useState } from "react";
+import { CategoryType } from "../../types/CategoryTypes";
+import useToastr from "../../hooks/Toastr";
 
 export default function AddCategory({
   isOpen,
   onClose,
+  setIsRefresh,
 }: {
   isOpen: boolean;
   onClose: Dispatch<SetStateAction<boolean>>;
+  setIsRefresh: Dispatch<SetStateAction<boolean>>;
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [slug, setSlug] = useState("");
+  const [error, setError] = useState<CategoryType | any>("");
+  const [loading, setLoading] = useState(false);
+  const { showSuccess, showError } = useToastr();
 
   if (!isOpen) {
     return null;
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsRefresh(true);
+    setLoading(true);
+    try {
+      const response = await api.post("/categories/create-category", {
+        categoryName: title,
+        description: description,
+        slug: slug,
+      });
+      if (response.status === 201) {
+        onClose(false);
+        setTitle("");
+        setDescription("");
+        setSlug("");
+        setError("");
+        showSuccess(response.data.categoryName, response.statusText);
+      }
+    } catch (error: any) {
+      console.error("Error submitting categories", error);
+      setError(error.response.data);
+      if (error.response.status === 429) {
+        showError(error.response.statusText, "Error");
+      }
+    } finally {
+      setIsRefresh(false);
+      setLoading(false);
+    }
   };
 
   const handleCloseModal = () => {
     onClose(false);
+    setError("");
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
-      <div className="bg-white dark:bg-gray-900 rounded-lg w-96 p-6 shadow-lg transition duration-300 ease-in-out">
+      <div className="bg-white relative dark:bg-gray-900 rounded-lg w-1/3 p-6 shadow-lg transition duration-300 ease-in-out">
+        <button type="button" className="absolute right-4 top-3" onClick={handleCloseModal}>
+          <i className="far fa-x"></i>
+        </button>
         <h2 className="text-2xl font-semibold mb-4">Add New Category</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -40,6 +78,11 @@ export default function AddCategory({
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:bg-gray-900 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter category title"
             />
+            {error.categoryName && (
+              <span className="text-sm text-red-500">
+                {error.categoryName.message}
+              </span>
+            )}
           </div>
 
           <div className="mb-4">
@@ -54,6 +97,11 @@ export default function AddCategory({
               placeholder="Enter category description"
               rows={4}
             />
+            {error.description && (
+              <span className="text-sm text-red-500">
+                {error.description.message}
+              </span>
+            )}
           </div>
 
           <div className="mb-4">
@@ -68,21 +116,33 @@ export default function AddCategory({
               className="mt-1 block w-full px-3 dark:bg-gray-900 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter category slug"
             />
+            {error.slug && (
+              <span className="text-sm text-red-500">{error.slug.message}</span>
+            )}
           </div>
 
           <div className="flex justify-end space-x-1">
             <button
               type="button"
               onClick={handleCloseModal}
-              className="hover border-gray-500 px-3 border rounded-md"
+              className="hover border-gray-500 text-sm px-3 border rounded-md"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              disabled={loading}
+              className="bg-blue-600 text-sm text-white px-4 py-2 rounded-md hover:bg-blue-700"
             >
-              Add Category
+              {loading ? (
+                <>
+                  <i className="far fa-spinner animate-spin"></i> Submiting...
+                </>
+              ) : (
+                <>
+                  <i className="far fa-save"></i> Submit
+                </>
+              )}
             </button>
           </div>
         </form>
