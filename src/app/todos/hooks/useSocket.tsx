@@ -3,18 +3,14 @@ import { io, Socket } from "socket.io-client";
 
 const useSocket = (url: string) => {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [todos, setTodos] = useState<string[]>([]);
+  const [todoAdded, setTodoAdded] = useState<boolean>(false);
 
   useEffect(() => {
     const socketInstance = io(url);
     setSocket(socketInstance);
 
-    socketInstance.on("todoAdded", (todo: string) => {
-      setTodos((prevTodos) => [...prevTodos, `New Todo: ${todo}`]);
-    });
-
-    socketInstance.on("todoRemoved", (todoId: string) => {
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo !== todoId));
+    socketInstance.on("todoAdded", (todo: boolean) => {
+      setTodoAdded(todo);
     });
 
     return () => {
@@ -22,15 +18,11 @@ const useSocket = (url: string) => {
     };
   }, [url]);
 
-  const sendTodo = (todo: string) => {
+  const addTodo = (todo: boolean) => {
     socket?.emit("addTodo", todo);
   };
 
-  const removeTodo = (todoId: string) => {
-    socket?.emit("removeTodo", todoId);
-  };
-
-  return { todos, sendTodo, removeTodo };
+  return { todoAdded, addTodo };
 };
 
 export default useSocket;

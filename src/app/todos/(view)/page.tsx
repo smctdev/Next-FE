@@ -21,6 +21,9 @@ export default function Page() {
   const [isRefresh, setIsRefresh] = useState(false);
   const [isSingleStatusRefresh, setIsSingleStatusRefresh] = useState(false);
   const [isEdited, setIsEdited] = useState<{ [key: number]: boolean }>({});
+  const { todoAdded, addTodo } = useSocket(
+    process.env.NEXT_PUBLIC_SOCKET_URL as string
+  );
   const { data, loading, error }: any = useFetch("/todos", isRefresh);
   const { data: editData, loading: editLoading }: any = useFetch(
     isEdited[id] ? `/todos/id/${id}` : null,
