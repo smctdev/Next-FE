@@ -1,10 +1,10 @@
 import localFont from "next/font/local";
 import "./assets/styles/globals.css";
-import { Providers } from "./providers";
 import DropUpButton from "@/app/components/DropUpButton";
 import { AuthProvider } from "./context/AuthContext";
 import BaseContent from "./components/BaseContent";
 import "toastr/build/toastr.min.css";
+import { Providers } from "./context/providers";
 
 const geistSans = localFont({
   src: "./assets/fonts/GeistVF.woff",
