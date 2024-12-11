@@ -1,29 +1,19 @@
 "use client";
 
-import LoadingLoaders from "@/app/components/loaders/LoadingLoaders";
 import { useAuth } from "@/app/context/AuthContext";
 import api from "@/app/lib/axiosCall";
+import withOutAuth from "@/app/lib/withOutAuth";
 import { ValidationErrors } from "@/app/types/ValidationType";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export default function page() {
+const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<ValidationErrors | any>("");
   const [flashError, setFlashError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const { login, isAuthenticated, loading: loadingAuth }: any = useAuth();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      return router.push("/dashboard");
-    }
-  }, [isAuthenticated, loadingAuth, router]);
-
-  if (loadingAuth || isAuthenticated) return <LoadingLoaders />;
+  const { login }: any = useAuth();
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
@@ -88,7 +78,7 @@ export default function page() {
         backgroundPosition: "center",
       }}
     >
-      <div className="p-10 bg-opacity-50 bg-black rounded-lg shadow-lg max-w-[26rem]">
+      <div className="p-10 bg-opacity-50 bg-black rounded-lg shadow-md max-w-[26rem]">
         {flashError && (
           <div
             className="flex items-center space-x-2 px-3 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded"
@@ -246,4 +236,6 @@ export default function page() {
       </div>
     </div>
   );
-}
+};
+
+export default withOutAuth(Login);

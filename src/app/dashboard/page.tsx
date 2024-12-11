@@ -1,9 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import LoadingLoaders from "../components/loaders/LoadingLoaders";
 import { Line, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -16,7 +12,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import UnauthorizedPage from "../utils/UnauthorizedPage";
+import withAuth from "../lib/withAuth";
 
 ChartJS.register(
   CategoryScale,
@@ -29,23 +25,7 @@ ChartJS.register(
   Legend
 );
 
-export default function Page() {
-  const { isAuthenticated, loading, isLogout }: any = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isAuthenticated && !loading) {
-      return router.push("/login");
-    }
-  }, [isAuthenticated, loading, router]);
-
-  if (loading) {
-    return <LoadingLoaders />;
-  }
-
-  if (!isAuthenticated && !isLogout) {
-    return <UnauthorizedPage />;
-  }
+const Dashboard = () => {
 
   const dashboardData = {
     posts: 150,
@@ -114,7 +94,7 @@ export default function Page() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
               Posts
@@ -128,7 +108,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
               Likes
@@ -142,7 +122,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
               Comments
@@ -158,14 +138,14 @@ export default function Page() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md">
           <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
             Posts Growth Over Time
           </h3>
           <Line data={lineChartData} />
         </div>
 
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-lg">
+        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md">
           <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
             Posts, Likes, and Comments Distribution
           </h3>
@@ -175,3 +155,6 @@ export default function Page() {
     </div>
   );
 }
+
+
+export default withAuth(Dashboard);

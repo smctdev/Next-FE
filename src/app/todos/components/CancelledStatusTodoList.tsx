@@ -3,7 +3,7 @@ export default function CancelledStatusTodoList({
   handleStatusUpdate,
 }: any) {
   return (
-    <div className="h-40 p-5 dark:bg-gray-900 bg-gray-50 shadow-lg w-full rounded-lg dark:hover:bg-gray-800 hover:bg-gray-100 hover:scale-105 transition-all duration-300 ease-in-out z-0">
+    <div className="h-40 p-5 dark:bg-gray-900 bg-gray-50 shadow-md w-full rounded-lg dark:hover:bg-gray-800 hover:bg-gray-100 hover:scale-105 transition-all duration-300 ease-in-out z-0">
       <div className="relative mb-2">
         <p className="text-lg font-bold truncate" title={item.title}>
           {item.title}

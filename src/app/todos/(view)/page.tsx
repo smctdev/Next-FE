@@ -3,9 +3,6 @@
 import { useEffect, useState } from "react";
 import useFetch from "../hooks/fetchData";
 import { useAuth } from "@/app/context/AuthContext";
-import LoadingLoaders from "@/app/components/loaders/LoadingLoaders";
-import { useRouter } from "next/navigation";
-import UnauthorizedPage from "@/app/utils/UnauthorizedPage";
 import api from "@/app/lib/axiosCall";
 import useToastr from "../lib/Toastr";
 import { TodoType } from "../types/TodoType";
@@ -15,8 +12,9 @@ import TodoOngoing from "../components/TodoOngoing";
 import TodoCompleted from "../components/TodoCompleted";
 import TodoCancelled from "../components/TodoCancelled";
 import useSocket from "../hooks/useSocket";
+import withAuth from "@/app/lib/withAuth";
 
-export default function Page() {
+const Page = () => {
   const [id, setId] = useState<number | any>(null);
   const [isRefresh, setIsRefresh] = useState(false);
   const [isSingleStatusRefresh, setIsSingleStatusRefresh] = useState(false);
@@ -30,9 +28,6 @@ export default function Page() {
     isRefresh
   );
   const {
-    isAuthenticated,
-    loading: authLoading,
-    isLogout,
     hasHigherRole,
   }: any = useAuth();
   const [title, setTitle] = useState("");
@@ -40,13 +35,6 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState<TodoType | any>([]);
   const { showSuccess, showError } = useToastr();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isAuthenticated && !authLoading) {
-      return router.push("/login");
-    }
-  }, [isAuthenticated, authLoading, router]);
 
   useEffect(() => {
     if (editData.length !== 0) {
@@ -58,12 +46,6 @@ export default function Page() {
       setContent("");
     }
   }, [editData, isEdited[id]]);
-
-  if (authLoading) return <LoadingLoaders />;
-
-  if (!isAuthenticated && !isLogout) {
-    return <UnauthorizedPage />;
-  }
 
   const handleSubmitTodo = async (e: any) => {
     setIsLoading(true);
@@ -321,7 +303,7 @@ export default function Page() {
       </div>
       <hr />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-        <div className="dark:bg-gray-900 bg-gray-200 rounded-md p-4 shadow-lg">
+        <div className="dark:bg-gray-900 bg-gray-200 rounded-md p-4 shadow-md">
           <h4 className="text-xl font-semibold mb-2 bg-blue-400 text-center rounded-md py-2 text-white">
             <i className="far fa-arrows-rotate"></i> Ongoing
           </h4>
@@ -334,7 +316,7 @@ export default function Page() {
             />
           </div>
         </div>
-        <div className="dark:bg-gray-900 bg-gray-200 rounded-md p-4 shadow-lg">
+        <div className="dark:bg-gray-900 bg-gray-200 rounded-md p-4 shadow-md">
           <h4 className="text-xl font-semibold mb-2 bg-blue-700 text-center rounded-md py-2 text-white">
             <i className="far fa-memo-circle-check"></i> Completed
           </h4>
@@ -347,7 +329,7 @@ export default function Page() {
             />
           </div>
         </div>
-        <div className="dark:bg-gray-900 bg-gray-200 rounded-md p-4 shadow-lg">
+        <div className="dark:bg-gray-900 bg-gray-200 rounded-md p-4 shadow-md">
           <h4 className="text-xl font-semibold mb-2 bg-red-500 text-center rounded-md py-2 text-white">
             <i className="far fa-ban"></i> Cancelled
           </h4>
@@ -364,3 +346,5 @@ export default function Page() {
     </div>
   );
 }
+
+export default withAuth(Page);

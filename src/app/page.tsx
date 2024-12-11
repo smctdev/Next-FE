@@ -8,11 +8,19 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
-  const { isAuthenticated, loading }: any = useAuth();
+  const { isAuthenticated, loading, userRoles }: any = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
-      return router.push("/dashboard");
+      if (userRoles?.includes("superadmin")) {
+        router.push("/superadmin/dashboard");
+      } else if (userRoles?.includes("admin")) {
+        router.push("/admin/dashboard");
+      } else if (userRoles?.includes("moderator")) {
+        router.push("/moderator/dashboard");
+      } else {
+        router.push("/dashboard");
+      }
     }
   }, [isAuthenticated, loading, router]);
 
@@ -27,7 +35,7 @@ export default function Home() {
         backgroundPosition: "center",
       }}
     >
-      <div className="text-center p-10 bg-black bg-opacity-40 rounded shadow-lg">
+      <div className="text-center p-10 bg-black bg-opacity-40 rounded shadow-md">
         <h1 className="text-4xl font-bold text-white-800 mb-6">
           Welcome to Our Platform
         </h1>

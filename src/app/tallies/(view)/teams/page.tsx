@@ -29,7 +29,7 @@ export default function page() {
   };
   return (
     <div className="mt-2 p-2">
-      <div className="rounded-lg shadow-lg p-5 bg-white dark:bg-gray-900 mt-3">
+      <div className="rounded-lg shadow-md p-5 bg-white dark:bg-gray-900 mt-3">
         <div className="flex justify-center mb-5 w-full">
           <Link
             href={"/tallies"}
@@ -79,7 +79,7 @@ export default function page() {
                   onChange={(e) => handleChecked("East", e.target.checked)}
                   checked={checked.East !== ""}
                 />
-                <span className="md:px-4 md:py-2 py-1 px-2 text-sm dark:border-white dark:text-white hover:text-white text-gray-600 rounded-lg transition-all duration-300 peer-checked:bg-gray-500 peer-checked:text-white peer-checked:shadow-lg peer-checked:scale-105 hover:bg-gray-400 border-gray-600 border peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 peer-focus:ring-opacity-50">
+                <span className="md:px-4 md:py-2 py-1 px-2 text-sm dark:border-white dark:text-white hover:text-white text-gray-600 rounded-lg transition-all duration-300 peer-checked:bg-gray-500 peer-checked:text-white peer-checked:shadow-md peer-checked:scale-105 hover:bg-gray-400 border-gray-600 border peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 peer-focus:ring-opacity-50">
                   Eastern
                 </span>
               </label>
@@ -92,7 +92,7 @@ export default function page() {
                   onChange={(e) => handleChecked("West", e.target.checked)}
                   checked={checked.West !== ""}
                 />
-                <span className="md:px-4 md:py-2 py-1 px-2 text-sm dark:border-white dark:text-white hover:text-white text-gray-600 rounded-lg transition-all duration-300 peer-checked:bg-gray-500 peer-checked:text-white peer-checked:shadow-lg peer-checked:scale-105 hover:bg-gray-400 border-gray-600 border peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 peer-focus:ring-opacity-50">
+                <span className="md:px-4 md:py-2 py-1 px-2 text-sm dark:border-white dark:text-white hover:text-white text-gray-600 rounded-lg transition-all duration-300 peer-checked:bg-gray-500 peer-checked:text-white peer-checked:shadow-md peer-checked:scale-105 hover:bg-gray-400 border-gray-600 border peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 peer-focus:ring-opacity-50">
                   Western
                 </span>
               </label>
@@ -123,7 +123,7 @@ export default function page() {
                       className="hover:scale-105 transition duration-300 ease-in-out"
                     >
                       <div
-                        className="bg-white dark:bg-gray-800 dark:hover:bg-gray-500 shadow-lg p-4 rounded-md transition duration-200 position-relative"
+                        className="bg-white dark:bg-gray-800 dark:hover:bg-gray-500 shadow-md p-4 rounded-md transition duration-200 position-relative"
                         data-aos="zoom-in-left"
                       >
                         <div className="position-absolute">

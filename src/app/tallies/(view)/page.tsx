@@ -12,7 +12,7 @@ export default function pages() {
         backgroundPosition: "center",
       }}
     >
-      <div className="text-center px-10 py-6 bg-black bg-opacity-40 rounded shadow-lg">
+      <div className="text-center px-10 py-6 bg-black bg-opacity-40 rounded shadow-md">
         <div className="mb-7">
           <img
             src="https://cdn.worldvectorlogo.com/logos/dallas-mavericks.svg"

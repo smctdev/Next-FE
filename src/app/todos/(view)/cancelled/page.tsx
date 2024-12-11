@@ -10,8 +10,9 @@ import CancelledStatusTodoList from "../../components/CancelledStatusTodoList";
 import { useRouter } from "next/navigation";
 import LoadingLoaders from "@/app/components/loaders/LoadingLoaders";
 import UnauthorizedPage from "@/app/utils/UnauthorizedPage";
+import withAuth from "@/app/lib/withAuth";
 
-export default function Page() {
+const Cancelled = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const { data, loading, error }: any = useFetch(
     `/todos/status/cancelled`,
@@ -28,7 +29,7 @@ export default function Page() {
 
   useEffect(() => {
     if (!isAuthenticated && !authLoading) {
-      return router.push("/login");
+      router.push("/login");
     }
   }, [isAuthenticated, authLoading, router]);
 
@@ -101,3 +102,4 @@ export default function Page() {
     </div>
   );
 }
+export default withAuth(Cancelled);

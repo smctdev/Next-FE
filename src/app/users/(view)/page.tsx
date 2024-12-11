@@ -1,41 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useFetch from "../hooks/fetchData";
-import { useAuth } from "@/app/context/AuthContext";
-import { useRouter } from "next/navigation";
-import LoadingLoaders from "@/app/components/loaders/LoadingLoaders";
-import UnauthorizedPage from "@/app/utils/UnauthorizedPage";
 import UserItemList from "../components/UserItemList";
 import UserItemListLoader from "../components/loaders/UserItemListLoader";
 import api from "@/app/lib/axiosCall";
 import useToastr from "../hooks/Toastr";
+import withRoleAuth from "@/app/lib/withRoleAuth";
 
-export default function Page() {
+const Users = () => {
   const [isRefresh, setIsRefresh] = useState(false);
-  const {
-    isAuthenticated,
-    loading: authLoading,
-    isLogout,
-    hasHigherRole,
-  }: any = useAuth();
   const { data, loading, error }: any = useFetch("/users", isRefresh);
   const { showSuccess, showError }: any = useToastr();
-  const router: any = useRouter();
-
-  useEffect(() => {
-    if (!isAuthenticated && !authLoading) {
-      return router.push("/login");
-    }
-  }, [isAuthenticated, authLoading, router]);
-
-  if (authLoading) {
-    return <LoadingLoaders />;
-  }
-
-  if ((!isAuthenticated && !isLogout) || !hasHigherRole) {
-    return <UnauthorizedPage />;
-  }
 
   const handleVerifyUser = async (id: string) => {
     setIsRefresh(true);
@@ -66,7 +42,7 @@ export default function Page() {
         </button>
       </div>
       <hr />
-      <div className="overflow-x-auto rounded-lg border shadow-lg border-gray-200 mt-3">
+      <div className="overflow-x-auto rounded-lg border shadow-md border-gray-200 mt-3">
         <table className="table-auto w-full">
           <thead>
             <tr className="bg-gray-500 dark:bg-gray-900 text-white">
@@ -102,4 +78,5 @@ export default function Page() {
       </div>
     </div>
   );
-}
+};
+export default withRoleAuth(Users);

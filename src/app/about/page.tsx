@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import publicAuth from "../lib/publicAuth";
 
-export default function About() {
+const About = () => {
   return (
     <div className="min-h-screen py-16 px-3">
       <section className="text-center max-w-4xl mx-auto px-6 mb-12">
@@ -195,3 +196,5 @@ export default function About() {
     </div>
   );
 }
+
+export default publicAuth(About);

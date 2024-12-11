@@ -1,6 +1,8 @@
 "use client";
 
-export default function Services() {
+import publicAuth from "../lib/publicAuth";
+
+const Services = () => {
   return (
     <section className="py-16">
       <div className="max-w-7xl mx-auto px-6 text-center">
@@ -9,7 +11,7 @@ export default function Services() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
             <div className="flex justify-center mb-4">
               <i className="fas fa-cogs text-4xl text-blue-500"></i>
             </div>
@@ -22,7 +24,7 @@ export default function Services() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
             <div className="flex justify-center mb-4">
               <i className="fas fa-search text-4xl text-green-500"></i>
             </div>
@@ -35,7 +37,7 @@ export default function Services() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
             <div className="flex justify-center mb-4">
               <i className="fas fa-laptop-code text-4xl text-purple-500"></i>
             </div>
@@ -48,7 +50,7 @@ export default function Services() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
             <div className="flex justify-center mb-4">
               <i className="fas fa-users text-4xl text-yellow-500"></i>
             </div>
@@ -61,7 +63,7 @@ export default function Services() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
             <div className="flex justify-center mb-4">
               <i className="fas fa-cloud-upload-alt text-4xl text-teal-500"></i>
             </div>
@@ -74,7 +76,7 @@ export default function Services() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
             <div className="flex justify-center mb-4">
               <i className="fas fa-headset text-4xl text-orange-500"></i>
             </div>
@@ -91,3 +93,5 @@ export default function Services() {
     </section>
   );
 }
+
+export default publicAuth(Services);

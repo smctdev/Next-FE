@@ -177,6 +177,9 @@ const Navbar = () => {
             <li>
               <ActiveLink href="/blog">Blogs</ActiveLink>
             </li>
+            <li>
+              <ActiveLink href="/blog/posts">Posts</ActiveLink>
+            </li>
             {isAuthenticated && (
               <li>
                 <ActiveLink href="/todos">Todos</ActiveLink>

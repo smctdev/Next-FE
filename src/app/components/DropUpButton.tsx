@@ -67,7 +67,7 @@ export default function DropUpButton() {
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute bottom-full right-0 mb-2 w-32 bg-white border rounded-lg shadow-lg"
+          className="absolute bottom-full right-0 mb-2 w-32 bg-white border rounded-lg shadow-md"
         >
           <ul className="p-2 space-y-2 text-black">
             <li

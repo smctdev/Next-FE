@@ -97,7 +97,7 @@ export default function page() {
   };
   return (
     <div className="mt-2 p-2">
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-5">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-5">
         <div className="flex justify-center mb-5 w-full">
           <Link
             href={"/tallies"}
@@ -303,7 +303,7 @@ export default function page() {
         )}
       </div>
 
-      <div className="rounded-lg shadow-lg p-5 bg-white dark:bg-gray-900 mt-3 h-full">
+      <div className="rounded-lg shadow-md p-5 bg-white dark:bg-gray-900 mt-3 h-full">
         {data.length !== 0 && (
           <h2 className="text-xl text-gray-600 mb-6 dark:text-white">
             Results: {data.length}
@@ -339,7 +339,7 @@ export default function page() {
                       <Link href={`/tallies/schedules/games/${game.id}`}>
                         <div
                           data-aos="zoom-in-left"
-                          className="bg-white dark:bg-gray-800 shadow-lg p-4 rounded-md hover:z-50 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-200"
+                          className="bg-white dark:bg-gray-800 shadow-md p-4 rounded-md hover:z-50 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-200"
                         >
                           <h3 className="text-xl font-semibold dark:text-white text-center text-gray-500">
                             {game.home_team.abbreviation} {game.home_team_score}{" "}

@@ -1,33 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import Cookies from "js-cookie";
 import { useAuth } from "@/app/context/AuthContext";
-import LoadingLoaders from "@/app/components/loaders/LoadingLoaders";
-import UnauthorizedPage from "@/app/utils/UnauthorizedPage";
+import sessionAuth from "@/app/lib/sessionAuth";
 
-export default function Page() {
+const Success = () => {
   const router = useRouter();
-  const { user, loading, logout, isAuthenticated, isLogout }: any = useAuth();
-
-  useEffect(() => {
-    if (!isAuthenticated && !loading) {
-      return router.push("/login");
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-    const rememberToken = urlParams.get("rememberToken");
-    if (token && rememberToken) {
-      Cookies.set("APP-TOKEN", token);
-      Cookies.set("APP-REMEMBER-TOKEN", rememberToken);
-    }
-  }, [router]);
-
-  if (loading) return <LoadingLoaders />;
-
-  if (!isAuthenticated && !isLogout) return <UnauthorizedPage />;
+  const { user, logout }: any = useAuth();
 
   return (
     <div
@@ -80,3 +59,5 @@ export default function Page() {
     </div>
   );
 }
+
+export default sessionAuth(Success);

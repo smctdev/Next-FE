@@ -1,15 +1,14 @@
 "use client";
 
-import LoadingLoaders from "@/app/components/loaders/LoadingLoaders";
-import { useAuth } from "@/app/context/AuthContext";
 import api from "@/app/lib/axiosCall";
+import withOutAuth from "@/app/lib/withOutAuth";
 import { ValidationErrors } from "@/app/types/ValidationType";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 
-export default function Register() {
+const Register = () => {
   const [flashError, setFlashError] = useState("");
   const [error, setError] = useState<ValidationErrors | any>("");
   const [username, setUsername] = useState("");
@@ -22,15 +21,6 @@ export default function Register() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { isAuthenticated, loading: loadingAuth }: any = useAuth();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      return router.push("/dashboard");
-    }
-  }, [isAuthenticated, loadingAuth, router]);
-
-  if (loadingAuth || isAuthenticated) return <LoadingLoaders />;
 
   const handleRegister = async (e: any) => {
     e.preventDefault();
@@ -94,7 +84,7 @@ export default function Register() {
         backgroundPosition: "center",
       }}
     >
-      <div className="p-10 max-w-[26rem] bg-opacity-50 bg-black rounded-lg shadow-lg">
+      <div className="p-10 max-w-[26rem] bg-opacity-50 bg-black rounded-lg shadow-md">
         {flashError && (
           <div
             className="flex items-center px-4 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded"
@@ -276,4 +266,6 @@ export default function Register() {
       </div>
     </div>
   );
-}
+};
+
+export default withOutAuth(Register);

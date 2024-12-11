@@ -73,7 +73,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     Cookies.set("APP-TOKEN", token);
     Cookies.set("APP-REMEMBER-TOKEN", rememberToken);
     fetchUserProfile();
-    router.push("/dashboard");
   };
 
   const logout = () => {

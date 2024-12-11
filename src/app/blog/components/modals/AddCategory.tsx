@@ -7,10 +7,12 @@ export default function AddCategory({
   isOpen,
   onClose,
   setIsRefresh,
+  modalRef,
 }: {
   isOpen: boolean;
   onClose: Dispatch<SetStateAction<boolean>>;
   setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  modalRef: any;
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -34,11 +36,7 @@ export default function AddCategory({
         slug: slug,
       });
       if (response.status === 201) {
-        onClose(false);
-        setTitle("");
-        setDescription("");
-        setSlug("");
-        setError("");
+        handleCloseModal();
         showSuccess(response.data.categoryName, response.statusText);
       }
     } catch (error: any) {
@@ -54,18 +52,36 @@ export default function AddCategory({
   };
 
   const handleCloseModal = () => {
+    setError("");
     onClose(false);
+    setTitle("");
+    setDescription("");
+    setSlug("");
     setError("");
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
-      <div className="bg-white relative dark:bg-gray-900 rounded-lg w-1/3 p-6 shadow-lg transition duration-300 ease-in-out">
-        <button type="button" className="absolute right-4 top-3" onClick={handleCloseModal}>
-          <i className="far fa-x"></i>
-        </button>
-        <h2 className="text-2xl font-semibold mb-4">Add New Category</h2>
-        <form onSubmit={handleSubmit}>
+      <div
+        ref={modalRef}
+        className="bg-white relative dark:bg-gray-900 rounded-lg w-1/3 p-6 shadow-md transition duration-300 ease-in-out"
+      >
+        <div className="flex justify-between">
+          <div>
+            <h2 className="text-lg font-bold">Add Category</h2>
+          </div>
+          <div>
+            <button
+              type="button"
+              className="absolute right-4 top-3"
+              onClick={handleCloseModal}
+            >
+              <i className="far fa-xmark text-black dark:text-white"></i>
+            </button>
+          </div>
+        </div>
+        <hr />
+        <form onSubmit={handleSubmit} className="mt-4">
           <div className="mb-4">
             <label className="block text-sm font-medium" htmlFor="title">
               Title
