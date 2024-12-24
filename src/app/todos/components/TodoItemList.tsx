@@ -12,7 +12,7 @@ export default function TodoItemList({
     setId(id);
   };
   return (
-    <div className="h-40 p-5 dark:bg-gray-900 bg-gray-50 shadow-md w-full rounded-lg dark:hover:bg-gray-800 hover:bg-gray-100 hover:scale-105 transition-all duration-300 ease-in-out z-0">
+    <div className="h-40 p-5 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 bg-gray-50 shadow-md w-full rounded-lg dark:hover:bg-gray-800 hover:bg-gray-100 hover:scale-105 transition-all duration-300 ease-in-out z-0">
       <div className="relative mb-2">
         <p className="text-lg font-bold truncate" title={item.title}>
           {item.title}
@@ -23,7 +23,7 @@ export default function TodoItemList({
         <button
           type="button"
           onClick={() => handleToEditTodo(item.id)}
-          className="text-sm absolute capitalize -top-4 -left-2 rounded text-white transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:translate-x-1"
+          className="text-sm absolute capitalize -top-4 -left-2 rounded text-gray-900 dark:text-white transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:translate-x-1"
         >
           {isEdited[item.id] ? (
             <>

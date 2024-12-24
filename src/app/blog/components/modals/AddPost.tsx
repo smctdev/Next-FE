@@ -7,17 +7,11 @@ export default function AddPost({
   isOpen,
   onClose,
   setIsRefresh,
+  postModalRef,
   modalRef,
   categories,
   categoriesLoading,
-}: {
-  isOpen: boolean;
-  onClose: Dispatch<SetStateAction<boolean>>;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
-  modalRef: any;
-  categories: any[];
-  categoriesLoading: boolean;
-}) {
+}: any) {
   const [image, setImage] = useState<File[]>([]);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -36,7 +30,7 @@ export default function AddPost({
     setError("");
     setTitle("");
     setDescription("");
-    setCategoryId(null);
+    setCategoryId("");
     setImage([]);
     setImageError("");
   };
@@ -94,8 +88,8 @@ export default function AddPost({
     <>
       <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
         <div
-          ref={modalRef}
-          className="p-6 bg-white dark:bg-gray-900 shadow-md rounded-lg w-1/3 relative"
+          ref={postModalRef || modalRef}
+          className="p-6 bg-white dark:bg-gray-900 shadow-md rounded-lg w-full mx-3 md:w-1/3 relative"
         >
           <div className="flex justify-between">
             <div>
@@ -104,7 +98,7 @@ export default function AddPost({
             <div>
               <button
                 type="button"
-                className="absolute right-4 top-3"
+                className="absolute right-4 top-3 bg-gray-400 bg-opacity-75 px-2 py-0.5 rounded-full hover:scale-95 transition-all duration-300 ease-in-out hover:bg-gray-500 hover:bg-opacity-75"
                 onClick={handleCloseModal}
               >
                 <i className="far fa-xmark text-black dark:text-white"></i>

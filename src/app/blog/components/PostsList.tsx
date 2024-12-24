@@ -1,12 +1,15 @@
+import { useAuth } from "@/app/context/AuthContext";
 import { Storage } from "@/app/utils/StorageUtils";
 import { formatDate } from "date-fns";
-import { format } from "path";
+import Link from "next/link";
 import { useState } from "react";
+import dateFormat from "../utils/dateFormat";
 
 export default function PostsList({ post }: any) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { user }: any = useAuth();
+  const [countLike, setCountLike] = useState(0);
 
-  // Handle next and previous image navigation
   const nextImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % post.image.length);
   };
@@ -16,17 +19,34 @@ export default function PostsList({ post }: any) {
       (prevIndex) => (prevIndex - 1 + post.image.length) % post.image.length
     );
   };
+
+  const imageIndex = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  const handleLike = () => {
+    setCountLike(countLike + 1);
+  };
+
   return (
     <div className="mb-5">
-      <div className="bg-white dark:bg-gray-900 hover:translate-x-1 dark:hover:bg-gray-800 hover:bg-gray-100 hover:scale-[1.01] transition-all duration-300 ease-in-out shadow-md rounded-lg overflow-hidden">
+      <div
+        className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800 hover:bg-gray-100 shadow-md rounded-lg overflow-hidden transition-all duration-300 ease-in-out"
+        data-aos="fade-up"
+      >
         <div className="bg-blue-500 text-white px-4 py-2 rounded-t-md text-center text-sm font-semibold uppercase tracking-wide">
-          {post.category.categoryName}
+          <Link
+            className="hover:underline"
+            href={`/blog/posts/${post.category.slug}`}
+          >
+            {post.category.categoryName}
+          </Link>
         </div>
 
         <div className="shadow-sm p-2">
           {post.image.length !== 0 && (
             <>
-              <div className="relative w-full h-48 overflow-hidden rounded-lg">
+              <div className="relative w-full h-[450px] overflow-hidden rounded-lg">
                 <div
                   className="w-full h-full flex transition-transform duration-300"
                   style={{
@@ -70,8 +90,9 @@ export default function PostsList({ post }: any) {
                 <div className="flex justify-center mt-2">
                   {post.image.map((_: any, index: any) => (
                     <div
+                      onClick={() => imageIndex(index)}
                       key={index}
-                      className={`w-2.5 h-2.5 mx-1 rounded-full ${
+                      className={`w-2.5 h-2.5 mx-1 rounded-full cursor-pointer hover:bg-blue-500 ${
                         currentIndex === index ? "bg-blue-500" : "bg-gray-300"
                       }`}
                     />
@@ -86,17 +107,87 @@ export default function PostsList({ post }: any) {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             {post.title}
           </h2>
-          <p className="text-lg text-gray-700 dark:text-gray-300">
+          <p className="text-lg text-gray-700 dark:text-gray-300 whitespace-break-spaces">
             {post.description}
           </p>
         </div>
 
-        <div className="px-4 py-4 flex justify-between items-center border-t border-gray-200 dark:border-gray-700">
-          <div className="text-sm text-gray-500 dark:text-gray-300">
-            <span>Posted by: {post.user.name}</span>
+        <div className="p-3 flex justify-between gap-2 items-center border-t border-gray-200 dark:border-gray-700">
+          <div className="text-sm text-gray-500 dark:text-gray-300 flex items-center">
+            <span>Author: </span>
+            <span className="p-2 bg-gray-200 text-gray-600 dark:text-white dark:bg-gray-700 rounded-lg font-bold text-xs flex gap-1 items-center">
+              {post?.user?.profile_pictures?.length === 0 ||
+              post?.user === null ? (
+                <>
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                    className="w-5 h-5 rounded-full"
+                    alt=""
+                  />
+                </>
+              ) : (
+                <>
+                  <img
+                    src={Storage(post?.user?.profile_pictures[0]?.avatar)}
+                    className="w-5 h-5 rounded-full"
+                    alt=""
+                  />
+                </>
+              )}{" "}
+              {post?.user?.name === user?.name
+                ? "You"
+                : post?.user === null
+                ? "Deleted User"
+                : post?.user?.name}
+            </span>
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-300">
-            <span>{formatDate(post.createdAt, "MMMM dd, yyyy h:mm:ss a")}</span>
+            <span>
+              {post.publishedAs === "public" ? (
+                <>
+                  <i className="far fa-earth-americas"></i>
+                </>
+              ) : post.publishedAs === "private" ? (
+                <>
+                  <i className="far fa-lock"></i>
+                </>
+              ) : post.publishedAs === "friends" ? (
+                <>
+                  <i className="far fa-user-group"></i>
+                </>
+              ) : (
+                <>
+                  <i className="far fa-signs-posts"></i>
+                </>
+              )}{" "}
+              • <small>{dateFormat(post.createdAt)}</small>
+            </span>
+          </div>
+        </div>
+        {countLike === 0 ? (
+          ""
+        ) : (
+          <div className="flex justify-between px-2 border-t border-gray-200 dark:border-gray-700 py-2">
+            <span>{countLike}</span>
+            <span></span>
+            <span></span>
+          </div>
+        )}
+        <div className="border-t flex justify-between items-center border-gray-200 dark:border-gray-700 py-4 px-3">
+          <div>
+            <button type="button" onClick={handleLike}>
+              <i className="far fa-thumbs-up"></i> Like
+            </button>
+          </div>
+          <div>
+            <button>
+              <i className="far fa-comment"></i> Comment
+            </button>
+          </div>
+          <div>
+            <button>
+              <i className="far fa-share"></i> Share
+            </button>
           </div>
         </div>
       </div>

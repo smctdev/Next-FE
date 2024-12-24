@@ -30,6 +30,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressContentEditableWarning>
       <head>
+        <meta name="author" content="Allan Justine Mascariñas" />
+
+        <meta
+          name="keywords"
+          content="Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content"
+        />
+
         <link
           rel="stylesheet"
           href="https://site-assets.fontawesome.com/releases/v6.6.0/css/all.css"

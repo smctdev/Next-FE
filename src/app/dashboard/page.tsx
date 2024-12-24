@@ -26,11 +26,11 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-
   const dashboardData = {
     posts: 150,
     likes: 1200,
     comments: 350,
+    shares: 500,
   };
 
   const lineChartData = {
@@ -55,6 +55,13 @@ const Dashboard = () => {
         data: [3, 6, 90, 29, 15, 18],
         fill: false,
         borderColor: "#f1c40f",
+        tension: 0.1,
+      },
+      {
+        label: "Shares Growth",
+        data: [10, 67, 190, 39, 125, 222],
+        fill: false,
+        borderColor: "#3429e1",
         tension: 0.1,
       },
     ],
@@ -84,17 +91,24 @@ const Dashboard = () => {
         borderColor: "#f39c12",
         borderWidth: 1,
       },
+      {
+        label: "Shares Distribution",
+        data: [5, 2, 4, 20, 150, 222],
+        backgroundColor: "#3429e1",
+        borderColor: "#3434e6",
+        borderWidth: 1,
+      },
     ],
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100 dark:bg-gray-800">
+    <div className="min-h-screen p-6">
       <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-8">
         Dashboard
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+        <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
               Posts
@@ -108,7 +122,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+        <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
               Likes
@@ -122,7 +136,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+        <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
           <div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
               Comments
@@ -135,26 +149,38 @@ const Dashboard = () => {
             <i className="fas fa-comment"></i>
           </div>
         </div>
+        <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
+          <div>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+              Shares
+            </h3>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              {dashboardData.shares}
+            </p>
+          </div>
+          <div className="text-6xl text-violet-500">
+            <i className="fas fa-share"></i>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md">
-          <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800 hover:bg-gray-100 p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Posts Growth Over Time
           </h3>
           <Line data={lineChartData} />
         </div>
 
-        <div className="bg-white dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md">
-          <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-            Posts, Likes, and Comments Distribution
+        <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800 hover:bg-gray-100 p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Posts, Likes, Comments and Shares Distribution
           </h3>
           <Bar data={barChartData} />
         </div>
       </div>
     </div>
   );
-}
-
+};
 
 export default withAuth(Dashboard);

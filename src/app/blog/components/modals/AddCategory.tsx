@@ -64,7 +64,7 @@ export default function AddCategory({
     <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div
         ref={modalRef}
-        className="bg-white relative dark:bg-gray-900 rounded-lg w-1/3 p-6 shadow-md transition duration-300 ease-in-out"
+        className="bg-white relative dark:bg-gray-900 rounded-lg w-full mx-3 md:w-1/3 p-6 shadow-md transition duration-300 ease-in-out"
       >
         <div className="flex justify-between">
           <div>
@@ -73,10 +73,10 @@ export default function AddCategory({
           <div>
             <button
               type="button"
-              className="absolute right-4 top-3"
+              className="absolute right-4 top-3 bg-gray-400 bg-opacity-75 px-2 py-0.5 rounded-full hover:scale-95 transition-all duration-300 ease-in-out hover:bg-gray-500 hover:bg-opacity-75"
               onClick={handleCloseModal}
             >
-              <i className="far fa-xmark text-black dark:text-white"></i>
+              <i className="far fa-xmark text-white"></i>
             </button>
           </div>
         </div>
@@ -141,14 +141,14 @@ export default function AddCategory({
             <button
               type="button"
               onClick={handleCloseModal}
-              className="hover border-gray-500 text-sm px-3 border rounded-md"
+              className="bg-gray-500 bg-opacity-75 hover:bg-gray-600 hover:scale-95 px-2 py-2 text-white rounded-lg text-sm"
             >
-              Cancel
+              <i className="far fa-xmark"></i> Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="bg-blue-600 text-sm text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              className="bg-blue-600 text-sm hover:scale-95 text-white px-4 py-2 rounded-md hover:bg-blue-700"
             >
               {loading ? (
                 <>

@@ -51,7 +51,7 @@ export default function DropUpButton() {
       <button
         ref={buttonRef}
         onClick={toggleDropdown}
-        className="px-4 py-1 text-xl text-white transition-all border border-white rounded-lg bg-white hover:text-black"
+        className="px-2 py-1 text-xl text-white transition-all border shadow-md border-white rounded-lg bg-gray-900 dark:bg-white hover:text-black"
       >
         {!mounted ? (
           <i className="far cursor-pointer fa-eclipse"></i>

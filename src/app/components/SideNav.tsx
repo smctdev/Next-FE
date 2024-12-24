@@ -3,12 +3,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
+import { Storage } from "../utils/StorageUtils";
 
 export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const { isAuthenticated, user, logout }: any = useAuth();
+  const { isAuthenticated, user, logout, isSetProfile }: any = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -37,7 +38,7 @@ export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
     <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
       <div className="px-3 py-3 lg:px-5 lg:pl-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center justify-start rtl:justify-end">
+          <div className="flex items-center justify-start rtl:justify-end sm:hidden">
             <button
               ref={sidebarButtonRef}
               onClick={toggleSideBar}
@@ -45,7 +46,7 @@ export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
               data-drawer-toggle="logo-sidebar"
               aria-controls="logo-sidebar"
               type="button"
-              className="inline-flex mr-28 items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              className="inline-flex mx-auto items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
             >
               <span className="sr-only">Open sidebar</span>
               <svg
@@ -62,20 +63,20 @@ export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
                 ></path>
               </svg>
             </button>
-            <Link
-              href="/"
-              className="flex items-center space-x-3 rtl:space-x-reverse"
-            >
-              <img
-                src="https://cdn-icons-png.flaticon.com/128/2065/2065254.png"
-                className="h-8"
-                alt="Flowbite Logo"
-              />
-              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                Blog App
-              </span>
-            </Link>
           </div>
+          <Link
+            href="/"
+            className="flex items-center space-x-3 rtl:space-x-reverse"
+          >
+            <img
+              src="https://cdn-icons-png.flaticon.com/128/2065/2065254.png"
+              className="h-8"
+              alt="Flowbite Logo"
+            />
+            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+              Blog App
+            </span>
+          </Link>
           <div className="flex items-center">
             <div className="flex items-center ms-3">
               <div>
@@ -90,7 +91,11 @@ export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
                     <span className="sr-only">Open user menu</span>
                     <img
                       className="w-8 h-8 rounded-full"
-                      src="https://cdn-icons-png.flaticon.com/128/4140/4140048.png"
+                      src={
+                        isSetProfile?.length === 0 || isSetProfile === undefined
+                          ? "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+                          : Storage(isSetProfile[0]?.avatar)
+                      }
                       alt="user photo"
                     />
                   </button>
@@ -101,18 +106,21 @@ export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
                   ref={dropdownRef}
                   className="absolute z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 min-w-52 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 right-3 top-11 md:right-5 md:top-10"
                 >
-                  <div className="absolute right-3 top-[-4px] transform rotate-45 bg-white dark:bg-gray-700 w-2 h-2"></div>
-                  <div className="px-4 py-3">
-                    <span className="block text-sm text-gray-900 dark:text-white">
-                      {user?.name}
-                    </span>
-                    <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                      {user?.email}
-                    </span>
-                  </div>
+                  <div className="absolute right-3 top-[-4px] transform rotate-45 bg-white dark:bg-gray-700 w-2 h-2 border-l-white border-r-white"></div>
+                  <Link href={"/profile"} onClick={toggleDropdown}>
+                    <div className="px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600">
+                      <span className="block text-sm text-gray-900 dark:text-white">
+                        {user?.name}
+                      </span>
+                      <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
+                        {user?.email}
+                      </span>
+                    </div>
+                  </Link>
                   <ul className="py-2" aria-labelledby="user-menu-button">
                     <li>
                       <Link
+                        onClick={toggleDropdown}
                         href="/dashboard"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                       >
@@ -121,6 +129,7 @@ export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
                     </li>
                     <li>
                       <Link
+                        onClick={toggleDropdown}
                         href="/settings"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                       >

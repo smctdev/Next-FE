@@ -6,8 +6,13 @@ import { useEffect } from "react";
 
 const withRoleAuth = (WrappedComponent: any) => {
   return (props: any) => {
-    const { isAuthenticated, loading, hasHigherRole, isLogout }: any =
-      useAuth();
+    const {
+      isAuthenticated,
+      loading,
+      hasHigherRole,
+      isLogout,
+      hasNormalRole,
+    }: any = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -20,7 +25,11 @@ const withRoleAuth = (WrappedComponent: any) => {
       return <LoadingLoaders />;
     }
 
-    if ((!isAuthenticated && !isLogout) || !hasHigherRole) {
+    if (
+      (!isAuthenticated && !isLogout) ||
+      (!isLogout && !hasHigherRole) ||
+      hasNormalRole
+    ) {
       return <UnauthorizedPage />;
     }
 

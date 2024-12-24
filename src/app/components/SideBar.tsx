@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import SideNav from "./SideNav";
-import Link from "next/link";
 import ActiveLink from "../utils/SidebarActiveLink";
 import ChildActiveLink from "../utils/ChildActiveLink";
+import Footer from "./Footer";
+import { usePathname } from "next/navigation";
 
 const SideBar = ({ children }: any) => {
+  const pathName = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -34,7 +36,11 @@ const SideBar = ({ children }: any) => {
   const toggleSideBar = () => {
     setSidebarOpen(!sidebarOpen);
   };
-  const toogleDropdown = () => setDropdownOpen(!dropdownOpen);
+  const toogleDropdown = () => {
+    if (pathName === "/todos") {
+      setDropdownOpen(!dropdownOpen);
+    }
+  };
   return (
     <>
       <SideNav
@@ -51,7 +57,7 @@ const SideBar = ({ children }: any) => {
       >
         <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
-            <li>
+            <li onClick={toggleSideBar}>
               <ActiveLink href="/dashboard">
                 <svg
                   className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -66,7 +72,7 @@ const SideBar = ({ children }: any) => {
                 <span className="ms-3">Dashboard</span>
               </ActiveLink>
             </li>
-            <li>
+            <li onClick={toggleSideBar}>
               <ActiveLink href="/blog">
                 <svg
                   className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -82,7 +88,7 @@ const SideBar = ({ children }: any) => {
                 </span>
               </ActiveLink>
             </li>
-            <li>
+            <li onClick={toggleSideBar}>
               <ActiveLink href="/blog/posts">
                 <svg
                   className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -99,7 +105,7 @@ const SideBar = ({ children }: any) => {
                 </span>
               </ActiveLink>
             </li>
-            <li>
+            <li onClick={toggleSideBar}>
               <button type="button" onClick={toogleDropdown} className="w-full">
                 <ActiveLink href="/todos">
                   <i className="flex-shrink-0 w-5 h-5 text-2xl text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white far fa-clipboard-list-check"></i>
@@ -145,23 +151,23 @@ const SideBar = ({ children }: any) => {
                 id="dropdown-example"
                 className={`${!dropdownOpen && "hidden"} py-2 space-y-2`}
               >
-                <li>
+                <li onClick={toggleSideBar}>
                   <ChildActiveLink href="/todos/pending">
                     Pending{" "}
                     <i className="far fa-clock-rotate-left ml-3 text-red-600"></i>
                   </ChildActiveLink>
                 </li>
-                <li>
+                <li onClick={toggleSideBar}>
                   <ChildActiveLink href="/todos/done">
                     Done <i className="far fa-check ml-3 text-green-500"></i>
                   </ChildActiveLink>
                 </li>
-                <li>
+                <li onClick={toggleSideBar}>
                   <ChildActiveLink href="/todos/ongoing">
                     Ongoing <i className="far fa-rotate ml-3 text-blue-600"></i>
                   </ChildActiveLink>
                 </li>
-                <li>
+                <li onClick={toggleSideBar}>
                   <ChildActiveLink href="/todos/cancelled">
                     Cancelled{" "}
                     <i className="far fa-file-xmark ml-3 text-red-400"></i>
@@ -169,7 +175,7 @@ const SideBar = ({ children }: any) => {
                 </li>
               </ul>
             </li>
-            <li>
+            <li onClick={toggleSideBar}>
               <ActiveLink href="/users">
                 <svg
                   className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -183,7 +189,7 @@ const SideBar = ({ children }: any) => {
                 <span className="flex-1 ms-3 whitespace-nowrap">Users</span>
               </ActiveLink>
             </li>
-            <li>
+            <li onClick={toggleSideBar}>
               <ActiveLink href="/tallies/schedules">
                 <i className="far fa-calendar flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
                 <span className="flex-1 ms-3 whitespace-nowrap">
@@ -191,7 +197,7 @@ const SideBar = ({ children }: any) => {
                 </span>
               </ActiveLink>
             </li>
-            <li>
+            <li onClick={toggleSideBar}>
               <ActiveLink href="/tallies/teams">
                 <i className="far fa-people-group flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
                 <span className="flex-1 ms-3 whitespace-nowrap">NBA Teams</span>
@@ -214,9 +220,10 @@ const SideBar = ({ children }: any) => {
       </aside>
 
       <div className="sm:ml-64 mt-12">
-        <div className="p-4 border-2 m-2 mt-16 border-gray-200 rounded-lg dark:border-gray-700">
+        <div className="m-2 mt-16 border-gray-200 rounded-lg dark:border-gray-700">
           {children}
         </div>
+        <Footer />
       </div>
     </>
   );

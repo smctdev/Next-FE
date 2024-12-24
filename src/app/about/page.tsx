@@ -27,7 +27,7 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-semibold mb-8">Our Values</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-gray-50 dark:bg-black hover:bg-gray-900 hover:scale-105 transition duration-300 ease-in-out p-6 rounded-lg shadow-xl border">
+            <div className="bg-gray-50 dark:bg-black hover:dark:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out p-6 rounded-lg shadow-xl border">
               <h3 className="text-xl font-semibold mb-2">
                 <i className="far fa-lightbulb-gear"></i> Innovation
               </h3>
@@ -36,7 +36,7 @@ const About = () => {
                 problems efficiently.
               </p>
             </div>
-            <div className="bg-gray-50 dark:bg-black hover:bg-gray-900 hover:scale-105 transition duration-300 ease-in-out p-6 rounded-lg shadow-xl border">
+            <div className="bg-gray-50 dark:bg-black hover:dark:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out p-6 rounded-lg shadow-xl border">
               <h3 className="text-xl font-semibold mb-2">
                 <i className="far fa-handshake"></i> Integrity
               </h3>
@@ -45,7 +45,7 @@ const About = () => {
                 with clients and partners.
               </p>
             </div>
-            <div className="bg-gray-50 dark:bg-black hover:bg-gray-900 hover:scale-105 transition duration-300 ease-in-out p-6 rounded-lg shadow-xl border">
+            <div className="bg-gray-50 dark:bg-black hover:dark:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out p-6 rounded-lg shadow-xl border">
               <h3 className="text-xl font-semibold mb-2">
                 <i className="far fa-trophy-star"></i> Excellence
               </h3>
@@ -188,7 +188,7 @@ const About = () => {
         </p>
         <a
           href="#"
-          className="inline-block bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-lg shadow-md transition duration-300"
+          className="inline-block bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-lg shadow-md transition duration-300 hover:translate-x-0.5 ease-in-out hover:-translate-y-0.5"
         >
           <i className="far fa-headset"></i> Contact Us
         </a>

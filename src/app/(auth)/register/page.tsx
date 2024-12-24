@@ -84,7 +84,7 @@ const Register = () => {
         backgroundPosition: "center",
       }}
     >
-      <div className="p-10 max-w-[26rem] bg-opacity-50 bg-black rounded-lg shadow-md">
+      <div className="my-3 p-10 max-w-[26rem] bg-opacity-50 bg-black rounded-lg shadow-md">
         {flashError && (
           <div
             className="flex items-center px-4 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded"

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import AllTodosLoader from "../../components/loaders/AllTodosLoader";
 import useFetch from "../../hooks/fetchData";
 import { useAuth } from "@/app/context/AuthContext";
-import useToastr from "../../lib/Toastr";
+import useToastr from "../../hooks/Toastr";
 import api from "@/app/lib/axiosCall";
 import OngoingStatusTodoList from "../../components/OngoingStatusTodoList";
 import { useRouter } from "next/navigation";

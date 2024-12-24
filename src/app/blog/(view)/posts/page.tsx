@@ -8,16 +8,18 @@ import PostLoader from "../../components/loaders/PostLoader";
 import AddPost from "../../components/modals/AddPost";
 import PostsList from "../../components/PostsList";
 import publicAuth from "@/app/lib/publicAuth";
+import { formatDate } from "date-fns";
 
 const Posts = () => {
   const { isAuthenticated }: any = useAuth();
   const [isRefresh, setIsRefresh] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const { data, loading }: any = useFetch(`/posts`, isRefresh);
   const { data: categoriesData, loading: categoriesLoading }: any = useFetch(
     `/categories`,
-    isRefresh
+    false
   );
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -42,11 +44,48 @@ const Posts = () => {
     setIsOpen(!isOpen);
   };
 
+  const filteredPosts = data.posts
+    ? data.posts.filter(
+        (post: any) =>
+          post.title.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+          post.description
+            .toLowerCase()
+            .includes(searchTerm.trim().toLowerCase()) ||
+          post.category.categoryName
+            .toLowerCase()
+            .includes(searchTerm.trim().toLowerCase()) ||
+          post.category.slug
+            .toLowerCase()
+            .includes(searchTerm.trim().toLowerCase()) ||
+          post?.user?.name
+            .toLowerCase()
+            .includes(searchTerm.trim().toLowerCase()) ||
+          (post?.user === null &&
+            "Deleted User"
+              .toLowerCase()
+              .includes(searchTerm.trim().toLowerCase())) ||
+          formatDate(post.createdAt, "MMMM dd, yyyy")
+            .toLowerCase()
+            .includes(searchTerm.trim().toLowerCase())
+      )
+    : [];
+
   return (
     <div className="p-4 dark:bg-black mx-auto">
-      <div className="flex justify-between mt-2">
+      <div className="flex justify-between flex-wrap items-center gap-5 mb-4">
         <div>
-          <h1 className="text-2xl font-bold mb-4">Posts</h1>
+          <h1 className="text-2xl font-bold">Posts</h1>
+        </div>
+        <div className="relative">
+          <i className="far fa-magnifying-glass left-3 top-3 absolute text-gray-400"></i>
+          <input
+            value={searchTerm}
+            maxLength={255}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            type="search"
+            className="py-2 pl-9 pr-2 rounded-lg active:ring-1 active:ring-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none border border-gray-400"
+            placeholder="Search..."
+          />
         </div>
         {isAuthenticated && (
           <div>
@@ -63,22 +102,31 @@ const Posts = () => {
       </div>
       <hr />
 
-      <div className="py-4 md:px-52 overflow-x-hidden">
+      <div className="py-4 sm:w-full md:w-full lg:w-3/4 xl:w-2/4 mx-auto overflow-hidden">
         {loading ? (
           <PostLoader />
-        ) : data.posts?.length > 0 ? (
-          data.posts.map((post: Post, index: number) => (
+        ) : filteredPosts?.length > 0 ? (
+          filteredPosts.map((post: Post, index: number) => (
             <PostsList key={index} post={post} />
           ))
         ) : (
           <div className="flex justify-center items-center col-span-full h-64 rounded-lg shadow-md">
             <div className="text-center">
               <h1 className="text-xl font-semibold text-gray-700 dark:text-white mb-4">
-                {data.message || "No Posts Added Yet"}
+                {searchTerm
+                  ? "No Results Found"
+                  : data.message || "No Posts Added Yet"}
               </h1>
-              <p className="text-gray-600 dark:text-gray-300">
-                It looks like there are no posts available right now. Be patient
-                and check back later!
+              <p className="text-gray-600 dark:text-gray-300 w-96">
+                {searchTerm ? (
+                  <>
+                    It looks like there are no posts available on your search "
+                    <span className="font-bold break-words">{searchTerm}</span>
+                    ".
+                  </>
+                ) : (
+                  "It looks like there are no posts available right now. Be patient and check back later!"
+                )}
               </p>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 export default function UnauthorizedPage() {
   const { isAuthenticated }: any = useAuth();
   return (
-    <div className="flex items-center justify-center mt-10">
+    <div className="flex items-center justify-center mt-10 mb-4">
       <div className="text-center p-8 dark:bg-gray-900 rounded-lg shadow-xl">
         <h1 className="text-6xl font-extrabold mb-4">403</h1>
         <p className="text-2xl font-semibold mb-6">

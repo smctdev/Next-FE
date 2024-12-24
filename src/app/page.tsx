@@ -1,30 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
-import { useAuth } from "./context/AuthContext";
-import LoadingLoaders from "./components/loaders/LoadingLoaders";
-import { useRouter } from "next/navigation";
+import publicAuth from "./lib/publicAuth";
 
-export default function Home() {
-  const router = useRouter();
-  const { isAuthenticated, loading, userRoles }: any = useAuth();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      if (userRoles?.includes("superadmin")) {
-        router.push("/superadmin/dashboard");
-      } else if (userRoles?.includes("admin")) {
-        router.push("/admin/dashboard");
-      } else if (userRoles?.includes("moderator")) {
-        router.push("/moderator/dashboard");
-      } else {
-        router.push("/dashboard");
-      }
-    }
-  }, [isAuthenticated, loading, router]);
-
-  if (loading || isAuthenticated) return <LoadingLoaders />;
+const Home = () => {
   return (
     <div
       className="flex items-center justify-center min-h-screen"
@@ -60,4 +39,5 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
+export default publicAuth(Home);

@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [userRoles, setUserRoles] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
       setIsAuthenticated(false);
     }
-  }, []);
+  }, [isRefresh]);
 
   const fetchUserProfile = async () => {
     const token = Cookies.get("APP-TOKEN");
@@ -96,6 +97,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const hasNormalRole = userRoles?.includes("user") || userRoles === null;
 
+  const isSetProfile = user?.profile_pictures?.filter(
+    (img: any) => img.isSet === true
+  );
+
   return (
     <AuthContext.Provider
       value={{
@@ -108,6 +113,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isLogout,
         hasHigherRole,
         hasNormalRole,
+        setIsRefresh,
+        isSetProfile,
       }}
     >
       {children}

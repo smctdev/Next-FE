@@ -8,4 +8,6 @@ export interface AuthContextType {
   userRoles: any;
   hasHigherRole: boolean;
   hasNormalRole: boolean;
+  setIsRefresh: any;
+  isSetProfile: any;
 }

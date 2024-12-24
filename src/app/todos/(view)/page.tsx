@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import useFetch from "../hooks/fetchData";
 import { useAuth } from "@/app/context/AuthContext";
 import api from "@/app/lib/axiosCall";
-import useToastr from "../lib/Toastr";
+import useToastr from "../hooks/Toastr";
 import { TodoType } from "../types/TodoType";
 import TodoItemList from "../components/TodoItemList";
 import AllTodosLoader from "../components/loaders/AllTodosLoader";
@@ -27,9 +27,7 @@ const Page = () => {
     isEdited[id] ? `/todos/id/${id}` : null,
     isRefresh
   );
-  const {
-    hasHigherRole,
-  }: any = useAuth();
+  const { hasHigherRole }: any = useAuth();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -142,7 +140,7 @@ const Page = () => {
         <div className="mb-5 flex justify-center">
           {isEdited[id] ? (
             <form onSubmit={(e) => handleUpdateTodo(e)}>
-              <div className="rounded-md p-4 w-full sm:w-64 space-y-4 dark:bg-gray-900 bg-gray-50 transition-all ease-in-out duration-300 shadow-xl">
+              <div className="rounded-md p-4 w-full border border-gray-200 dark:border-gray-700 sm:w-64 space-y-4 dark:bg-gray-900 bg-gray-50 transition-all ease-in-out duration-300 shadow-xl">
                 <h2 className="text-xl">Edit Todo</h2>
                 <hr />
                 <div>
@@ -199,7 +197,7 @@ const Page = () => {
             </form>
           ) : (
             <form onSubmit={(e) => handleSubmitTodo(e)}>
-              <div className="rounded-md p-4 w-full sm:w-64 space-y-4 dark:bg-gray-900 bg-gray-50 transition-all ease-in-out duration-300 transform shadow-xl">
+              <div className="border border-gray-200 dark:border-gray-700 rounded-md p-4 w-full sm:w-64 space-y-4 dark:bg-gray-900 bg-gray-50 transition-all ease-in-out duration-300 transform shadow-xl">
                 <h2 className="text-xl">Add Todo</h2>
                 <hr />
                 <div>
@@ -345,6 +343,6 @@ const Page = () => {
       </div>
     </div>
   );
-}
+};
 
 export default withAuth(Page);

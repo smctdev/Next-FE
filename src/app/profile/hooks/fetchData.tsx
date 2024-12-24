@@ -5,12 +5,10 @@ const useFetch = (url: any, isRefresh: boolean) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (!url) return;
     setError(null);
-    setIsOpen(true);
     const fetchData = async () => {
       try {
         const response = await api.get(url);
@@ -19,14 +17,13 @@ const useFetch = (url: any, isRefresh: boolean) => {
         setError(err);
       } finally {
         setLoading(false);
-        setIsOpen(false);
       }
     };
 
     fetchData();
   }, [url, isRefresh]);
 
-  return { data, loading, error, isOpen };
+  return { data, loading, error };
 };
 
 export default useFetch;
