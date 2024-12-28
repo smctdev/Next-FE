@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Blog App | Register",
+  title: "Register",
   description: "Register to the blog app",
 };
 

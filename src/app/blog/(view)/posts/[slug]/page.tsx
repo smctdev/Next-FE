@@ -7,10 +7,12 @@ import { Post } from "@/app/blog/types/PostType";
 import PostsList from "@/app/blog/components/PostsList";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
 
 const PostWithSlugs = () => {
   const { slug } = useParams();
-  const { data, loading, error }: any = useFetch(`/categories/${slug}`, false);
+  const [isRefresh, setIsRefresh] = useState(false);
+  const { data, loading, error }: any = useFetch(`/categories/${slug}`, isRefresh);
 
   return (
     <div className="p-4 dark:bg-black mx-auto">
@@ -40,7 +42,7 @@ const PostWithSlugs = () => {
           <PostLoader />
         ) : data.category.posts?.length > 0 ? (
           data.category.posts.map((post: Post, index: number) => (
-            <PostsList key={index} post={post} />
+            <PostsList key={index} post={post} setIsRefresh={setIsRefresh} />
           ))
         ) : (
           <div className="flex justify-center items-center col-span-full h-64 rounded-lg shadow-md">

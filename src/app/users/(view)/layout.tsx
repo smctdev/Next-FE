@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Blog App | Users",
+  title: "Users",
   description:
     "Welcome to blog app users page. You can post and manage your users",
 };

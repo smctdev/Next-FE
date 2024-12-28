@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Blog App | Todos | Pending",
+  title: "Todos | Pending",
   description:
     "Welcome to blog app todos page. You can post and manage your todos | Pending Todos",
 };

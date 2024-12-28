@@ -118,7 +118,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="text-6xl text-blue-500">
-            <i className="fas fa-edit"></i>
+            <i className="fas text-6xl fa-edit"></i>
           </div>
         </div>
 
@@ -132,7 +132,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="text-6xl text-pink-500">
-            <i className="fas fa-thumbs-up"></i>
+            <i className="fas text-6xl fa-thumbs-up"></i>
           </div>
         </div>
 
@@ -146,7 +146,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="text-6xl text-green-500">
-            <i className="fas fa-comment"></i>
+            <i className="fas text-6xl fa-comment"></i>
           </div>
         </div>
         <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 hover:bg-gray-200 p-6 rounded-lg shadow-md flex justify-between items-center hover:scale-105 transition duration-300 ease-in-out">
@@ -159,7 +159,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="text-6xl text-violet-500">
-            <i className="fas fa-share"></i>
+            <i className="fas text-6xl fa-share"></i>
           </div>
         </div>
       </div>

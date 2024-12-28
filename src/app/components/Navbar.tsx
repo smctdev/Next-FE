@@ -5,6 +5,7 @@ import ActiveLink from "../utils/NavbarActiveLink";
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
 import { Storage } from "../utils/StorageUtils";
+import Image from "./images/Image";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -86,15 +87,7 @@ const Navbar = () => {
                 aria-expanded={dropdownOpen ? "true" : "false"}
               >
                 <span className="sr-only">Open user menu</span>
-                <img
-                  className="w-8 h-8 rounded-full"
-                  src={
-                    isSetProfile?.length === 0 || isSetProfile === undefined
-                      ? "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
-                      : Storage(isSetProfile[0]?.avatar)
-                  }
-                  alt="user photo"
-                />
+                <Image avatar={isSetProfile && isSetProfile[0]?.avatar} alt={user?.name} h={8} w={8} />
               </button>
             ) : (
               <Link
@@ -108,7 +101,7 @@ const Navbar = () => {
             {dropdownOpen && (
               <div
                 ref={dropdownRef}
-                className="absolute z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 min-w-52 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 right-12 top-9 md:right-0 md:top-6"
+                className="border shadow-md dark:border-gray-600 border-gray-200 absolute z-50 mt-4 text-base list-none bg-white divide-y divide-gray-100 min-w-52 rounded-lg dark:bg-gray-700 dark:divide-gray-600 right-12 top-9 md:right-0 md:top-6"
               >
                 <div className="absolute right-3 top-[-4px] transform rotate-45 bg-white dark:bg-gray-700 w-2 h-2"></div>
                 <Link href={"/profile"} onClick={toggleDropdown}>

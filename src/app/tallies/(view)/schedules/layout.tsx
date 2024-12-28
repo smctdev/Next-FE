@@ -1,5 +1,8 @@
 export const metadata = {
-  title: "Blog App | Tallies Schedules",
+  title: {
+    default: "Schedules",
+    template: "Blog App | %s",
+  },
   description: "This page is tallies schedules in NBA",
 };
 

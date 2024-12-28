@@ -1,5 +1,5 @@
 export const metadata = {
-    title: "Blog App | Tallies",
+    title: "Teams",
     description: "This page is tallies list of all teams in NBA",
   };
   

@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Blog App | Login",
+  title: "Login",
   description: "Login to the blog app",
 };
 

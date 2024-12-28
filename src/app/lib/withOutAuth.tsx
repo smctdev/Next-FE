@@ -11,15 +11,16 @@ const withOutAuth = (WrappedComponent: any) => {
 
     useEffect(() => {
       if (isAuthenticated) {
-        if (userRoles?.includes("superadmin")) {
-          router.push("/superadmin/dashboard");
-        } else if (userRoles?.includes("admin")) {
-          router.push("/admin/dashboard");
-        } else if (userRoles?.includes("moderator")) {
-          router.push("/moderator/dashboard");
-        } else {
-          router.push("/dashboard");
-        }
+        // if (userRoles?.includes("superadmin")) {
+        //   router.push("/superadmin/dashboard");
+        // } else if (userRoles?.includes("admin")) {
+        //   router.push("/admin/dashboard");
+        // } else if (userRoles?.includes("moderator")) {
+        //   router.push("/moderator/dashboard");
+        // } else {
+        //   router.push("/dashboard");
+        // }
+        router.push("/dashboard");
       }
     }, [isAuthenticated, loading, router]);
 

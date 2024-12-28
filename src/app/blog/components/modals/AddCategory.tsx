@@ -2,6 +2,8 @@ import api from "@/app/lib/axiosCall";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { CategoryType } from "../../types/CategoryTypes";
 import useToastr from "../../hooks/Toastr";
+import Input from "../inputs/Input";
+import TextArea from "../inputs/TextArea";
 
 export default function AddCategory({
   isOpen,
@@ -14,9 +16,11 @@ export default function AddCategory({
   setIsRefresh: Dispatch<SetStateAction<boolean>>;
   modalRef: any;
 }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [slug, setSlug] = useState("");
+  const [formInputs, setFormInputs] = useState({
+    title: "",
+    description: "",
+    slug: "",
+  });
   const [error, setError] = useState<CategoryType | any>("");
   const [loading, setLoading] = useState(false);
   const { showSuccess, showError } = useToastr();
@@ -31,9 +35,7 @@ export default function AddCategory({
     setLoading(true);
     try {
       const response = await api.post("/categories/create-category", {
-        categoryName: title,
-        description: description,
-        slug: slug,
+        ...formInputs,
       });
       if (response.status === 201) {
         handleCloseModal();
@@ -51,12 +53,21 @@ export default function AddCategory({
     }
   };
 
+  const handleInputChange = (title: any) => (e: any) => {
+    setFormInputs({
+      ...formInputs,
+      [title]: e.target.value,
+    });
+  };
+
   const handleCloseModal = () => {
     setError("");
     onClose(false);
-    setTitle("");
-    setDescription("");
-    setSlug("");
+    setFormInputs({
+      title: "",
+      description: "",
+      slug: "",
+    });
     setError("");
   };
 
@@ -81,63 +92,42 @@ export default function AddCategory({
           </div>
         </div>
         <hr />
-        <form onSubmit={handleSubmit} className="mt-4">
-          <div className="mb-4">
-            <label className="block text-sm font-medium" htmlFor="title">
-              Title
-            </label>
-            <input
+        <form onSubmit={handleSubmit}>
+          <div className="mt-4 max-h-[70vh] overflow-y-auto">
+            <Input
               type="text"
               id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={formInputs.title}
+              onChange={handleInputChange("title")}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:bg-gray-900 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter category title"
+              error={error.categoryName?.message}
+              label="title"
             />
-            {error.categoryName && (
-              <span className="text-sm text-red-500">
-                {error.categoryName.message}
-              </span>
-            )}
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium" htmlFor="description">
-              Description
-            </label>
-            <textarea
+            <TextArea
               id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              label="description"
+              value={formInputs.description}
+              onChange={handleInputChange("description")}
               className="mt-1 block w-full px-3 py-2 border dark:bg-gray-900 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter category description"
               rows={4}
+              error={error.description?.message}
             />
-            {error.description && (
-              <span className="text-sm text-red-500">
-                {error.description.message}
-              </span>
-            )}
-          </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium" htmlFor="slug">
-              Slug
-            </label>
-            <input
+            <Input
+              label="slug"
               type="text"
               id="slug"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
+              value={formInputs.slug}
+              onChange={handleInputChange("slug")}
               className="mt-1 block w-full px-3 dark:bg-gray-900 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter category slug"
+              error={error.slug?.message}
             />
-            {error.slug && (
-              <span className="text-sm text-red-500">{error.slug.message}</span>
-            )}
           </div>
 
-          <div className="flex justify-end space-x-1">
+          <div className="flex justify-end space-x-1 mt-2">
             <button
               type="button"
               onClick={handleCloseModal}

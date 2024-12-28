@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
 import { Storage } from "../utils/StorageUtils";
+import Image from "./images/Image";
 
 export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -89,14 +90,11 @@ export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
                     aria-expanded={dropdownOpen ? "true" : "false"}
                   >
                     <span className="sr-only">Open user menu</span>
-                    <img
-                      className="w-8 h-8 rounded-full"
-                      src={
-                        isSetProfile?.length === 0 || isSetProfile === undefined
-                          ? "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
-                          : Storage(isSetProfile[0]?.avatar)
-                      }
-                      alt="user photo"
+                    <Image
+                      avatar={isSetProfile && isSetProfile[0]?.avatar}
+                      alt={user?.name}
+                      h={8}
+                      w={8}
                     />
                   </button>
                 )}
@@ -104,7 +102,7 @@ export default function SideNav({ toggleSideBar, sidebarButtonRef }: any) {
               {dropdownOpen && (
                 <div
                   ref={dropdownRef}
-                  className="absolute z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 min-w-52 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 right-3 top-11 md:right-5 md:top-10"
+                  className="absolute shadow-md border dark:border-gray-600 border-gray-200 z-50 mt-4 text-base list-none bg-white divide-y divide-gray-100 min-w-52 rounded-lg dark:bg-gray-700 dark:divide-gray-600 right-3 top-11 md:right-5 md:top-10"
                 >
                   <div className="absolute right-3 top-[-4px] transform rotate-45 bg-white dark:bg-gray-700 w-2 h-2 border-l-white border-r-white"></div>
                   <Link href={"/profile"} onClick={toggleDropdown}>

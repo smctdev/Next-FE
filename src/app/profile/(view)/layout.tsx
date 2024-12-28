@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Blog App | Profile",
+  title: "Profile",
   description:
     "User profile page showcasing personal details, bio, skills, and social links of me.",
 };

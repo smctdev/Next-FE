@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  box-sizing: border-box;
+  font-size: 14px;
+  font-family: "Quicksand", sans-serif;
+}
+
 body {
   color: #000;
   background-color: #fff;

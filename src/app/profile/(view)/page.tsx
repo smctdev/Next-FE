@@ -238,7 +238,7 @@ const Profile = () => {
               <div className="w-full flex justify-center">
                 <div className="md:w-2/3">
                   {user?.posts.map((post: any, index: number) => (
-                    <PostsList key={index} post={post} />
+                    <PostsList key={index} post={post} setIsRefresh={setIsRefresh} />
                   ))}
                 </div>
               </div>

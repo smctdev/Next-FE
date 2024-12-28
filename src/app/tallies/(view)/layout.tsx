@@ -1,5 +1,8 @@
 export const metadata = {
-  title: "Blog App | Tallies",
+  title: {
+    default: "Tallies",
+    template: "Blog App | %s"
+  },
   description: "Welcome to Tallies page",
 };
 

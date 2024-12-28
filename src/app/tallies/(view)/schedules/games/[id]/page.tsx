@@ -79,7 +79,7 @@ export default function page() {
                     : ""
                 } `}
               >
-                {gameData?.home_team_score}
+                <span className="text-2xl">{gameData?.home_team_score}</span>
               </span>{" "}
               - {gameData?.visitor_team?.abbreviation}{" "}
               <span
@@ -90,7 +90,7 @@ export default function page() {
                     : ""
                 } `}
               >
-                {gameData?.visitor_team_score}
+                <span className="text-2xl">{gameData?.visitor_team_score}</span>
               </span>
             </p>
             <div className="flex space-x-2 items-center">

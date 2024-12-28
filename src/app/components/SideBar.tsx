@@ -39,6 +39,8 @@ const SideBar = ({ children }: any) => {
   const toogleDropdown = () => {
     if (pathName === "/todos") {
       setDropdownOpen(!dropdownOpen);
+    } else {
+      setDropdownOpen(true);
     }
   };
   return (
@@ -149,7 +151,11 @@ const SideBar = ({ children }: any) => {
               </button>
               <ul
                 id="dropdown-example"
-                className={`${!dropdownOpen && "hidden"} py-2 space-y-2`}
+                className={`${
+                  !dropdownOpen
+                    ? "opacity-0 max-h-0 pointer-events-none -mt-4"
+                    : "opacity-100 max-h-screen pointer-events-auto"
+                } py-2 space-y-2 transition-all duration-200 ease-in-out`}
               >
                 <li onClick={toggleSideBar}>
                   <ChildActiveLink href="/todos/pending">

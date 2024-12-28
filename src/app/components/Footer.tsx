@@ -148,7 +148,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 border-t border-gray-700 pt-6 text-center text-sm">
-          <p>&copy; 2024 Blog App. All rights reserved.</p>
+          <p className="text-xs">&copy; 2024 Blog App. All rights reserved.</p>
         </div>
       </div>
     </div>

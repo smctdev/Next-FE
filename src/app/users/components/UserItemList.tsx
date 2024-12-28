@@ -20,7 +20,12 @@ export default function UserItemList({
         <td className="border-y dark:border-gray-700 border-gray-200 px-4 py-2">
           {item.id}
         </td>
-        <td className="border-y dark:border-gray-700 border-gray-200 px-4 py-2">
+        <td className="border-y dark:border-gray-700 border-gray-200 px-4 py-2 relative">
+          {item.provider !== null && (
+            <span className="absolute top-3 text-xs rounded-md bg-blue-600 px-1 py-0.5">
+              {item.provider}
+            </span>
+          )}
           {item.username}
         </td>
         <td className="border-y dark:border-gray-700 border-gray-200 px-4 py-2">

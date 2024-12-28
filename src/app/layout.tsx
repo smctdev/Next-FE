@@ -18,7 +18,10 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Blog App",
+  title: {
+    default: "Blog App",
+    template: "Blog App | %s",
+  },
   description: "Add post to a blog",
 };
 
@@ -71,6 +74,11 @@ export default function RootLayout({
           rel="shortcut icon"
           href="https://cdn-icons-png.flaticon.com/128/2065/2065254.png"
           type="image/x-icon"
+        />
+
+        <link
+          href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
         />
       </head>
       <body

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import AddCategory from "../components/modals/AddCategory";
 import useFetch from "../hooks/fetchData";

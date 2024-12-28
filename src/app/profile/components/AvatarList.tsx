@@ -119,12 +119,12 @@ export default function AvatarList({ image, setIsRefresh }: any) {
                     : isOverflowing === "left"
                     ? "left-0 right-auto"
                     : "right-0"
-                } absolute 0 z-10 mt-2 w-52 origin-top-right rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black/5 focus:outline-none`}
+                } absolute z-10 mt-2 w-52 origin-top-right rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black/5 focus:outline-none`}
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="menu-button"
               >
-                <div className="py-1">
+                <div className="py-1 w-full">
                   <button
                     type="button"
                     onClick={() => handleUpdateProfile(image.id)}

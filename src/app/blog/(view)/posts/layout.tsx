@@ -2,11 +2,10 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "Blogs",
-    template: "Blog App | Blog %s",
+    default: "Posts",
+    template: "Blog App | %s",
   },
-  description:
-    "Welcome to blog app there is many categories to pick what blogs you want page",
+  description: "Welcome to blog app posts there is many posts to explore.",
 };
 
 export default function RootLayout({

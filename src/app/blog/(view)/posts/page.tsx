@@ -107,7 +107,7 @@ const Posts = () => {
           <PostLoader />
         ) : filteredPosts?.length > 0 ? (
           filteredPosts.map((post: Post, index: number) => (
-            <PostsList key={index} post={post} />
+            <PostsList key={index} post={post} setIsRefresh={setIsRefresh} />
           ))
         ) : (
           <div className="flex justify-center items-center col-span-full h-64 rounded-lg shadow-md">
