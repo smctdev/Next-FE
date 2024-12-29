@@ -13,6 +13,11 @@ export default function PostLoader() {
             <div className="h-4 bg-slate-300 dark:bg-slate-400 rounded w-full mb-2 animate-pulse"></div>
             <div className="h-4 bg-slate-300 dark:bg-slate-400 rounded w-3/6 mb-2 animate-pulse"></div>
             <div className="h-4 bg-slate-300 dark:bg-slate-400 rounded w-3/5 mb-2 animate-pulse"></div>
+            <div className="flex justify-between items-center border-t p-2 border-gray-400 dark:border-gray-500">
+              <div className="h-4 bg-slate-300 dark:bg-slate-400 rounded w-28 mb-2 animate-pulse mx-auto"></div>
+              <div className="h-4 bg-slate-300 dark:bg-slate-400 rounded w-28 mb-2 animate-pulse mx-auto"></div>
+              <div className="h-4 bg-slate-300 dark:bg-slate-400 rounded w-28 mb-2 animate-pulse mx-auto"></div>
+            </div>
           </div>
         </div>
       ))}

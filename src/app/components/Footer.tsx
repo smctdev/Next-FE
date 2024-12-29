@@ -7,7 +7,7 @@ export default function Footer() {
   const { isAuthenticated }: any = useAuth();
 
   return (
-    <div className="bg-gray-50 text-sm dark:bg-gray-900 py-8 w-full overflow-hidden text-gray-800 dark:text-gray-200">
+    <div className="bg-gray-50 text-sm dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 py-8 w-full overflow-hidden text-gray-800 dark:text-gray-200">
       <div className="w-full mx-auto px-6">
         <div className="flex flex-wrap justify-center xl:justify-between gap-8 px-6 w-full">
           <div>

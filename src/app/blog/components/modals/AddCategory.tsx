@@ -17,7 +17,7 @@ export default function AddCategory({
   modalRef: any;
 }) {
   const [formInputs, setFormInputs] = useState({
-    title: "",
+    categoryName: "",
     description: "",
     slug: "",
   });
@@ -64,7 +64,7 @@ export default function AddCategory({
     setError("");
     onClose(false);
     setFormInputs({
-      title: "",
+      categoryName: "",
       description: "",
       slug: "",
     });
@@ -96,11 +96,11 @@ export default function AddCategory({
           <div className="mt-4 max-h-[70vh] overflow-y-auto">
             <Input
               type="text"
-              id="title"
-              value={formInputs.title}
-              onChange={handleInputChange("title")}
+              id="categoryName"
+              value={formInputs.categoryName}
+              onChange={handleInputChange("categoryName")}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:bg-gray-900 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter category title"
+              placeholder="Enter category name"
               error={error.categoryName?.message}
               label="title"
             />

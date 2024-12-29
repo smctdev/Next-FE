@@ -16,6 +16,7 @@ export default function PostsList({ post, setIsRefresh }: any) {
   const [comment, setComment] = useState("");
   const [error, setError] = useState<any>("");
   const { user }: any = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const textareaRef = useRef<any>("");
 
@@ -51,6 +52,10 @@ export default function PostsList({ post, setIsRefresh }: any) {
       ...isCommentOpen,
       [postId]: true,
     }));
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+    setIsOpen(true);
   };
 
   const handleNavigate = () => {
@@ -59,13 +64,14 @@ export default function PostsList({ post, setIsRefresh }: any) {
 
   const handleSubmitComment = (postId: any) => async () => {
     setIsRefresh(true);
+    textareaRef.current.focus();
     try {
       const response = await api.post(`/comments/${postId}`, {
         comment,
       });
 
       if (textareaRef.current && response.status === 201) {
-        textareaRef.current.style.height = "40px";
+        textareaRef.current.style.height = "auto";
         setComment("");
         setError("");
       }
@@ -102,6 +108,10 @@ export default function PostsList({ post, setIsRefresh }: any) {
     } else {
       textareaRef.current.style.overflowY = "hidden";
     }
+  };
+
+  const handleClickOpen = () => {
+    setIsOpen(true);
   };
 
   return (
@@ -205,6 +215,8 @@ export default function PostsList({ post, setIsRefresh }: any) {
                   ? "You"
                   : post?.user === null
                   ? "Deleted User"
+                  : post?.user?.name === null
+                  ? "Anonymous"
                   : post?.user?.name}
               </span>
             </span>
@@ -235,11 +247,15 @@ export default function PostsList({ post, setIsRefresh }: any) {
             </span>
           </div>
         </div>
-        {post.likes.length > 0 && (
-          <div className="flex justify-between text-center px-2 border-t border-gray-200 dark:border-gray-700 py-2">
+        {(post.likes.length || post.comments.length) > 0 && (
+          <div className="flex justify-between text-center p-2 border-t border-gray-200 dark:border-gray-700">
             <div className="flex gap-2 items-center">
-              <i className="fas fa-thumbs-up text-blue-500"></i>
-              <span>{post.likes.length}</span>
+              {post.likes.length > 0 && (
+                <>
+                  <i className="fas fa-thumbs-up text-blue-500"></i>
+                  <span>{post.likes.length}</span>
+                </>
+              )}
               <div className="flex gap-1 items-center">
                 {post.likes.length > 0 &&
                   post.likes
@@ -261,6 +277,8 @@ export default function PostsList({ post, setIsRefresh }: any) {
                       >
                         {liker.userId === user?.id
                           ? `You${post.likes.length > 1 ? "," : ""}`
+                          : liker.user.name === null
+                          ? "Anonymous"
                           : `${liker.user.name}`}
                       </span>
                     ))}
@@ -279,8 +297,12 @@ export default function PostsList({ post, setIsRefresh }: any) {
             </div>
             <div className="flex gap-2">
               <div className="flex gap-2 items-center">
-                <i className="far fa-comment"></i>
-                <span>2</span>
+                {post.comments.length > 0 && (
+                  <>
+                    <i className="far fa-comment"></i>
+                    <span>2</span>
+                  </>
+                )}
               </div>
               <div className="flex gap-2 items-center">
                 <i className="far fa-share"></i>
@@ -305,62 +327,67 @@ export default function PostsList({ post, setIsRefresh }: any) {
           />
           <PostButton type="button" icon="share" label="Share" />
         </div>
-        <div className="border-t flex justify-between items-center flex-col gap-2 border-gray-200 dark:border-gray-700 py-5">
-          {post.comments.length > 0 &&
-            post.comments
-              .slice(0, 1)
-              .map((comment: any, index: number) => (
-                <CommentsList
-                  key={index}
-                  comment={comment}
-                  postUserId={post.userId}
+        {(isCommentOpen[post.id] || post.comments.length > 0) && (
+          <div className="border-t flex justify-between items-center flex-col gap-2 border-gray-200 dark:border-gray-700 py-5">
+            {post.comments.length > 0 &&
+              post.comments
+                .slice(0, 1)
+                .map((comment: any, index: number) => (
+                  <CommentsList
+                    key={index}
+                    comment={comment}
+                    postUserId={post.userId}
+                  />
+                ))}
+            {(isCommentOpen[post.id] || post.comments.length > 0) && user && (
+              <div className="flex gap-2 w-full px-3">
+                <Image
+                  avatar={user?.profile_pictures[0]?.avatar}
+                  alt={user?.name}
+                  h={8}
+                  w={8}
                 />
-              ))}
-          {isCommentOpen[post.id] && (
-            <div className="flex gap-2 w-full px-3">
-              <Image
-                avatar={user?.profile_pictures[0]?.avatar}
-                alt={user?.name}
-                h={8}
-                w={8}
-              />
-              <div className="w-full px-3 dark:bg-gray-700 bg-gray-200 rounded-lg mx-2">
-                <TextAreaComment
-                  ref={textareaRef}
-                  value={comment}
-                  error={error.comment?.message}
-                  onKeyDown={handleKeyDown(post.id)}
-                  onChange={handleInputChange}
-                  onInput={handleInput}
-                  placeholder={`Comment as ${user?.name}`}
-                  rows={1}
-                />
+                <div className="w-full px-3 pt-2 dark:bg-gray-700 bg-gray-200 mx-2 rounded-3xl">
+                  <TextAreaComment
+                    ref={textareaRef}
+                    onClick={handleClickOpen}
+                    value={comment}
+                    error={error.comment?.message}
+                    onKeyDown={handleKeyDown(post.id)}
+                    onChange={handleInputChange}
+                    onInput={handleInput}
+                    placeholder={`Comment as ${user?.name}`}
+                    rows={1}
+                  />
 
-                <div className="flex justify-between pb-2 items-center">
-                  <div>
-                    <i className="far fa-smile"></i>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      disabled={!comment}
-                      onClick={
-                        comment ? handleSubmitComment(post.id) : undefined
-                      }
-                      className={`${
-                        !comment
-                          ? "cursor-not-allowed"
-                          : "text-blue-500 dark:text-blue-300 hover:dark:bg-gray-600 hover:bg-gray-300"
-                      } rounded-full px-2 py-1`}
-                    >
-                      <i className="far fa-paper-plane-top"></i>
-                    </button>
-                  </div>
+                  {isOpen && (
+                    <div className="flex justify-between pb-2 items-center transition-all duration-300 ease-in-out">
+                      <div>
+                        <i className="far fa-smile"></i>
+                      </div>
+                      <div>
+                        <button
+                          type="button"
+                          disabled={!comment}
+                          onClick={
+                            comment ? handleSubmitComment(post.id) : undefined
+                          }
+                          className={`${
+                            !comment
+                              ? "cursor-not-allowed text-gray-400 dark:text-gray-500"
+                              : "text-blue-500 dark:text-blue-300 hover:dark:bg-gray-600 hover:bg-gray-300"
+                          } rounded-full px-2 py-1`}
+                        >
+                          <i className="far fa-paper-plane-top"></i>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
