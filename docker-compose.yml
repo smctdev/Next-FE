@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  client-blog:
+    build: .
+    container_name: client-blog
+    restart: unless-stopped
+    networks:
+      - blog-app
+    depends_on:
+      - nginx
+
+  nginx-blog:
+    image: nginx:alpine
+    container_name: blog-nginx
+    restart: unless-stopped
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/usr/share/nginx/html
+    ports:
+      - "2001:2001"
+    networks:
+      - blog-app
+
+networks:
+  blog-app:
+    driver: bridge

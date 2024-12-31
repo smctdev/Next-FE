@@ -1,41 +1,34 @@
-FROM node:20.14.0-alpine AS deps
+# Step 1: Build the Next.js application
+FROM node:18 AS builder
 
-RUN apk add --no-cache libc6-compat
+# Set working directory
 WORKDIR /app
 
-RUN npm install -g pnpm
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm install
 
-COPY package.json pnpm-lock.yaml* ./
-
-RUN pnpm install
-
-FROM node:20.14.0-alpine AS builder
-WORKDIR /app
-
-RUN npm install -g pnpm
-
-COPY --from=deps /app/node_modules ./node_modules
-
+# Copy the rest of the application
 COPY . .
 
-# RUN pnpm run build
+# Build the Next.js app
+RUN npm run build
 
-FROM node:20.14.0-alpine AS runner
+# Step 2: Create the production image
+FROM node:18 AS production
+
 WORKDIR /app
 
-RUN npm install -g pnpm
+# Install only production dependencies
+COPY --from=builder /app/package.json /app/package-lock.json ./
+RUN npm install --production
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Copy built files from builder
+COPY --from=builder /app/.next /app/.next
+COPY --from=builder /app/public /app/public
 
-COPY --from=builder /app/public ./public
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+# Expose the application port
+EXPOSE 2001
 
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 5005
-
-CMD ["pnpm", "run", "dev"]
+# Start the Next.js app
+CMD ["npm", "start"]
