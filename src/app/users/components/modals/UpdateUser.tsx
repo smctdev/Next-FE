@@ -15,18 +15,17 @@ export default function UpdateUser({
 }: any) {
   const [error, setError] = useState<string | any>("");
   const { data, error: errorRoles, loading }: any = useFetch("/role", false);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     data: userData,
     error: errorUser,
     loading: loadingUser,
-    isOpen: isOpenLoading,
-  }: any = useFetch(isOpen && `/users/${id}`, false);
+  }: any = useFetch(isOpen && `/users/${id}`, isLoading);
   const { showSuccess }: any = useToastr();
-  const [isLoading, setIsLoading] = useState(false);
   const [formInputs, setFormInputs] = useState<FormInputsInterface | any>({});
 
   useEffect(() => {
-    if (isOpen && userData) {
+    if (isOpen) {
       let roleId: string = "";
 
       if (userData?.user?.roles.length > 0) {
@@ -43,7 +42,7 @@ export default function UpdateUser({
         oldPassword: "",
       });
     }
-  }, [isOpen, userData]);
+  }, [isOpen]);
 
   if (!isOpen) {
     return null;
@@ -88,6 +87,11 @@ export default function UpdateUser({
     }
   };
 
+  const handleClose = () => {
+    onClose();
+    setError("");
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-[50]">
       <div
@@ -96,7 +100,7 @@ export default function UpdateUser({
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className="px-2 text-white py-0.5 rounded-full bg-gray-400 bg-opacity-75 hover:scale-95 transition-all duration-300 ease-in-out hover:bg-gray-500 hover:bg-opacity-75 absolute top-2 right-2"
         >
           <i className="far fa-xmark"></i>
@@ -104,7 +108,7 @@ export default function UpdateUser({
         <h2 className="text-xl font-bold mb-4">Updating {userName}...</h2>
         <hr className="border-gray-500" />
         <form onSubmit={handleSubmit}>
-          {loadingUser || isOpenLoading ? (
+          {loadingUser ? (
             <UpdateLoader />
           ) : (
             <>
@@ -116,7 +120,6 @@ export default function UpdateUser({
                     value={formInputs.name}
                     className="border border-gray-300 dark:border-gray-600 w-full rounded-md py-2 focus:ring-1 px-2 focus:outline-none focus:ring-blue-500"
                     placeholder="Enter name"
-                    // onChange={(e) => setName(e.target.value)}
                     onChange={handleChange("name")}
                   />
                   {error.name && (
@@ -228,7 +231,7 @@ export default function UpdateUser({
               </div>
               <div className="flex gap-2 justify-end border-t pt-3">
                 <button
-                  onClick={onClose}
+                  onClick={handleClose}
                   type="button"
                   className="px-2 py-1.5 rounded-md bg-gray-400 hover:scale-105 transition-all duration-300 ease-in-out hover:bg-gray-500"
                 >

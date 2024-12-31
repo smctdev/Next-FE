@@ -1,13 +1,12 @@
 import { useState } from "react";
 import Image from "./images/Image";
+import commentDateFormat from "../utils/commentDateFormat";
+import dateFormat from "../utils/dateFormat";
 
-export default function CommentsList({
-  comment,
-  postUserId,
-}: any) {
+export default function CommentsList({ comment, author, commentOwner }: any) {
   const [seeMore, setSeeMore] = useState(false);
   const handleSeeMore = () => {
-    if (comment.comment.length > 300) {
+    if (comment.comment.length > 100) {
       setSeeMore(!seeMore);
     }
   };
@@ -20,21 +19,22 @@ export default function CommentsList({
           h={8}
           w={8}
         />
-        <div className="rounded-xl text-gray-900 dark:text-gray-300 dark:bg-gray-700 bg-gray-300 p-2 w-full">
-          <p className="text-md font-bold">
-            {comment.user === null ? "Deleted User" : comment.user.name}{" "}
-            {comment.userId === postUserId && (
-              <span className="text-xs bg-gray-400 text-white dark:bg-gray-600 px-2 py-1 rounded-lg">
+        <div className="rounded-xl text-gray-900 dark:text-gray-300 dark:bg-gray-700 bg-gray-100 p-2 w-full">
+          <p className={`text-md font-bold relative ${author && "pt-6"}`}>
+            {author && (
+              <span className="absolute top-0 text-xs bg-gray-300 text-gray-700 dark:text-gray-100 dark:bg-gray-600 px-2 py-1 rounded-lg">
+                <i className="far fa-microphone-stand text-xs -scale-x-100"></i>{" "}
                 Author
               </span>
             )}
+            {comment.user === null ? "Deleted User" : comment.user.name}
           </p>
           <p className="break-all whitespace-break-spaces">
             <span
               className={`${
                 seeMore
-                  ? comment.comment.length < 300
-                  : comment.comment.length > 300
+                  ? comment.comment.length < 100
+                  : comment.comment.length > 100
                   ? "line-clamp-3"
                   : ""
               }`}
@@ -42,8 +42,8 @@ export default function CommentsList({
               {comment.comment}
             </span>
             {seeMore
-              ? comment.comment.length < 300
-              : comment.comment.length > 300 && (
+              ? comment.comment.length < 100
+              : comment.comment.length > 100 && (
                   <>
                     <button
                       type="button"
@@ -57,10 +57,19 @@ export default function CommentsList({
           </p>
         </div>
         <div className="absolute -bottom-1 left-[45px]">
-          <div className="flex gap-2">
-            <button type="button" className="hover:underline">Like</button>
-            <button type="button" className="hover:underline">Reply</button>
-            <button type="button" className="hover:underline">Delete</button>
+          <div className="flex gap-4 text-sm items-center">
+            <span className="text-gray-500 text-sm dark:text-gray-400 font-semibold hover:underline cursor-pointer" title={dateFormat(comment.createdAt)}>{commentDateFormat(comment.createdAt)}</span>
+            <button type="button" className="hover:underline">
+              Like
+            </button>
+            <button type="button" className="hover:underline">
+              Reply
+            </button>
+            {commentOwner && (
+              <button type="button" className="hover:underline">
+                Delete
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import api from "@/app/lib/axiosCall";
 import { useState } from "react";
 import useToastr from "../../hooks/Toastr";
-import { formatDate, set } from "date-fns";
+import { formatDate } from "date-fns";
 
 export default function EditProfile({
   isOpen,

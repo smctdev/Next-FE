@@ -13,6 +13,7 @@ import {
   Legend,
 } from "chart.js";
 import withAuth from "../lib/withAuth";
+import useFetch from "./hooks/fetchData";
 
 ChartJS.register(
   CategoryScale,
@@ -26,10 +27,12 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  const { data, loading }: any = useFetch("/dashboard", false);
+
   const dashboardData = {
-    posts: 150,
-    likes: 1200,
-    comments: 350,
+    posts: data.postCounts,
+    likes: data.likeCounts,
+    comments: data.commentCounts,
     shares: 500,
   };
 
@@ -114,11 +117,17 @@ const Dashboard = () => {
               Posts
             </h3>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              {dashboardData.posts}
+              {loading ? (
+                <>
+                  <i className="far fa-fan animate-spin text-3xl"></i>
+                </>
+              ) : (
+                dashboardData.posts
+              )}
             </p>
           </div>
           <div className="text-6xl text-blue-500">
-            <i className="fas text-6xl fa-edit"></i>
+            <i className="fas text-6xl fa-sign-post"></i>
           </div>
         </div>
 
@@ -128,7 +137,13 @@ const Dashboard = () => {
               Likes
             </h3>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              {dashboardData.likes}
+              {loading ? (
+                <>
+                  <i className="far fa-fan animate-spin text-3xl"></i>
+                </>
+              ) : (
+                dashboardData.likes
+              )}
             </p>
           </div>
           <div className="text-6xl text-pink-500">
@@ -142,7 +157,13 @@ const Dashboard = () => {
               Comments
             </h3>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              {dashboardData.comments}
+              {loading ? (
+                <>
+                  <i className="far fa-fan animate-spin text-3xl"></i>
+                </>
+              ) : (
+                dashboardData.comments
+              )}
             </p>
           </div>
           <div className="text-6xl text-green-500">

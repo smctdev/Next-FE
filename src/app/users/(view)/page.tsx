@@ -9,17 +9,15 @@ import useToastr from "../hooks/Toastr";
 import withRoleAuth from "@/app/lib/withRoleAuth";
 import AddUser from "../components/modals/AddUser";
 import DeleteConfirmation from "../utils/DeleteConfirmation";
-import UpdateUser from "../components/modals/UpdateUser";
 
 const Users = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
-  const [isUpdateUserModal, setIsUpdateUserModal] = useState(false);
+  const [id, setId] = useState("");
   const { data, loading, error }: any = useFetch("/users", isRefresh);
   const { showSuccess, showError }: any = useToastr();
   const [userName, setUserName] = useState("");
-  const [id, setId] = useState("");
   const modalRef = useRef<HTMLElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -88,12 +86,6 @@ const Users = () => {
     setId(id);
   };
 
-  const handleUpdateUserModal = (id: string, name: string) => {
-    setId(id);
-    setUserName(name);
-    setIsUpdateUserModal(!isUpdateUserModal);
-  };
-
   const handleOpenModal = () => {
     setIsOpen(!isOpen);
   };
@@ -136,7 +128,7 @@ const Users = () => {
                   index={index}
                   handleVerifyUser={handleVerifyUser}
                   handleConfirmDelete={handleConfirmDelete}
-                  handleUpdateUserModal={handleUpdateUserModal}
+                  setIsRefresh={setIsRefresh}
                 />
               ))
             ) : (
@@ -161,13 +153,6 @@ const Users = () => {
         id={id}
         isOpen={isOpenConfirmDelete}
         onClose={handleConfirmDelete}
-      />
-      <UpdateUser
-        isOpen={isUpdateUserModal}
-        userName={userName}
-        id={id}
-        setIsRefresh={setIsRefresh}
-        onClose={handleUpdateUserModal}
       />
     </div>
   );

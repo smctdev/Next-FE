@@ -1,57 +1,31 @@
-import { useAuth } from "@/app/context/AuthContext";
 import { Storage } from "@/app/utils/StorageUtils";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import dateFormat from "../utils/dateFormat";
 import PostButton from "./buttons/PostButton";
 import api from "@/app/lib/axiosCall";
 import { useRouter } from "next/navigation";
-import TextAreaComment from "./inputs/TextAreaComment";
 import CommentsList from "./CommentsList";
 import Image from "./images/Image";
-import ViewPostComments from "./modals/ViewPostComments";
 
-export default function PostsList({ post, setIsRefresh }: any) {
+export default function SinglePost({
+  post,
+  setIsRefresh,
+  setIsRefreshData,
+  user,
+}: any) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isCommentOpen, setIsCommentOpen] = useState<any>({});
-  const [comment, setComment] = useState("");
-  const [error, setError] = useState<any>("");
-  const { user }: any = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isViewCommentOpen, setIsViewCommentOpen] = useState(false);
-  const [postId, setPostId] = useState<any>(null);
   const router = useRouter();
-  const textareaRef = useRef<any>("");
-  const modalRef = useRef<any>(null);
-  const buttonRef = useRef<any>(null);
 
-  const isLiked = post.likes.some((liker: any) => liker.userId === user?.id);
-
-  useEffect(() => {
-    const handleClickOutside = (e: any) => {
-      if (
-        buttonRef.current &&
-        !buttonRef.current.contains(e.target as Node) &&
-        modalRef.current &&
-        !modalRef.current.contains(e.target as Node)
-      ) {
-        setIsViewCommentOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const isLiked = post?.likes?.some((liker: any) => liker.userId === user?.id);
 
   const nextImage = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % post.image.length);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % post?.image.length);
   };
 
   const prevImage = () => {
     setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + post.image.length) % post.image.length
+      (prevIndex) => (prevIndex - 1 + post?.image.length) % post?.image.length
     );
   };
 
@@ -61,104 +35,35 @@ export default function PostsList({ post, setIsRefresh }: any) {
 
   const handleLike = (postId: number) => async () => {
     setIsRefresh(true);
+    setIsRefreshData(true);
     try {
       await api.post(`/posts/like/${postId}`, {});
     } catch (error: any) {
       console.error(error);
     } finally {
       setIsRefresh(false);
+      setIsRefreshData(false);
     }
-  };
-
-  const handleOpenComment = (postId: number) => async () => {
-    setIsCommentOpen((isCommentOpen: any) => ({
-      ...isCommentOpen,
-      [postId]: true,
-    }));
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
-    setIsOpen(true);
   };
 
   const handleNavigate = () => {
     router.push("/login");
   };
 
-  const handleSubmitComment = (postId: any) => async () => {
-    setIsRefresh(true);
-    textareaRef.current.focus();
-    try {
-      const response = await api.post(`/comments/${postId}`, {
-        comment,
-      });
-
-      if (textareaRef.current && response.status === 201) {
-        textareaRef.current.style.height = "auto";
-        setComment("");
-        setError("");
-      }
-    } catch (error: any) {
-      console.error(error);
-      setError(error.response.data);
-    } finally {
-      setIsRefresh(false);
-    }
-  };
-
-  const handleKeyDown = (postId: any) => (e: any) => {
-    if (window.innerWidth > 640) {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        if (comment) {
-          handleSubmitComment(postId)();
-        }
-      }
-    }
-  };
-
-  const handleInputChange = (e: any) => {
-    setComment(e.target.value);
-  };
-
-  const handleInput = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-    if (textareaRef.current.scrollHeight > 200) {
-      textareaRef.current.style.overflowY = "auto";
-    } else {
-      textareaRef.current.style.overflowY = "hidden";
-    }
-  };
-
-  const handleClickOpen = () => {
-    setIsOpen(true);
-  };
-
-  const handleViewComment = (postId: number) => () => {
-    setPostId(postId);
-    setIsViewCommentOpen(!isViewCommentOpen);
-  };
-
   return (
     <div className="mb-5">
-      <div
-        className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-900 shadow-md rounded-lg overflow-hidden transition-all duration-300 ease-in-out"
-        data-aos="fade-up"
-      >
+      <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-800 shadow-md rounded-lg overflow-hidden transition-all duration-300 ease-in-out">
         <div className="bg-blue-500 text-white px-4 py-2 rounded-t-md text-center text-sm font-semibold uppercase tracking-wide">
           <Link
             className="hover:underline"
-            href={`/blog/posts/${post.category.slug}`}
+            href={`/blog/posts/${post?.category?.slug}`}
           >
-            {post.category.categoryName}
+            {post?.category?.categoryName}
           </Link>
         </div>
 
         <div className="shadow-sm p-2">
-          {post.image.length !== 0 && (
+          {post?.image.length !== 0 && (
             <>
               <div className="relative w-full h-[450px] overflow-hidden rounded-lg">
                 <div
@@ -167,7 +72,7 @@ export default function PostsList({ post, setIsRefresh }: any) {
                     transform: `translateX(-${currentIndex * 100}%)`,
                   }}
                 >
-                  {post.image.map((image: any, index: number) => (
+                  {post?.image.map((image: any, index: number) => (
                     <div
                       key={index}
                       className="flex-shrink-0 w-full h-full relative"
@@ -181,7 +86,7 @@ export default function PostsList({ post, setIsRefresh }: any) {
                   ))}
                 </div>
 
-                {post.image.length > 1 && (
+                {post?.image.length > 1 && (
                   <>
                     <button
                       onClick={prevImage}
@@ -200,9 +105,9 @@ export default function PostsList({ post, setIsRefresh }: any) {
                 )}
               </div>
 
-              {post.image.length > 1 && (
+              {post?.image.length > 1 && (
                 <div className="flex justify-center mt-2">
-                  {post.image.map((_: any, index: any) => (
+                  {post?.image.map((_: any, index: any) => (
                     <div
                       onClick={() => imageIndex(index)}
                       key={index}
@@ -219,10 +124,10 @@ export default function PostsList({ post, setIsRefresh }: any) {
 
         <div className="px-4 py-2">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {post.title}
+            {post?.title}
           </h2>
           <p className="text-lg text-gray-700 dark:text-gray-300 whitespace-break-spaces">
-            {post.description}
+            {post?.description}
           </p>
         </div>
 
@@ -240,7 +145,7 @@ export default function PostsList({ post, setIsRefresh }: any) {
                 w={5}
               />{" "}
               <span className="truncate" title={post?.user?.name}>
-                {post?.user?.id === user?.id
+                {post?.user?.name === user?.name
                   ? "You"
                   : post?.user === null
                   ? "Deleted User"
@@ -252,15 +157,15 @@ export default function PostsList({ post, setIsRefresh }: any) {
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-300 truncate">
             <span>
-              {post.publishedAs === "public" ? (
+              {post?.publishedAs === "public" ? (
                 <>
                   <i className="far fa-earth-americas"></i>
                 </>
-              ) : post.publishedAs === "private" ? (
+              ) : post?.publishedAs === "private" ? (
                 <>
                   <i className="far fa-lock"></i>
                 </>
-              ) : post.publishedAs === "friends" ? (
+              ) : post?.publishedAs === "friends" ? (
                 <>
                   <i className="far fa-user-group"></i>
                 </>
@@ -270,24 +175,24 @@ export default function PostsList({ post, setIsRefresh }: any) {
                 </>
               )}{" "}
               •{" "}
-              <small title={dateFormat(post.createdAt)}>
-                {dateFormat(post.createdAt)}
+              <small title={dateFormat(post?.createdAt)}>
+                {dateFormat(post?.createdAt)}
               </small>
             </span>
           </div>
         </div>
-        {(post.likes.length || post.comments.length) > 0 && (
+        {(post?.likes.length || post?.comments.length) > 0 && (
           <div className="flex justify-between text-center p-2 border-t border-gray-200 dark:border-gray-700">
             <div className="cursor-pointer flex gap-2 items-center">
-              {post.likes.length > 0 && (
+              {post?.likes.length > 0 && (
                 <>
                   <i className="fas fa-thumbs-up text-blue-500"></i>
-                  <span>{post.likes.length}</span>
+                  <span>{post?.likes.length}</span>
                 </>
               )}
               <div className="flex gap-1 items-center">
-                {post.likes.length > 0 &&
-                  post.likes
+                {post?.likes.length > 0 &&
+                  post?.likes
                     .sort((a: any, b: any) => {
                       if (a.userId === user?.id) {
                         return -1;
@@ -305,18 +210,18 @@ export default function PostsList({ post, setIsRefresh }: any) {
                         title={liker.user.name}
                       >
                         {liker.userId === user?.id
-                          ? `You${post.likes.length > 1 ? "," : ""}`
+                          ? `You${post?.likes.length > 1 ? "," : ""}`
                           : liker.user.name === null
                           ? "Anonymous"
                           : `${liker.user.name}`}
                       </span>
                     ))}
-                {post.likes.length - (isLiked ? 1 : 0) > 1 && (
+                {post?.likes.length - (isLiked ? 1 : 0) > 1 && (
                   <span className="sm:max-w-full max-w-[100px] relative group hover:underline cursor-pointer">
                     and others
                     <div className="hidden group-hover:block absolute w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 left-0 bottom-full">
                       <ul>
-                        {post.likes
+                        {post?.likes
                           .sort((a: any, b: any) => {
                             if (a.userId === user?.id) {
                               return -1;
@@ -337,21 +242,17 @@ export default function PostsList({ post, setIsRefresh }: any) {
               </div>
             </div>
             <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={user ? handleViewComment(post.id) : handleNavigate}
-                ref={buttonRef}
-              >
-                {post.comments.length > 0 && (
-                  <span className="hover:border-b border-gray-600 dark:border-gray-300 relative group">
+              <button type="button">
+                {post?.comments.length > 0 && (
+                  <span className="hover:border-b relative group border-gray-600 dark:border-gray-300">
                     <i className="far fa-comment"></i>
                     <span className="ml-1">
-                      {post.comments.length}{" "}
-                      {post.comments.length === 1 ? "comment" : "comments"}
+                      {post?.comments.length}{" "}
+                      {post?.comments.length === 1 ? "comment" : "comments"}
                     </span>
                     <div className="hidden group-hover:block absolute w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 right-0 bottom-full">
                       <ul>
-                        {post.comments
+                        {post?.comments
                           .filter(
                             (value: any, index: any, self: any) =>
                               index ===
@@ -371,12 +272,10 @@ export default function PostsList({ post, setIsRefresh }: any) {
                           })
                           .map((commenter: any, index: number) => (
                             <li key={index}>
-                              {commenter?.userId === user?.id
+                              {commenter?.user?.id === user?.id
                                 ? "You"
                                 : commenter?.user?.name === null
                                 ? "Anonymous"
-                                : commenter?.user === null
-                                ? "Deleted User"
                                 : commenter?.user?.name}
                             </li>
                           ))}
@@ -397,94 +296,28 @@ export default function PostsList({ post, setIsRefresh }: any) {
         <div className="border-t flex justify-between items-center border-gray-200 dark:border-gray-700 py-1">
           <PostButton
             type="button"
-            onClick={user ? handleLike(post.id) : handleNavigate}
+            onClick={user ? handleLike(post?.id) : handleNavigate}
             icon="thumbs-up"
             label="Like"
             isLiked={isLiked}
           />
-          <PostButton
-            type="button"
-            icon="comment"
-            label="Comment"
-            onClick={user ? handleOpenComment(post.id) : handleNavigate}
-          />
+          <PostButton type="button" icon="comment" label="Comment" />
           <PostButton type="button" icon="share" label="Share" />
         </div>
-        {(isCommentOpen[post.id] || post.comments.length > 0) && (
+        {post?.comments.length > 0 && (
           <div className="border-t flex justify-between items-center flex-col gap-2 border-gray-200 dark:border-gray-700 py-5">
-            {post.comments.length > 0 &&
-              post.comments
-                .slice(0, 1)
-                .map((comment: any, index: number) => (
-                  <CommentsList
-                    key={index}
-                    comment={comment}
-                    author={comment.userId === post.userId}
-                    commentOwner={comment.userId === user?.id}
-                  />
-                ))}
-            {(isCommentOpen[post.id] || post.comments.length > 0) && user && (
-              <div className="flex gap-2 w-full px-3">
-                <Image
-                  avatar={user?.profile_pictures[0]?.avatar}
-                  alt={user?.name}
-                  h={8}
-                  w={8}
+            {post?.comments.length > 0 &&
+              post?.comments.map((comment: any, index: number) => (
+                <CommentsList
+                  key={index}
+                  comment={comment}
+                  author={comment.userId === post?.userId}
+                  commentOwner={comment.userId === user?.id}
                 />
-                <div className="w-full px-3 pt-2 dark:bg-gray-700 bg-gray-200 mx-2 rounded-3xl relative">
-                  <TextAreaComment
-                    ref={textareaRef}
-                    onClick={handleClickOpen}
-                    value={comment}
-                    error={error.comment?.message}
-                    onKeyDown={handleKeyDown(post.id)}
-                    onChange={handleInputChange}
-                    onInput={handleInput}
-                    placeholder={`Comment as ${user?.name}`}
-                    rows={1}
-                  />
-                  {!isOpen && (
-                    <div className="absolute top-2 right-3">
-                      <i className="far fa-smile"></i>
-                    </div>
-                  )}
-
-                  {isOpen && (
-                    <div className="flex justify-between pb-2 items-center transition-all duration-300 ease-in-out">
-                      <div>
-                        <i className="far fa-smile"></i>
-                      </div>
-                      <div>
-                        <button
-                          type="button"
-                          disabled={!comment}
-                          onClick={
-                            comment ? handleSubmitComment(post.id) : undefined
-                          }
-                          className={`${
-                            !comment
-                              ? "cursor-not-allowed text-gray-400 dark:text-gray-500"
-                              : "text-blue-500 dark:text-blue-300 hover:dark:bg-gray-600 hover:bg-gray-300"
-                          } rounded-full px-2 py-1`}
-                        >
-                          <i className="far fa-paper-plane-top"></i>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+              ))}
           </div>
         )}
       </div>
-      <ViewPostComments
-        modalRef={modalRef}
-        isOpen={isViewCommentOpen}
-        onClose={handleViewComment(post.id)}
-        postId={postId}
-        setIsRefresh={setIsRefresh}
-      />
     </div>
   );
 }
