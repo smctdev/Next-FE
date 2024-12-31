@@ -5,7 +5,7 @@ FROM node:18 AS builder
 WORKDIR /app
 
 # Install dependencies
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml ./
 RUN npm install
 
 # Copy the rest of the application
@@ -20,7 +20,7 @@ FROM node:18 AS production
 WORKDIR /app
 
 # Install only production dependencies
-COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 RUN npm install --production
 
 # Copy built files from builder
