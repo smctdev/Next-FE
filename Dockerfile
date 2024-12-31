@@ -6,13 +6,13 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json pnpm-lock.yaml ./
-RUN npm install
+RUN pnpm install
 
 # Copy the rest of the application
 COPY . .
 
 # Build the Next.js app
-RUN npm run build
+RUN pnpm run build
 
 # Step 2: Create the production image
 FROM node:18 AS production
@@ -21,7 +21,7 @@ WORKDIR /app
 
 # Install only production dependencies
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
-RUN npm install --production
+RUN pnpm install --production
 
 # Copy built files from builder
 COPY --from=builder /app/.next /app/.next
@@ -31,4 +31,4 @@ COPY --from=builder /app/public /app/public
 EXPOSE 2001
 
 # Start the Next.js app
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
