@@ -4,6 +4,9 @@ FROM node:18 AS builder
 # Set working directory
 WORKDIR /app
 
+# Install pnpm globally
+RUN npm install -g pnpm
+
 # Install dependencies
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install
@@ -18,6 +21,9 @@ RUN pnpm run build
 FROM node:18 AS production
 
 WORKDIR /app
+
+# Install pnpm globally
+RUN npm install -g pnpm
 
 # Install only production dependencies
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
