@@ -62,7 +62,7 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-semibold mb-8">Meet Our Team</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl hover:scale-110 transition duration-300 ease-in-out hover:border">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl hover:scale-105 transition duration-300 ease-in-out hover:border">
               <img
                 className="w-32 h-32 rounded-full mx-auto mb-4"
                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq3ps64efvuEfVM67Jx45gZ11aXksiHe1CXg&s"
@@ -80,26 +80,26 @@ const About = () => {
               </p>
               <p className="flex space-x-5 justify-center mt-3">
                 <Link
-                  href="/https://www.facebook.com"
+                  href="https://www.facebook.com"
                   className="border px-2 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out"
                 >
                   <i className="fab fa-facebook text-blue-600 text-md"></i>
                 </Link>
                 <Link
-                  href="/https://www.instagram.com"
+                  href="https://www.instagram.com"
                   className="border px-2 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out"
                 >
                   <i className="fab fa-instagram text-orange-600 text-md"></i>
                 </Link>
                 <Link
-                  href="/https://www.x.com"
+                  href="https://www.x.com"
                   className="border px-2 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out"
                 >
                   <i className="fab fa-x-twitter text-white-600 text-md"></i>
                 </Link>
               </p>
             </div>
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl hover:scale-110 transition duration-300 ease-in-out hover:border">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl hover:scale-105 transition duration-300 ease-in-out hover:border">
               <img
                 className="w-32 h-32 rounded-full mx-auto mb-4"
                 src="https://s1.zerochan.net/Fanny.600.3260627.jpg"
@@ -117,19 +117,19 @@ const About = () => {
               </p>
               <p className="flex space-x-5 justify-center mt-3">
                 <Link
-                  href="/https://www.facebook.com"
+                  href="https://www.facebook.com"
                   className="border px-2 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out"
                 >
                   <i className="fab fa-facebook text-blue-600 text-md"></i>
                 </Link>
                 <Link
-                  href="/https://www.instagram.com"
+                  href="https://www.instagram.com"
                   className="border px-2 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out"
                 >
                   <i className="fab fa-instagram text-orange-600 text-md"></i>
                 </Link>
                 <Link
-                  href="/https://www.x.com"
+                  href="https://www.x.com"
                   className="border px-2 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out"
                 >
                   <i className="fab fa-x-twitter text-white-600 text-md"></i>
@@ -137,7 +137,7 @@ const About = () => {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl hover:scale-110 transition duration-300 ease-in-out hover:border">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl hover:scale-105 transition duration-300 ease-in-out hover:border">
               <img
                 className="w-32 h-32 rounded-full mx-auto mb-4"
                 src="https://i.pinimg.com/originals/7a/df/24/7adf247941ed75f6423abcba2219cbf8.jpg"
@@ -157,19 +157,19 @@ const About = () => {
               </p>
               <p className="flex space-x-5 justify-center mt-3">
                 <Link
-                  href="/https://www.facebook.com"
+                  href="https://www.facebook.com"
                   className="border px-2 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out"
                 >
                   <i className="fab fa-facebook text-blue-600 text-md"></i>
                 </Link>
                 <Link
-                  href="/https://www.instagram.com"
+                  href="https://www.instagram.com"
                   className="border px-2 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out"
                 >
                   <i className="fab fa-instagram text-orange-600 text-md"></i>
                 </Link>
                 <Link
-                  href="/https://www.x.com"
+                  href="https://www.x.com"
                   className="border px-2 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200 hover:scale-105 transition duration-300 ease-in-out"
                 >
                   <i className="fab fa-x-twitter text-white-600 text-md"></i>

@@ -42,7 +42,7 @@ export default function UpdateUser({
         oldPassword: "",
       });
     }
-  }, [isOpen]);
+  }, [isOpen, loadingUser]);
 
   if (!isOpen) {
     return null;

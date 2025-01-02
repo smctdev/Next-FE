@@ -13,6 +13,7 @@ export default function SinglePost({
   setIsRefresh,
   setIsRefreshData,
   user,
+  commentRef
 }: any) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
@@ -293,7 +294,7 @@ export default function SinglePost({
             </div>
           </div>
         )}
-        <div className="border-t flex justify-between items-center border-gray-200 dark:border-gray-700 py-1">
+        <div ref={commentRef} className="border-t flex justify-between items-center border-gray-200 dark:border-gray-700 py-1">
           <PostButton
             type="button"
             onClick={user ? handleLike(post?.id) : handleNavigate}

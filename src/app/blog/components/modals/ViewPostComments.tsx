@@ -21,8 +21,10 @@ export default function ViewPostComments({
   );
   const [comment, setComment] = useState("");
   const [error, setError] = useState<any>("");
+  const [isOpenSec, setIsOpenSec] = useState(false);
   const { user }: any = useAuth();
   const textareaRef = useRef<any>("");
+  const commentRef = useRef<any>("");
 
   if (!isOpen) {
     return null;
@@ -37,10 +39,15 @@ export default function ViewPostComments({
         comment,
       });
 
-      if (textareaRef.current && response.status === 201) {
-        textareaRef.current.style.height = "auto";
-        setComment("");
-        setError("");
+      if (response.status === 201) {
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+          setComment("");
+          setError("");
+        }
+        if (commentRef.current) {
+          commentRef.current.scrollIntoView({ behavior: "smooth" });
+        }
       }
     } catch (error: any) {
       console.error(error);
@@ -78,10 +85,16 @@ export default function ViewPostComments({
     }
   };
 
+  const handleFocus = () => {
+    setIsOpenSec(true);
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div
-        className="bg-white dark:bg-gray-800 shadow-md rounded-lg w-full md:w-2/4 relative py-5"
+        className={`bg-white dark:bg-gray-800 shadow-md rounded-lg w-full md:w-2/4 relative ${
+          isOpenSec ? "pt-5 pb-28" : "pt-5 pb-16"
+        }`}
         ref={modalRef}
       >
         <button
@@ -114,11 +127,12 @@ export default function ViewPostComments({
               setIsRefresh={setIsRefresh}
               setIsRefreshData={setIsRefreshData}
               user={user}
+              commentRef={commentRef}
             />
           )}
         </div>
         {user && (
-          <div className="flex gap-2 w-full px-3 pt-2">
+          <div className="flex gap-2 w-full px-3 pt-2 absolute bottom-4 bg-white dark:bg-gray-800">
             {loading ? (
               <p className="h-8 w-8 rounded-full bg-slate-300 dark:bg-slate-400 animate-pulse"></p>
             ) : (
@@ -129,7 +143,7 @@ export default function ViewPostComments({
                 w={8}
               />
             )}
-            <div className="w-full px-3 py-2 dark:bg-gray-700 bg-gray-200 mx-2 rounded-3xl relative">
+            <div className="w-full px-3 pt-2 dark:bg-gray-700 bg-gray-200 mx-2 rounded-3xl relative">
               <div className="relative">
                 <TextAreaComment
                   ref={textareaRef}
@@ -139,33 +153,43 @@ export default function ViewPostComments({
                   onChange={handleInputChange}
                   onInput={handleInput}
                   placeholder={!loading ? `Comment as ${user?.name}` : ""}
+                  onFocus={handleFocus}
                   rows={1}
                 />
                 {loading && (
                   <p className="top-0 rounded-3xl absolute h-6 w-full bg-slate-300 dark:bg-slate-400 animate-pulse"></p>
                 )}
               </div>
-              <div className="flex justify-between items-center transition-all duration-300 ease-in-out">
-                <div>
+              {!isOpenSec && (
+                <div className="absolute top-2 right-3">
                   <i className="far fa-smile"></i>
                 </div>
-                <div>
-                  <button
-                    type="button"
-                    disabled={!comment}
-                    onClick={
-                      comment ? handleSubmitComment(data?.post?.id) : undefined
-                    }
-                    className={`${
-                      !comment
-                        ? "cursor-not-allowed text-gray-400 dark:text-gray-500"
-                        : "text-blue-500 dark:text-blue-300 hover:dark:bg-gray-600 hover:bg-gray-300"
-                    } rounded-full px-2 py-1`}
-                  >
-                    <i className="far fa-paper-plane-top"></i>
-                  </button>
+              )}
+              {isOpenSec && (
+                <div className="flex justify-between pb-2 items-center transition-all duration-300 ease-in-out">
+                  <div>
+                    <i className="far fa-smile"></i>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      disabled={!comment}
+                      onClick={
+                        comment
+                          ? handleSubmitComment(data?.post?.id)
+                          : undefined
+                      }
+                      className={`${
+                        !comment
+                          ? "cursor-not-allowed text-gray-400 dark:text-gray-500"
+                          : "text-blue-500 dark:text-blue-300 hover:dark:bg-gray-600 hover:bg-gray-300"
+                      } rounded-full px-2 py-1`}
+                    >
+                      <i className="far fa-paper-plane-top"></i>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}
