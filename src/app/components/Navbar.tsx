@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import ActiveLink from "../utils/NavbarActiveLink";
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
-import { Storage } from "../utils/StorageUtils";
 import Image from "./images/Image";
 
 const Navbar = () => {

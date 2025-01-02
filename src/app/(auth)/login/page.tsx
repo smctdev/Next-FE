@@ -5,15 +5,30 @@ import api from "@/app/lib/axiosCall";
 import withOutAuth from "@/app/lib/withOutAuth";
 import { ValidationErrors } from "@/app/types/ValidationType";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<ValidationErrors | any>("");
-  const [flashError, setFlashError] = useState("");
+  const [flashError, setFlashError] = useState<any>("");
+  const [flashSuccess, setFlashSuccess] = useState<any>("");
   const [loading, setLoading] = useState(false);
   const { login }: any = useAuth();
+  const verifications = new URLSearchParams(window.location.search);
+
+  useEffect(() => {
+    const error = verifications.has("errorVerification");
+    const success = verifications.has("successVerification");
+
+    if (success) {
+      setFlashSuccess(verifications.get("successVerification"));
+    } else if (error) {
+      setFlashError(verifications.get("errorVerification"));
+    }
+
+    window.history.replaceState(null, "", "login");
+  }, [verifications]);
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
@@ -46,6 +61,7 @@ const Login = () => {
       }
       if (error.response.status === 400) {
         setFlashError("");
+        setFlashSuccess("");
       }
     } finally {
       setLoading(false);
@@ -54,6 +70,9 @@ const Login = () => {
 
   const handleCloseFlashError = () => {
     setFlashError("");
+  };
+  const handleCloseFlashSuccess = () => {
+    setFlashSuccess("");
   };
 
   const handleGoogleLogin = () => {
@@ -79,22 +98,40 @@ const Login = () => {
       }}
     >
       <div className="p-10 bg-opacity-50 bg-black rounded-lg shadow-md max-w-[26rem]">
-        {flashError && (
+        {flashError ? (
           <div
-            className="flex items-center space-x-2 px-3 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded"
+            className="flex items-center space-x-2 px-3 py-5 mb-4 text-red-700 bg-red-100 border border-red-400 rounded relative"
             role="alert"
             aria-live="assertive"
           >
-            <i className="w-6 h-6 far fa-triangle-exclamation mt-2 text-red-500"></i>
-            <span className="block ml-2 sm:inline">{flashError}</span>
+            <i className="w-6 h-6 far fa-triangle-exclamation mt-2 text-red-500 text-2xl"></i>
+            <span className="block ml-3 pr-2 sm:inline">{flashError}</span>
             <button
               onClick={handleCloseFlashError}
-              className="ml-auto justify-end text-red-500 hover:text-red-700 focus:outline-none"
+              className="ml-auto absolute right-3 text-red-500 hover:text-red-700 focus:outline-none"
               aria-label="Close alert"
             >
-              &times;
+              <i className="far fa-xmark"></i>
             </button>
           </div>
+        ) : (
+          flashSuccess && (
+            <div
+              className="flex items-center space-x-2 px-3 py-5 mb-4 text-green-700 bg-green-100 border border-green-400 rounded relative"
+              role="alert"
+              aria-live="assertive"
+            >
+              <i className="w-6 h-6 far fa-triangle-exclamation mt-2 text-green-500 text-2xl"></i>
+              <span className="block ml-3 pr-2 sm:inline">{flashSuccess}</span>
+              <button
+                onClick={handleCloseFlashSuccess}
+                className="ml-auto absolute right-3 text-green-500 hover:text-green-700 focus:outline-none"
+                aria-label="Close alert"
+              >
+                <i className="far fa-xmark"></i>
+              </button>
+            </div>
+          )
         )}
 
         <h3 className="text-3xl font-bold text-white mb-6">
