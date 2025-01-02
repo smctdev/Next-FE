@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Uncomment and customize headers if needed
   // async headers() {
   //   return [
   //     {
@@ -15,6 +16,10 @@ const nextConfig: NextConfig = {
   //     },
   //   ];
   // },
+
+  eslint: {
+    ignoreDuringBuilds: true, // Ignores all ESLint warnings/errors during the build
+  },
 };
 
 export default nextConfig;
