@@ -6,8 +6,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json pnpm-lock.yaml ./
-RUN npm install
-RUN pnpm install
+RUN npm install -g pnpm
 
 # Copy the rest of the application
 COPY . .
@@ -32,4 +31,4 @@ COPY --from=builder /app/public /app/public
 EXPOSE 2001
 
 # Start the Next.js app
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]
