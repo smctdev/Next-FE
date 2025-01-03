@@ -52,9 +52,10 @@ const ManagePersonalInformation = () => {
     e.preventDefault();
     setIsLoading(true);
     setIsRefresh(true);
+    const { username, email, ...rest} = formInput;
     try {
       const response = await api.patch("settings/manage-personal-info", {
-        ...formInput,
+        ...rest,
       });
 
       if (response.status === 200) {
@@ -62,6 +63,7 @@ const ManagePersonalInformation = () => {
         showSuccess(response.data.message, "Success");
       }
     } catch (error: any) {
+      console.error(error);
       setError(error.response.data);
       if (error.response.status === 429) {
         showError(
@@ -119,6 +121,7 @@ const ManagePersonalInformation = () => {
               label="Address"
               type="text"
               placeholder="Enter your address"
+              error={error?.address?.message}
             />
             <Input
               value={formInput.jobTitle}
@@ -126,6 +129,7 @@ const ManagePersonalInformation = () => {
               label="Job Title"
               type="text"
               placeholder="Enter your job title"
+              error={error?.jobTitle?.message}
             />
             <Input
               value={formInput.phoneNumber}
@@ -133,11 +137,13 @@ const ManagePersonalInformation = () => {
               label="Phone Number"
               type="text"
               placeholder="Enter your phone number"
+              error={error?.phoneNumber?.message}
             />
             <Select
               value={formInput.gender}
               onChange={handleInputChange("gender")}
               label="Select Gender"
+              error={error?.gender?.message}
             />
             <Input
               value={formInput.dateOfBirth}
@@ -145,6 +151,7 @@ const ManagePersonalInformation = () => {
               label="Date of Birth"
               type="date"
               placeholder="Enter your date of birth"
+              error={error?.dateOfBirth?.message}
             />
             <div className="flex justify-end">
               <Button
@@ -184,13 +191,16 @@ const ManagePersonalInformation = () => {
               label="Username"
               type="text"
               placeholder="Enter your username"
+              error={error?.username?.message}
             />
             <Input
               value={formInput.email}
               onChange={handleInputChange("email")}
+              disabled
               label="Email"
               type="email"
               placeholder="Enter your email"
+              error={error?.email?.message}
             />
             <div className="flex justify-end">
               <Button
