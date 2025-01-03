@@ -273,10 +273,12 @@ export default function SinglePost({
                           })
                           .map((commenter: any, index: number) => (
                             <li key={index}>
-                              {commenter?.user?.id === user?.id
+                              {commenter?.userId === user?.id
                                 ? "You"
                                 : commenter?.user?.name === null
                                 ? "Anonymous"
+                                : commenter?.user === null
+                                ? "Deleted User"
                                 : commenter?.user?.name}
                             </li>
                           ))}

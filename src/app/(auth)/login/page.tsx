@@ -5,17 +5,21 @@ import api from "@/app/lib/axiosCall";
 import withOutAuth from "@/app/lib/withOutAuth";
 import { ValidationErrors } from "@/app/types/ValidationType";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Input from "../components/inputs/Input";
 
 const Login = () => {
-  const [usernameOrEmail, setUsernameOrEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formInput, setFormInput] = useState<any>({
+    usernameOrEmail: "",
+    password: "",
+  });
   const [error, setError] = useState<ValidationErrors | any>("");
   const [flashError, setFlashError] = useState<any>("");
   const [flashSuccess, setFlashSuccess] = useState<any>("");
   const [loading, setLoading] = useState(false);
   const { login }: any = useAuth();
   const verifications = new URLSearchParams(window.location.search);
+  const [isShowPassword, setIsShowPassword] = useState<any>(false);
 
   useEffect(() => {
     const error = verifications.has("errorVerification");
@@ -30,13 +34,19 @@ const Login = () => {
     window.history.replaceState(null, "", "login");
   }, [verifications]);
 
+  const handleInputChange = (title: any) => (e: any) => {
+    setFormInput((formInput: any) => ({
+      ...formInput,
+      [title]: e.target.value,
+    }));
+  };
+
   const handleLogin = async (e: any) => {
     e.preventDefault();
     setLoading(true);
     try {
       const response = await api.post("/auth/login", {
-        usernameOrEmail,
-        password,
+        ...formInput,
       });
 
       if (response.data.statusCode === 200) {
@@ -85,6 +95,10 @@ const Login = () => {
     const githubAuthUrl = process.env.NEXT_PUBLIC_API_GITHUB_AUTH_URL;
 
     window.open(githubAuthUrl, "_self");
+  };
+
+  const handleShowPassword = () => {
+    setIsShowPassword(!isShowPassword);
   };
 
   return (
@@ -139,42 +153,37 @@ const Login = () => {
         </h3>
 
         <div className="space-y-6">
-          <form className="space-y-6" onSubmit={handleLogin}>
-            <div>
-              <div className="relative">
-                <i className="far fa-user absolute left-3 top-4 text-gray-400"></i>
-                <input
-                  type="text"
-                  onChange={(e) => setUsernameOrEmail(e.target.value)}
-                  id="email"
-                  className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your username/email"
-                />
-              </div>
-              {error.usernameOrEmail && (
-                <small className="text-red-500">
-                  {error.usernameOrEmail.message}
-                </small>
-              )}
+          <form className="space-y-2" onSubmit={handleLogin}>
+            <div className="space-y-6">
+              <Input
+                error={error?.usernameOrEmail?.message}
+                icon="user"
+                type="text"
+                onChange={handleInputChange("usernameOrEmail")}
+                id="email"
+                placeholder="Enter your username/email"
+              />
+              <Input
+                error={error?.password?.message}
+                icon="lock"
+                type={isShowPassword ? "text" : "password"}
+                onChange={handleInputChange("password")}
+                id="password"
+                placeholder="Enter your password"
+              />
             </div>
-
-            <div>
-              <div className="relative">
-                <i className="far fa-lock absolute left-3 top-4 text-gray-400"></i>
-                <input
-                  onChange={(e) => setPassword(e.target.value)}
-                  type="password"
-                  id="password"
-                  className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your password"
-                />
-                {error.password && (
-                  <small className="text-red-500">
-                    {error.password.message}
-                  </small>
-                )}
-              </div>
-            </div>
+            <button
+              type="button"
+              className="flex items-center gap-2 hover:underline"
+              onClick={handleShowPassword}
+            >
+              <input
+                type="checkbox"
+                checked={isShowPassword}
+                onChange={handleShowPassword}
+              />{" "}
+              Show password
+            </button>
 
             <button
               type="submit"

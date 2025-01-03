@@ -76,6 +76,7 @@ const Navbar = () => {
               Blog App
             </span>
           </Link>
+
           <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse relative">
             {isAuthenticated ? (
               <button
@@ -86,7 +87,12 @@ const Navbar = () => {
                 aria-expanded={dropdownOpen ? "true" : "false"}
               >
                 <span className="sr-only">Open user menu</span>
-                <Image avatar={isSetProfile && isSetProfile[0]?.avatar} alt={user?.name} h={8} w={8} />
+                <Image
+                  avatar={isSetProfile && isSetProfile[0]?.avatar}
+                  alt={user?.name}
+                  h={8}
+                  w={8}
+                />
               </button>
             ) : (
               <Link
