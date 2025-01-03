@@ -9,8 +9,6 @@ services:
       - blog-app
     depends_on:
       - nginx-blog
-    volumes:
-      - ./.example.env:/app/.env.production
 
   nginx-blog:
     image: nginx:alpine
