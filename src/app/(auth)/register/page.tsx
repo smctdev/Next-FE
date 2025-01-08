@@ -7,18 +7,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Swal from "sweetalert2";
+import Input from "../components/inputs/Input";
+import Button from "../components/buttons/Button";
 
 const Register = () => {
   const [flashError, setFlashError] = useState("");
   const [error, setError] = useState<ValidationErrors | any>("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [name, setName] = useState("");
+  const [formInput, setFormInput] = useState<any>({
+    email: "",
+    name: "",
+    username: "",
+    address: "",
+    phoneNumber: "",
+    dateOfBirth: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -27,14 +31,7 @@ const Register = () => {
     setLoading(true);
     try {
       const response = await api.post("/auth/register", {
-        username: username,
-        password: password,
-        confirmPassword: confirmPassword,
-        email: email,
-        address: address,
-        dateOfBirth: dateOfBirth,
-        phoneNumber: phoneNumber,
-        name: name,
+        ...formInput,
       });
 
       if (response.status === 201) {
@@ -50,6 +47,16 @@ const Register = () => {
           }
         });
         setError("");
+        setFormInput({
+          email: "",
+          name: "",
+          username: "",
+          address: "",
+          phoneNumber: "",
+          dateOfBirth: "",
+          password: "",
+          confirmPassword: "",
+        });
       } else {
         setFlashError(response.data.message);
       }
@@ -68,6 +75,13 @@ const Register = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChange = (title: any) => async (e: any) => {
+    setFormInput((formInput: any) => ({
+      ...formInput,
+      [title]: e.target.value,
+    }));
   };
 
   const handleCloseFlashError = () => {
@@ -108,153 +122,79 @@ const Register = () => {
         </h3>
 
         <form className="space-y-6" onSubmit={handleRegister}>
-          <div>
-            <div className="relative">
-              <i className="far fa-envelope absolute left-3 top-4 text-gray-400"></i>
-              <input
-                type="email"
-                onChange={(e) => setEmail(e.target.value)}
-                id="email"
-                className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your email"
-              />
-            </div>
-            {error.email && (
-              <small className="text-red-500">{error.email.message}</small>
-            )}
-          </div>
+          <Input
+            icon="envelope"
+            error={error?.email?.message}
+            type="email"
+            onChange={handleChange("email")}
+            id="email"
+            placeholder="Enter your email"
+          />
+          <Input
+            icon="user"
+            error={error?.name?.message}
+            type="text"
+            onChange={handleChange("name")}
+            id="name"
+            placeholder="Enter your name"
+          />
+          <Input
+            icon="user"
+            error={error?.username?.message}
+            type="text"
+            onChange={handleChange("username")}
+            id="username"
+            placeholder="Enter your username"
+          />
+          <Input
+            icon="location-dot"
+            error={error?.address?.message}
+            type="text"
+            onChange={handleChange("address")}
+            id="address"
+            placeholder="Enter your address"
+          />
+          <Input
+            icon="phone"
+            error={error?.phoneNumber?.message}
+            type="text"
+            onChange={handleChange("phoneNumber")}
+            id="phoneNumber"
+            placeholder="Enter your phone number"
+          />
+          <Input
+            icon="calendar"
+            error={error?.dateOfBirth?.message}
+            type="date"
+            onChange={handleChange("dateOfBirth")}
+            id="dateOfBirth"
+            placeholder="Enter your date of birth"
+          />
+          <Input
+            icon="lock"
+            error={error?.password?.message}
+            type="password"
+            onChange={handleChange("password")}
+            id="password"
+            placeholder="Enter your password"
+          />
+          <Input
+            icon="lock"
+            error={error?.confirmPassword?.message}
+            type="password"
+            onChange={handleChange("confirmPassword")}
+            id="confirmPassword"
+            placeholder="Enter your confirm password"
+          />
 
-          <div>
-            <div className="relative">
-              <i className="far fa-user absolute left-3 top-4 text-gray-400"></i>
-              <input
-                type="text"
-                onChange={(e) => setName(e.target.value)}
-                id="name"
-                className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your name"
-              />
-            </div>
-            {error.name && (
-              <small className="text-red-500">{error.name.message}</small>
-            )}
-          </div>
-
-          <div>
-            <div className="relative">
-              <i className="far fa-user absolute left-3 top-4 text-gray-400"></i>
-              <input
-                type="text"
-                onChange={(e) => setUsername(e.target.value)}
-                id="username"
-                className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your username"
-              />
-            </div>
-            {error.username && (
-              <small className="text-red-500">{error.username.message}</small>
-            )}
-          </div>
-
-          <div>
-            <div className="relative">
-              <i className="far fa-location-dot absolute left-3 top-4 text-gray-400"></i>
-              <input
-                type="text"
-                onChange={(e) => setAddress(e.target.value)}
-                id="address"
-                className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your address"
-              />
-            </div>
-            {error.address && (
-              <small className="text-red-500">{error.address.message}</small>
-            )}
-          </div>
-
-          <div>
-            <div className="relative">
-              <i className="far fa-phone absolute left-3 top-4 text-gray-400"></i>
-              <input
-                type="text"
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                id="phone number"
-                className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your phone number"
-              />
-            </div>
-            {error.phoneNumber && (
-              <small className="text-red-500">
-                {error.phoneNumber.message}
-              </small>
-            )}
-          </div>
-
-          <div>
-            <div className="relative">
-              <i className="far fa-calendar absolute left-3 top-4 text-gray-400"></i>
-              <input
-                type="date"
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                id="date of birth"
-                className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your date of birth"
-              />
-            </div>
-            {error.dateOfBirth && (
-              <small className="text-red-500">
-                {error.dateOfBirth.message}
-              </small>
-            )}
-          </div>
-
-          <div>
-            <div className="relative">
-              <i className="far fa-lock absolute left-3 top-4 text-gray-400"></i>
-              <input
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                id="password"
-                className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your password"
-              />
-              {error.password && (
-                <small className="text-red-500">{error.password.message}</small>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <div className="relative">
-              <i className="far fa-lock absolute left-3 top-4 text-gray-400"></i>
-              <input
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                type="password"
-                id="confirmPassword"
-                className="w-full pl-10 p-3 rounded bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter password confirmation"
-              />
-              {error.confirmPassword && (
-                <small className="text-red-500">
-                  {error.confirmPassword.message}
-                </small>
-              )}
-            </div>
-          </div>
-
-          <button
+          <Button
             type="submit"
-            disabled={loading}
-            className="w-full py-3 text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition"
-          >
-            {loading ? (
-              <span>
-                <i className="fas fa-spinner fa-pulse"></i> Registering...
-              </span>
-            ) : (
-              <span>Register</span>
-            )}
-          </button>
+            bgColor="blue-600"
+            hoverBgColor="blue-700"
+            loadingText="Registering..."
+            label="Register"
+            isLoading={loading}
+          />
         </form>
 
         <p className="mt-4 text-white text-center">

@@ -11,7 +11,7 @@ import publicAuth from "@/app/lib/publicAuth";
 import { formatDate } from "date-fns";
 
 const Posts = () => {
-  const { isAuthenticated }: any = useAuth();
+  const { isAuthenticated, user }: any = useAuth();
   const [isRefresh, setIsRefresh] = useState(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { data, loading }: any = useFetch(`/posts`, isRefresh);
@@ -47,7 +47,6 @@ const Posts = () => {
   const filteredPosts = data.posts
     ? data.posts.filter(
         (post: any) =>
-          post.title.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
           post.description
             .toLowerCase()
             .includes(searchTerm.trim().toLowerCase()) ||
@@ -139,6 +138,7 @@ const Posts = () => {
         modalRef={modalRef}
         categories={categoriesData.categories}
         categoriesLoading={categoriesLoading}
+        user={user}
       />
     </div>
   );

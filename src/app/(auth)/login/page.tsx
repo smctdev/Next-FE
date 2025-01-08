@@ -5,8 +5,9 @@ import api from "@/app/lib/axiosCall";
 import withOutAuth from "@/app/lib/withOutAuth";
 import { ValidationErrors } from "@/app/types/ValidationType";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "../components/inputs/Input";
+import Button from "../components/buttons/Button";
 
 const Login = () => {
   const [formInput, setFormInput] = useState<any>({
@@ -18,10 +19,11 @@ const Login = () => {
   const [flashSuccess, setFlashSuccess] = useState<any>("");
   const [loading, setLoading] = useState(false);
   const { login }: any = useAuth();
-  const verifications = new URLSearchParams(window.location.search);
   const [isShowPassword, setIsShowPassword] = useState<any>(false);
 
   useEffect(() => {
+    const verifications = new URLSearchParams(window.location.search);
+
     const error = verifications.has("errorVerification");
     const success = verifications.has("successVerification");
 
@@ -32,7 +34,7 @@ const Login = () => {
     }
 
     window.history.replaceState(null, "", "login");
-  }, [verifications]);
+  }, []);
 
   const handleInputChange = (title: any) => (e: any) => {
     setFormInput((formInput: any) => ({
@@ -185,19 +187,14 @@ const Login = () => {
               Show password
             </button>
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="w-full py-3 text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition"
-            >
-              {loading ? (
-                <span>
-                  <i className="fas fa-spinner fa-pulse"></i> Logging In...
-                </span>
-              ) : (
-                "Login"
-              )}
-            </button>
+              bgColor="blue-600"
+              hoverBgColor="blue-700"
+              loadingText="Logging in..."
+              label="Login"
+              isLoading={loading}
+            />
           </form>
           <div className="relative">
             <span className="block w-full h-px bg-gray-300"></span>

@@ -14,6 +14,7 @@ import {
 } from "chart.js";
 import withAuth from "../lib/withAuth";
 import useFetch from "./hooks/fetchData";
+import { useEffect, useState } from "react";
 
 ChartJS.register(
   CategoryScale,
@@ -27,7 +28,16 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  const [mounted, setMounted] = useState(false);
   const { data, loading }: any = useFetch("/dashboard", false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   const dashboardData = {
     posts: data.postCounts,

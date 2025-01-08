@@ -14,6 +14,7 @@ import ViewPostComments from "./modals/ViewPostComments";
 export default function PostsList({ post, setIsRefresh }: any) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isCommentOpen, setIsCommentOpen] = useState<any>({});
+  const [seeMore, setSeeMore] = useState(false);
   const [comment, setComment] = useState("");
   const [error, setError] = useState<any>("");
   const { user }: any = useAuth();
@@ -142,6 +143,10 @@ export default function PostsList({ post, setIsRefresh }: any) {
     setIsViewCommentOpen(!isViewCommentOpen);
   };
 
+  const handleSeeMore = () => {
+    setSeeMore(!seeMore);
+  };
+
   return (
     <div className="mb-5">
       <div
@@ -218,18 +223,32 @@ export default function PostsList({ post, setIsRefresh }: any) {
         </div>
 
         <div className="px-4 py-2">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {post.title}
-          </h2>
-          <p className="text-lg text-gray-700 dark:text-gray-300 whitespace-break-spaces">
+          <p
+            className={`${
+              post.description.length < 100
+                ? "text-4xl font-bold"
+                : post.description.length > 150 && !seeMore
+                ? "line-clamp-[10] text-md"
+                : "text-md"
+            } text-gray-700 dark:text-gray-300 whitespace-break-spaces break-all`}
+          >
             {post.description}
           </p>
+          {post.description.length > 150 && !seeMore && (
+            <button
+              onClick={handleSeeMore}
+              type="button"
+              className="text-gray-400 font-bold hover:underline dark:text-gray-500"
+            >
+              See more...
+            </button>
+          )}
         </div>
 
         <div className="p-3 flex justify-between gap-2 items-center border-t border-gray-200 dark:border-gray-700">
           <div className="text-sm text-gray-900 dark:text-gray-300 flex items-center relative">
             <span className="absolute top-1 font-bold left-2 px-2 py-1 rounded-md text-xs bg-gray-300 text-gray-700 dark:text-gray-100 dark:bg-gray-600">
-              <i className="far fa-microphone-stand -scale-x-100 text-xs"></i>{" "}
+              <i className="far fa-microphone-stand text-xs"></i>{" "}
               Author
             </span>
             <span className="px-2 pb-2 pt-8 bg-gray-100 text-gray-900 dark:text-gray-200 min-w-24 dark:bg-gray-700 rounded-lg font-bold text-xs flex gap-1 items-center">
