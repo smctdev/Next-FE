@@ -12,14 +12,20 @@ import PostsList from "@/app/blog/components/PostsList";
 import AddPost from "@/app/blog/components/modals/AddPost";
 import useFetch from "../hooks/fetchData";
 import ImageProfileLoader from "../components/loaders/ImageProfileLoader";
+import PostLoader from "@/app/blog/components/loaders/PostLoader";
 
 const Profile = () => {
   const { user, hasNormalRole, setIsRefresh, isSetProfile }: any = useAuth();
   const [isAddProfileModalOpen, setIsAddProfileModalOpen] = useState(false);
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+  const [isAddPostRefresh, setIsAddPostRefresh] = useState(false);
   const { data: categoriesData, loading: categoriesLoading }: any = useFetch(
     `/categories`,
     false
+  );
+  const { data: userPostsData, loading: userPostsDataLoading }: any = useFetch(
+    "posts/own/user-posts",
+    isAddPostRefresh
   );
   const postButtonRef = useRef<HTMLButtonElement>(null);
   const postModalRef = useRef<HTMLDivElement>(null);
@@ -230,15 +236,25 @@ const Profile = () => {
                 <i className="far fa-plus"></i> Add post
               </button>
             </div>
-            {user?.posts.length === 0 ? (
+            {userPostsDataLoading ? (
+              <div className="w-full flex justify-center">
+                <div className="md:w-2/3">
+                  <PostLoader />
+                </div>
+              </div>
+            ) : userPostsData.length === 0 ? (
               <div className="flex items-center justify-center h-48 w-full">
                 <p className="text-center font-bold">You have no posts yet</p>
               </div>
             ) : (
               <div className="w-full flex justify-center">
                 <div className="md:w-2/3">
-                  {user?.posts.map((post: any, index: number) => (
-                    <PostsList key={index} post={post} setIsRefresh={setIsRefresh} />
+                  {userPostsData.map((post: any, index: number) => (
+                    <PostsList
+                      key={index}
+                      post={post}
+                      setIsRefresh={setIsRefresh}
+                    />
                   ))}
                 </div>
               </div>
@@ -283,6 +299,7 @@ const Profile = () => {
         postModalRef={postModalRef}
         categories={categoriesData.categories}
         categoriesLoading={categoriesLoading}
+        setIsAddPostRefresh={setIsAddPostRefresh}
       />
     </div>
   );

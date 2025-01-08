@@ -13,6 +13,7 @@ export default function AddPost({
   categories,
   categoriesLoading,
   user,
+  setIsAddPostRefresh,
 }: any) {
   const [formInput, setFormInput] = useState<any>({
     categoryId: "",
@@ -45,6 +46,7 @@ export default function AddPost({
     e.preventDefault();
     setIsRefresh(true);
     setLoading(true);
+    setIsAddPostRefresh(true);
     try {
       const formData = new FormData();
       formData.append("description", formInput.description);
@@ -71,6 +73,7 @@ export default function AddPost({
     } finally {
       setIsRefresh(false);
       setLoading(false);
+      setIsAddPostRefresh(false);
     }
   };
 
