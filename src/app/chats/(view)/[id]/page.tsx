@@ -5,7 +5,7 @@ import ChatContent from "../../components/ChatContent";
 import RecentChatContent from "../../components/RecentChatContent";
 import Button from "../../components/buttons/Button";
 import TextArea from "../../components/inputs/TextArea";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import api from "@/app/lib/axiosCall";
 import useFetch from "../../hooks/useFetch";
 import { useAuth } from "@/app/context/AuthContext";
@@ -34,6 +34,14 @@ const Chats = () => {
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const chatContentRef = useRef<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useRouter();
+  const [isSending, setIsSending] = useState(false);
+
+  useEffect(() => {
+    if (data.statusCode === 404) {
+      navigate.back();
+    }
+  }, [data]);
 
   const handleInputChange = (title: any) => (e: any) => {
     setFormInput((formInput) => ({
@@ -68,6 +76,7 @@ const Chats = () => {
 
   const handleSendMessage = async () => {
     sendMessage(true);
+    setIsSending(true);
     if (isEmojiPickerOpen) {
       handleEmojiPickerOpen();
     }
@@ -91,11 +100,13 @@ const Chats = () => {
       setError(error.response.data);
     } finally {
       sendMessage(false);
+      setIsSending(false);
     }
   };
 
   const handleSendLike = async () => {
     sendMessage(true);
+    setIsSending(true);
     try {
       const response = await api.post(`chats/sendMessage/${id}`, {
         content: "(y)",
@@ -111,6 +122,7 @@ const Chats = () => {
       console.error(error);
     } finally {
       sendMessage(false);
+      setIsSending(false);
     }
   };
 
@@ -163,7 +175,8 @@ const Chats = () => {
         <div className="overflow-y-auto">
           {loadingConversationData ? (
             <RecentChat />
-          ) : conversationData?.conversations.length > 0 ? (
+          ) : conversationData?.conversations &&
+            conversationData?.conversations.length > 0 ? (
             conversationData?.conversations.map((convo: any, index: number) => (
               <RecentChatContent
                 key={index}
@@ -175,7 +188,7 @@ const Chats = () => {
               />
             ))
           ) : (
-            <p className="text-center font-bold text-lg mt-5 break-all px-10 w-20 md:w-full">
+            <p className="text-center font-bold text-lg mt-5 break-words px-10 w-20 md:w-full">
               {searchTerm ? `No "${searchTerm}" found` : "No conversations yet"}
             </p>
           )}
@@ -221,6 +234,9 @@ const Chats = () => {
           ref={chatContentRef}
           className="flex-1 flex flex-col-reverse gap-4 p-4 overflow-y-auto bg-white dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
         >
+          {isSending && (
+            <p className="text-end text-sm">Sending...</p>
+          )}
           {loadingConversationData ? (
             <Content />
           ) : messages && messages.length > 0 ? (
@@ -275,7 +291,9 @@ const Chats = () => {
                 <button type="button" onClick={handleEmojiPickerOpen}>
                   <i
                     className={`fas fa-smile ${
-                      isEmojiPickerOpen ? "text-yellow-500" : "dark:text-white text-gray-600"
+                      isEmojiPickerOpen
+                        ? "text-yellow-500"
+                        : "dark:text-white text-gray-600"
                     } text-xl`}
                   ></i>
                 </button>

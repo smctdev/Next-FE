@@ -1,12 +1,9 @@
-import api from "@/app/lib/axiosCall";
 import { Storage } from "@/app/utils/StorageUtils";
 import { useEffect, useRef, useState } from "react";
-import useToastr from "../hooks/Toastr";
 import ImageLoading from "./loaders/ImageLoader";
 
-export default function AvatarList({ image, setIsRefresh }: any) {
+export default function AvatarList({ image }: any) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { showSuccess, showError } = useToastr();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState("");
@@ -61,39 +58,6 @@ export default function AvatarList({ image, setIsRefresh }: any) {
     };
   }, [dropdownOpen]);
 
-  const handleUpdateProfile = async (id: number) => {
-    setIsRefresh(true);
-    try {
-      const response = await api.patch(`/profile/update-profile-picture/${id}`);
-
-      if (response.status === 200) {
-        showSuccess(response.data.message, "Profile Picture Updated");
-        setDropdownOpen(false);
-      }
-    } catch (error: any) {
-      console.error(error);
-      showError(error.response.data.message, "Something went wrong");
-    } finally {
-      setIsRefresh(false);
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    setIsRefresh(true);
-    try {
-      const response = await api.delete(`/profile/${id}`);
-      if (response.status === 200) {
-        showSuccess(response.data.message, "Profile Picture Deleted");
-        setDropdownOpen(false);
-      }
-    } catch (error: any) {
-      console.error(error);
-      showError(error.response.data.message, "Something went wrong");
-    } finally {
-      setIsRefresh(false);
-    }
-  };
-
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
@@ -126,15 +90,6 @@ export default function AvatarList({ image, setIsRefresh }: any) {
                 aria-labelledby="menu-button"
               >
                 <div className="py-1 w-full">
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateProfile(image.id)}
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-start"
-                    role="menuitem"
-                    id="menu-item-2"
-                  >
-                    Set as profile
-                  </button>
                   <a
                     href={`${
                       process.env.NEXT_PUBLIC_STORAGE_URL
@@ -150,15 +105,6 @@ export default function AvatarList({ image, setIsRefresh }: any) {
                   >
                     Download
                   </a>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(image.id)}
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-start"
-                    role="menuitem"
-                    id="menu-item-1"
-                  >
-                    Remove
-                  </button>
                 </div>
               </div>
             )}

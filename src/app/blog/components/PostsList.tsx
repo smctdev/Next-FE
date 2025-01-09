@@ -230,7 +230,7 @@ export default function PostsList({ post, setIsRefresh }: any) {
                 : post.description.length > 150 && !seeMore
                 ? "line-clamp-[10] text-md"
                 : "text-md"
-            } text-gray-700 dark:text-gray-300 whitespace-break-spaces break-all`}
+            } text-gray-700 dark:text-gray-300 whitespace-break-spaces break-words`}
           >
             {post.description}
           </p>

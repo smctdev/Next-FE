@@ -8,7 +8,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   ).then((res) => res.json());
 
   return {
-    title: `${data?.user?.name}`,
+    title: `${data?.user?.name || id}`,
     description: `${data?.user?.name} ${data?.user?.address} ${data?.user?.jobTitle} ${data?.user?.bio}`,
     keywords: `${data?.user?.name} ${data?.user?.address} ${data?.user?.jobTitle} ${data?.user?.bio}`,
     authors: {

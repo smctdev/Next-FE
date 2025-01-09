@@ -1,6 +1,5 @@
 import localFont from "next/font/local";
 import "./assets/styles/globals.css";
-import DropUpButton from "@/app/components/DropUpButton";
 import { AuthProvider } from "./context/AuthContext";
 import BaseContent from "./components/BaseContent";
 import "toastr/build/toastr.min.css";
@@ -87,7 +86,6 @@ export default function RootLayout({
         <AuthProvider>
           <Providers>
             <BaseContent children={children} />
-            <DropUpButton />
           </Providers>
         </AuthProvider>
       </body>

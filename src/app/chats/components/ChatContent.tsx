@@ -1,4 +1,5 @@
 import dateWithTime from "../utils/dateWithTime";
+import formatEmojis from "../utils/formatEmojis";
 import Image from "./images/Image";
 
 export default function ChatContent({
@@ -8,12 +9,7 @@ export default function ChatContent({
   name,
   timeSent,
 }: any) {
-  const message =
-    content === "(y)" ? (
-      <img src="https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f44d.png" />
-    ) : (
-      content
-    );
+  const message = formatEmojis(content, 16, 16);
   const isIcon = content === "(y)";
 
   return (
@@ -23,12 +19,12 @@ export default function ChatContent({
           {/* Sent Message */}
           <div className="flex justify-end">
             <div
-              className={`xl:max-w-4xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-xs ${
+              className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-xs ${
                 !isIcon && "bg-blue-500 shadow-md"
               } text-white p-3 rounded-2xl`}
             >
               <p
-                className="text-sm whitespace-break-spaces break-all"
+                className="text-sm whitespace-break-spaces break-words"
                 title={timeSent && dateWithTime(timeSent)}
               >
                 {message}
@@ -44,12 +40,12 @@ export default function ChatContent({
               <Image avatar={avatar} alt={name} width={10} height={10} />
             </div>
             <div
-              className={`xl:max-w-4xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-xs ${
+              className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-xs ${
                 !isIcon && "bg-gray-200 shadow-md"
               } text-gray-800 p-3 rounded-2xl`}
             >
               <p
-                className="text-sm whitespace-break-spaces break-all"
+                className="text-sm whitespace-break-spaces break-words"
                 title={timeSent && dateWithTime(timeSent)}
               >
                 {message}

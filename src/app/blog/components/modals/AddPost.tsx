@@ -13,7 +13,6 @@ export default function AddPost({
   categories,
   categoriesLoading,
   user,
-  setIsAddPostRefresh,
 }: any) {
   const [formInput, setFormInput] = useState<any>({
     categoryId: "",
@@ -46,7 +45,6 @@ export default function AddPost({
     e.preventDefault();
     setIsRefresh(true);
     setLoading(true);
-    setIsAddPostRefresh(true);
     try {
       const formData = new FormData();
       formData.append("description", formInput.description);
@@ -73,7 +71,6 @@ export default function AddPost({
     } finally {
       setIsRefresh(false);
       setLoading(false);
-      setIsAddPostRefresh(false);
     }
   };
 
@@ -142,7 +139,7 @@ export default function AddPost({
                 />
                 <div>
                   <p className="font-bold text-md">{user?.name}</p>
-                  <div className="flex gap-1 bg-gray-300 dark:bg-gray-700 p-1 rounded-md items-center">
+                  <div className="flex gap-1 bg-gray-300 dark:bg-gray-700 max-w-fit p-1 rounded-md items-center">
                     <i className="far fa-earth-americas"></i>
                     <select
                       onChange={handleInputChange("publishedAs")}

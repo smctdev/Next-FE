@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 import SideBar from "./SideBar";
+import DropUpButton from "./DropUpButton";
 
 const BaseContent = ({ children }: any) => {
   const { hasHigherRole, hasNormalRole }: any = useAuth();
@@ -16,23 +17,19 @@ const BaseContent = ({ children }: any) => {
     return <>{children}</>;
   }
 
-  if (hasHigherRole) {
-    return (
-      <>
-        <SideBar children={children} />
-      </>
-    );
-  }
-
-  if (hasNormalRole) {
-    return (
-      <>
-        <Navbar />
-        {children}
-        <Footer />
-      </>
-    );
-  }
+  return (
+    <>
+      <DropUpButton />
+      {hasHigherRole && <SideBar children={children} />}
+      {hasNormalRole && (
+        <>
+          <Navbar />
+          {children}
+          <Footer />
+        </>
+      )}
+    </>
+  );
 };
 
 export default BaseContent;

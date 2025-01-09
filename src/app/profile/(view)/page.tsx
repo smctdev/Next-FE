@@ -123,7 +123,7 @@ const Profile = () => {
                 ref={addButtonRef}
                 type="button"
                 onClick={openAddProfileModal}
-                className="hover:bg-gray-500 hover:scale-95 transition-all duration-300 ease-in-out absolute top-[90px] text-white rounded-full bg-gray-400 px-2 py-1 right-0"
+                className="hover:bg-gray-500 hover:scale-95 transition-all duration-300 ease-in-out absolute top-[80px] border-2 border-gray-400 dark:border-gray-700 text-white rounded-full bg-gray-400 px-2 py-1 right-0"
               >
                 <i className="fas fa-camera"></i>
               </button>
@@ -236,29 +236,27 @@ const Profile = () => {
                 <i className="far fa-plus"></i> Add post
               </button>
             </div>
-            {userPostsDataLoading ? (
-              <div className="w-full flex justify-center">
-                <div className="md:w-2/3">
+            <div className="w-full flex justify-center">
+              <div className="md:w-2/3">
+                {userPostsDataLoading ? (
                   <PostLoader />
-                </div>
-              </div>
-            ) : userPostsData.length === 0 ? (
-              <div className="flex items-center justify-center h-48 w-full">
-                <p className="text-center font-bold">You have no posts yet</p>
-              </div>
-            ) : (
-              <div className="w-full flex justify-center">
-                <div className="md:w-2/3">
-                  {userPostsData.map((post: any, index: number) => (
+                ) : userPostsData.length > 0 ? (
+                  userPostsData.map((post: any, index: number) => (
                     <PostsList
                       key={index}
                       post={post}
                       setIsRefresh={setIsRefresh}
                     />
-                  ))}
-                </div>
+                  ))
+                ) : (
+                  <div className="flex items-center justify-center h-48 w-full">
+                    <p className="text-center font-bold">
+                      You have no posts yet
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </>
         ) : user?.profile_pictures.length === 0 ? (
           <div className="flex items-center justify-center h-48 w-full">

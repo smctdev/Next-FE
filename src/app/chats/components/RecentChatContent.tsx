@@ -1,12 +1,14 @@
 import Link from "next/link";
 import Image from "./images/Image";
 import dateFormat from "../utils/dateFormat";
+import formatEmojis from "../utils/formatEmojis";
 
 export default function RecentChatContent({
   user,
   lastMessage,
   timeSent,
 }: any) {
+  const message = formatEmojis(lastMessage, 4, 4);
   return (
     <Link href={`/chats/${user?.id}`}>
       <div className="flex items-center mt-2 p-2 rounded-lg cursor-pointer hover:dark:bg-gray-600 hover:bg-gray-100 md:mx-3">
@@ -22,7 +24,7 @@ export default function RecentChatContent({
           </p>
           <div className="flex gap-1 max-w-44">
             <div className="text-gray-500 dark:text-gray-100 sm:max-w-40">
-              <p className="text-xs truncate">{lastMessage}</p>
+              <p className="text-xs truncate">{message}</p>
             </div>
             {timeSent && (
               <span className="text-xs">

@@ -31,6 +31,7 @@ const Chats = () => {
     useFetch("chat-messages/public-messages", sentPublicMessage);
   const [searchTerm, setSearchTerm] = useState("");
   const chatContentRef = useRef<any>(null);
+  const [isSending, setIsSending] = useState(false);
 
   const handleInputChange = (title: any) => (e: any) => {
     setFormInput((formInput: any) => ({
@@ -79,6 +80,7 @@ const Chats = () => {
 
   const handleSendMessage = async () => {
     sendPublicMessage(true);
+    setIsSending(true);
     if (isEmojiPickerOpen) {
       handleEmojiPickerOpen();
     }
@@ -103,11 +105,13 @@ const Chats = () => {
       setError(error.response.data);
     } finally {
       sendPublicMessage(false);
+      setIsSending(false);
     }
   };
 
   const handleSendLike = async () => {
     sendPublicMessage(true);
+    setIsSending(true);
     try {
       const response = await api.post("chat-messages/send-public-message", {
         content: "(y)",
@@ -123,6 +127,7 @@ const Chats = () => {
       console.error(error);
     } finally {
       sendPublicMessage(false);
+      setIsSending(false);
     }
   };
   const handleSearchTerm = (e: any) => {
@@ -162,7 +167,7 @@ const Chats = () => {
               <RecentChatContent key={index} user={user} />
             ))
           ) : (
-            <p className="text-center font-bold text-lg mt-5 break-all px-10 w-20 md:w-full">
+            <p className="text-center font-bold text-lg mt-5 break-words px-10 w-20 md:w-full">
               {searchTerm ? `No "${searchTerm}" found` : "No conversations yet"}
             </p>
           )}
@@ -197,6 +202,7 @@ const Chats = () => {
           ref={chatContentRef}
           className="flex-1 flex flex-col-reverse p-4 overflow-y-auto bg-white dark:bg-gray-700 gap-4 border-b border-gray-200 dark:border-gray-600"
         >
+          {isSending && <p className="text-end text-sm">Sending...</p>}
           {publicMessagesDataLoading ? (
             <Content />
           ) : publicMessagesData && publicMessagesData.length > 0 ? (
