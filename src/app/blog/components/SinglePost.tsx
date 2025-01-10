@@ -136,7 +136,7 @@ export default function SinglePost({
                 : post.description.length > 150 && !seeMore
                 ? "line-clamp-[10] text-md"
                 : "text-md"
-            } text-gray-700 dark:text-gray-300 whitespace-break-spaces`}
+            } text-gray-700 dark:text-gray-300 break-words whitespace-break-spaces`}
           >
             {post.description}
           </p>

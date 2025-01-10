@@ -18,16 +18,16 @@ export default function CommentsList({ comment, author, commentOwner }: any) {
         h={8}
         w={8}
       />
-      <div className="rounded-3xl text-gray-900 dark:text-gray-400/95 dark:bg-gray-700/95 bg-gray-100 px-3 py-2 max-w-[91.666667%]">
-        <p className={`text-md font-bold relative ${author && "pt-6"}`}>
+      <div className="rounded-3xl text-gray-900 dark:text-gray-400 dark:bg-gray-700/95 bg-gray-100 px-3 py-2 max-w-[91.666667%]">
+        <p className={`text-md font-bold relative text-gray-800 dark:text-gray-300 ${author && "pt-6"}`}>
           {author && (
-            <span className="absolute top-0 text-xs bg-gray-300 text-gray-700 dark:text-gray-100 dark:bg-gray-600 px-2 py-1 rounded-lg">
+            <span className="absolute top-0 text-xs bg-gray-300 text-gray-700 dark:text-gray-200 dark:bg-gray-600 px-2 py-1 rounded-lg">
               <i className="far fa-microphone-stand text-xs"></i> Author
             </span>
           )}
           {comment.user === null ? "Deleted User" : comment.user.name}
         </p>
-        <p className="break-words whitespace-break-spaces">
+        <p className="break-words whitespace-break-spaces text-gray-800 dark:text-gray-300">
           <span
             className={`${
               seeMore

@@ -32,6 +32,23 @@ const Chats = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const chatContentRef = useRef<any>(null);
   const [isSending, setIsSending] = useState(false);
+  const emojiPickerRef = useRef<any>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(event.target as any)
+      ) {
+        setIsEmojiPickerOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleInputChange = (title: any) => (e: any) => {
     setFormInput((formInput: any) => ({
@@ -47,7 +64,6 @@ const Chats = () => {
         if (formInput.content) {
           handleSendMessage();
         }
-        textareaRef.current.style.height = "18px";
       }
     }
   };
@@ -81,6 +97,8 @@ const Chats = () => {
   const handleSendMessage = async () => {
     sendPublicMessage(true);
     setIsSending(true);
+    textareaRef.current.focus();
+    textareaRef.current.style.height = "18px";
     if (isEmojiPickerOpen) {
       handleEmojiPickerOpen();
     }
@@ -244,13 +262,14 @@ const Chats = () => {
               <Emoji
                 onEmojiSelect={handleEmojiSelect}
                 isEmojiPickerOpen={isEmojiPickerOpen}
+                emojiPickerRef={emojiPickerRef}
               >
                 <button type="button" onClick={handleEmojiPickerOpen}>
                   <i
                     className={`fas fa-smile ${
                       isEmojiPickerOpen
                         ? "text-yellow-500"
-                        : "dark:text-white text-gray-600"
+                        : "dark:text-white text-gray-600 hover:dark:text-gray-400 hover:text-gray-500"
                     } text-xl`}
                   ></i>
                 </button>
@@ -263,8 +282,8 @@ const Chats = () => {
                 onClick={handleSendMessage}
                 type="button"
                 icon="paper-plane-top"
-                color="gray-300"
-                hoverColor="blue-400"
+                color="blue-500"
+                hoverColor="blue-600"
               />
             ) : (
               <Button
