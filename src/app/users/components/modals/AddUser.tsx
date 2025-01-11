@@ -10,7 +10,7 @@ export default function AddUser({
   setIsRefresh,
 }: any) {
   const [error, setError] = useState<string | any>("");
-  const { data, error: errorRoles, loading }: any = useFetch("/role", false);
+  const { data, error: errorRoles, loading }: any = useFetch(isOpen && "/role", false, false);
   const { showSuccess }: any = useToastr();
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");

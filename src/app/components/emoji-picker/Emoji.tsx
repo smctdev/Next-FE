@@ -15,7 +15,10 @@ export default function Emoji({
     <div ref={emojiPickerRef} className="relative">
       {isEmojiPickerOpen && (
         <div className="absolute bottom-full mb-2 right-0">
-          <EmojiPicker onEmojiClick={handleEmojiClick} />
+          <EmojiPicker
+            autoFocusSearch={false}
+            onEmojiClick={handleEmojiClick}
+          />
         </div>
       )}
       {children}

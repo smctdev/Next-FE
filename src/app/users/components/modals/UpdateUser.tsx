@@ -14,13 +14,13 @@ export default function UpdateUser({
   id,
 }: any) {
   const [error, setError] = useState<string | any>("");
-  const { data, error: errorRoles, loading }: any = useFetch("/role", false);
+  const { data, error: errorRoles, loading }: any = useFetch(isOpen && "/role", false, false);
   const [isLoading, setIsLoading] = useState(false);
   const {
     data: userData,
     error: errorUser,
     loading: loadingUser,
-  }: any = useFetch(isOpen && `/users/${id}`, isLoading);
+  }: any = useFetch(isOpen && `/users/${id}`, isLoading, false);
   const { showSuccess }: any = useToastr();
   const [formInputs, setFormInputs] = useState<FormInputsInterface | any>({});
 

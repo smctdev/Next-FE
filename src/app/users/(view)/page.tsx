@@ -9,13 +9,21 @@ import useToastr from "../hooks/Toastr";
 import withRoleAuth from "@/app/lib/withRoleAuth";
 import AddUser from "../components/modals/AddUser";
 import DeleteConfirmation from "../utils/DeleteConfirmation";
+import Pagination from "@/app/components/pagination/Pagination";
 
 const Users = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
   const [id, setId] = useState("");
-  const { data, loading, error }: any = useFetch("/users", isRefresh);
+  const {
+    data,
+    loading,
+    error,
+    setCurrentPage,
+    currentPage,
+    itemsPerPage,
+  }: any = useFetch("/users", isRefresh, true);
   const { showSuccess, showError }: any = useToastr();
   const [userName, setUserName] = useState("");
   const modalRef = useRef<HTMLElement>(null);
@@ -120,8 +128,8 @@ const Users = () => {
           <tbody>
             {loading ? (
               <UserItemListLoader />
-            ) : data?.users?.length > 0 ? (
-              data.users.map((user: any, index: number) => (
+            ) : data?.users?.users?.length > 0 ? (
+              data.users?.users.map((user: any, index: number) => (
                 <UserItemList
                   item={user}
                   key={index}
@@ -140,6 +148,12 @@ const Users = () => {
             )}
           </tbody>
         </table>
+        <Pagination
+          totalItems={data?.users?.total ?? 0}
+          itemsPerPage={itemsPerPage}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
       </div>
       <AddUser
         isOpen={isOpen}

@@ -60,6 +60,22 @@ const Chats = () => {
     }
   }, [data]);
 
+  useEffect(() => {
+    const handleInfinitScroll = () => {
+      if (chatContentRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } =
+        chatContentRef.current;
+        if (scrollTop + scrollHeight === clientHeight + 1) {
+          console.log('reached');
+        }
+      }
+    };
+    chatContentRef?.current?.addEventListener("scroll", handleInfinitScroll);
+    return () => {
+      chatContentRef?.current?.removeEventListener("scroll", handleInfinitScroll);
+    };
+  }, []);
+
   const handleInputChange = (title: any) => (e: any) => {
     setFormInput((formInput) => ({
       ...formInput,

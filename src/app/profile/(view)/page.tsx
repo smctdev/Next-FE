@@ -237,7 +237,7 @@ const Profile = () => {
               </button>
             </div>
             <div className="w-full flex justify-center">
-              <div className="md:w-2/3">
+              <div className="w-full md:w-2/3">
                 {userPostsDataLoading ? (
                   <PostLoader />
                 ) : userPostsData.length > 0 ? (

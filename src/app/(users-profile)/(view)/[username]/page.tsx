@@ -171,7 +171,7 @@ const UserProfile = () => {
             {active === "posts" ? (
               <>
                 <div className="w-full flex justify-center mt-5">
-                  <div className="md:w-2/3">
+                  <div className="w-full md:w-2/3">
                     {data.posts?.length > 0 ? (
                       data.posts?.map((post: any, index: number) => (
                         <PostsList key={index} post={post} />
