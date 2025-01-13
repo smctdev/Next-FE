@@ -226,11 +226,16 @@ const Chats = () => {
   const handleSearchTerm = (e: any) => {
     setSearchTerm(e.target.value);
   };
-  const filteredUser = data.users
-    ? data.users.filter((user: any) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
+  const filteredUser = searchTerm
+    ? data.users.filter((user: any) => {
+        const userName = user?.name || "Anonymous";
+
+        return userName
+          ?.toLowerCase()
+          .trim()
+          .includes(searchTerm.trim().toLowerCase());
+      })
+    : data.users || [];
 
   return (
     <div className="flex h-screen">
@@ -297,14 +302,6 @@ const Chats = () => {
           ref={chatContentRef}
           className="flex-1 flex flex-col-reverse p-4 overflow-y-auto bg-white dark:bg-gray-700 gap-4 border-b border-gray-200 dark:border-gray-600"
         >
-          {backToBottom && (
-            <button onClick={handleBackToBottom} className="mx-auto p-3 rounded-full bg-gray-300 dark:bg-gray-700" type="button">
-              <i className="far fa-arrow-down"></i>
-            </button>
-          )}
-          <button onClick={handleBackToBottom} className="mx-auto p-3 rounded-full bg-gray-300 dark:bg-gray-700" type="button">
-            <i className="far fa-arrow-down"></i>
-          </button>
           {isSending && <p className="text-end text-sm">Sending...</p>}
           {publicMessagesDataLoading ? (
             <Content />
@@ -334,6 +331,19 @@ const Chats = () => {
         </div>
         {/* Message Input Area */}
         <div className="bg-white dark:bg-gray-700 px-4 py-2 gap-2 flex items-center relative">
+          <div
+            className={`absolute left-1/2 bottom-4 transform -translate-x-1/2 transition-all duration-300 ease-in-out ${
+              backToBottom ? "opacity-100 -top-20" : "opacity-0 -top-10"
+            }`}
+          >
+            <button
+              onClick={handleBackToBottom}
+              className="py-3 px-3.5 text-white hover:bg-gray-400/75 hover:dark:bg-gray-500/75 dark:border-gray-400 border-gray-300 flex place-items-center rounded-full border bg-gray-400 dark:bg-gray-500"
+              type="button"
+            >
+              <i className="far fa-arrow-down"></i>
+            </button>
+          </div>
           <div className="bottom-3 absolute">
             <button type="button">
               <i className="far fa-image text-2xl"></i>

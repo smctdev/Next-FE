@@ -48,6 +48,7 @@ const Chats = () => {
     setAddTake,
   }: any = useConversation();
   const loadingOnTakeRef = useRef(loadingOnTake);
+  const [backToBottom, setBackToBottom] = useState(false);
 
   const getDataPerUser = convos?.conversations?.filter(
     (chat: any) =>
@@ -55,8 +56,10 @@ const Chats = () => {
       (chat.senderId === data?.user?.id || chat.receiverId === data?.user?.id)
   );
 
-  const totalMessages = getDataPerUser && getDataPerUser[0]?.messages?.length || 0;
-  const totalData = getDataPerUser && getDataPerUser[0]?._count?.messages || 0;
+  const totalMessages =
+    (getDataPerUser && getDataPerUser[0]?.messages?.length) || 0;
+  const totalData =
+    (getDataPerUser && getDataPerUser[0]?._count?.messages) || 0;
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -91,6 +94,12 @@ const Chats = () => {
           setAddTake((prev: any) => prev + 5);
         }
       }
+
+      if (chatContentRef.current) {
+        const { scrollTop } = chatContentRef.current;
+
+        setBackToBottom(scrollTop < -200);
+      }
     };
     chatContentRef?.current?.addEventListener("scroll", handleInfinitScroll);
     return () => {
@@ -100,6 +109,12 @@ const Chats = () => {
       );
     };
   }, [totalMessages, totalData]);
+
+  const handleBackToBottom = () => {
+    if (chatContentRef.current) {
+      chatContentRef.current.scrollTop = 0;
+    }
+  };
 
   useEffect(() => {
     if (data.statusCode === 404) {
@@ -346,6 +361,19 @@ const Chats = () => {
         </div>
         {/* Message Input Area */}
         <div className="bg-white dark:bg-gray-700 px-4 py-2 gap-2 flex items-center relative">
+          <div
+            className={`absolute left-1/2 bottom-4 transform -translate-x-1/2 transition-all duration-300 ease-in-out ${
+              backToBottom ? "opacity-100 -top-20" : "opacity-0 -top-10"
+            }`}
+          >
+            <button
+              onClick={handleBackToBottom}
+              className="py-3 px-3.5 text-white hover:bg-gray-400/75 hover:dark:bg-gray-500/75 dark:border-gray-400 border-gray-300 flex place-items-center rounded-full border bg-gray-400 dark:bg-gray-500"
+              type="button"
+            >
+              <i className="far fa-arrow-down"></i>
+            </button>
+          </div>
           <div className="bottom-3 absolute">
             <button type="button">
               <i className="far fa-image text-2xl"></i>
