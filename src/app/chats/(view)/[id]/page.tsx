@@ -17,13 +17,16 @@ import useSocket from "../../hooks/useSocket";
 import RecentChat from "../../components/loaders/RecentChat";
 import Emoji from "@/app/components/emoji-picker/Emoji";
 import Link from "next/link";
+import { useConversation } from "../../context/conversationContext";
 
 const Chats = () => {
   const { id }: any = useParams();
-  const { sendMessage, sentMessage }: any = useSocket();
-  const { data, loading }: any = useFetch(id && `/users/for/seo/${id}`, false);
-  const { data: conversationData, loading: loadingConversationData }: any =
-    useFetch("chats/conversations", sentMessage);
+  const { sendMessage }: any = useSocket();
+  const { data, loading }: any = useFetch(
+    id && `/users/for/seo/${id}`,
+    false,
+    false
+  );
   const { user }: any = useAuth();
   const [error, setError] = useState<any>("");
   const [formInput, setFormInput] = useState({
@@ -37,6 +40,23 @@ const Chats = () => {
   const navigate = useRouter();
   const [isSending, setIsSending] = useState(false);
   const emojiPickerRef = useRef<any>(null);
+  const {
+    data: convos,
+    loading: loadingConvos,
+    setIsRefresh,
+    loadingOnTake,
+    setAddTake,
+  }: any = useConversation();
+  const loadingOnTakeRef = useRef(loadingOnTake);
+
+  const getDataPerUser = convos?.conversations?.filter(
+    (chat: any) =>
+      (chat.senderId === user?.id || chat.receiverId === user?.id) &&
+      (chat.senderId === data?.user?.id || chat.receiverId === data?.user?.id)
+  );
+
+  const totalMessages = getDataPerUser && getDataPerUser[0]?.messages?.length || 0;
+  const totalData = getDataPerUser && getDataPerUser[0]?._count?.messages || 0;
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -55,26 +75,37 @@ const Chats = () => {
   }, []);
 
   useEffect(() => {
-    if (data.statusCode === 404) {
-      navigate.back();
-    }
-  }, [data]);
+    loadingOnTakeRef.current = loadingOnTake;
+  }, [loadingOnTake]);
 
   useEffect(() => {
     const handleInfinitScroll = () => {
-      if (chatContentRef.current) {
+      if (
+        chatContentRef.current &&
+        !loadingOnTakeRef.current &&
+        totalMessages < totalData
+      ) {
         const { scrollTop, scrollHeight, clientHeight } =
-        chatContentRef.current;
-        if (scrollTop + scrollHeight === clientHeight + 1) {
-          console.log('reached');
+          chatContentRef.current;
+        if (scrollTop + scrollHeight - 1 <= clientHeight) {
+          setAddTake((prev: any) => prev + 5);
         }
       }
     };
     chatContentRef?.current?.addEventListener("scroll", handleInfinitScroll);
     return () => {
-      chatContentRef?.current?.removeEventListener("scroll", handleInfinitScroll);
+      chatContentRef?.current?.removeEventListener(
+        "scroll",
+        handleInfinitScroll
+      );
     };
-  }, []);
+  }, [totalMessages, totalData]);
+
+  useEffect(() => {
+    if (data.statusCode === 404) {
+      navigate.back();
+    }
+  }, [data]);
 
   const handleInputChange = (title: any) => (e: any) => {
     setFormInput((formInput) => ({
@@ -107,8 +138,12 @@ const Chats = () => {
   };
 
   const handleSendMessage = async () => {
-    sendMessage(true);
+    sendMessage({
+      toRefresh: true,
+      receiverId: id,
+    });
     setIsSending(true);
+    setIsRefresh(true);
     textareaRef.current.focus();
     textareaRef.current.style.height = "18px";
     if (isEmojiPickerOpen) {
@@ -133,14 +168,22 @@ const Chats = () => {
       console.error(error);
       setError(error.response.data);
     } finally {
-      sendMessage(false);
+      sendMessage({
+        toRefresh: false,
+        receiverId: "",
+      });
       setIsSending(false);
+      setIsRefresh(false);
     }
   };
 
   const handleSendLike = async () => {
-    sendMessage(true);
+    sendMessage({
+      toRefresh: true,
+      receiverId: id,
+    });
     setIsSending(true);
+    setIsRefresh(true);
     try {
       const response = await api.post(`chats/sendMessage/${id}`, {
         content: "(y)",
@@ -155,12 +198,16 @@ const Chats = () => {
     } catch (error: any) {
       console.error(error);
     } finally {
-      sendMessage(false);
+      sendMessage({
+        toRefresh: false,
+        receiverId: "",
+      });
       setIsSending(false);
+      setIsRefresh(false);
     }
   };
 
-  const messages = conversationData?.conversations?.filter(
+  const messages = convos?.conversations?.filter(
     (chat: any) =>
       (chat.senderId === user?.id || chat.receiverId === user?.id) &&
       (chat.senderId === data?.user?.id || chat.receiverId === data?.user?.id)
@@ -207,11 +254,10 @@ const Chats = () => {
         </div>
         {/* Recent Chats */}
         <div className="overflow-y-auto">
-          {loadingConversationData ? (
+          {loadingConvos ? (
             <RecentChat />
-          ) : conversationData?.conversations &&
-            conversationData?.conversations.length > 0 ? (
-            conversationData?.conversations.map((convo: any, index: number) => (
+          ) : convos?.conversations && convos?.conversations.length > 0 ? (
+            convos?.conversations.map((convo: any, index: number) => (
               <RecentChatContent
                 key={index}
                 user={
@@ -268,10 +314,8 @@ const Chats = () => {
           ref={chatContentRef}
           className="flex-1 flex flex-col-reverse gap-4 p-4 overflow-y-auto bg-white dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
         >
-          {isSending && (
-            <p className="text-end text-sm">Sending...</p>
-          )}
-          {loadingConversationData ? (
+          {isSending && <p className="text-end text-sm">Sending...</p>}
+          {loading ? (
             <Content />
           ) : messages && messages.length > 0 ? (
             messages.map((content: any) =>
@@ -292,6 +336,12 @@ const Chats = () => {
               Say <strong>HI</strong>{" "}
               <i className="fas fa-hand-wave text-xl"></i>{" "}
             </p>
+          )}
+
+          {loadingOnTake && (
+            <div className="relative flex justify-center items-center">
+              <i className="fa-duotone fa-solid fa-spinner-third text-center animate-spin"></i>
+            </div>
           )}
         </div>
         {/* Message Input Area */}

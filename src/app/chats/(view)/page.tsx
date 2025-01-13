@@ -14,6 +14,7 @@ import useSocket from "../hooks/useSocket";
 import api from "@/app/lib/axiosCall";
 import Content from "../components/loaders/Content";
 import { useAuth } from "@/app/context/AuthContext";
+import DoubleRecentChat from "../components/loaders/DoubleRecentChat";
 
 const Chats = () => {
   const { user }: any = useAuth();
@@ -23,16 +24,32 @@ const Chats = () => {
     attachment: "",
   });
   const textareaRef = useRef<any>("");
-  const [isRefresh, setIsRefresh] = useState(false);
-  const { data, loading }: any = useFetch("users/to/chat", isRefresh);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const { sentPublicMessage, sendPublicMessage }: any = useSocket();
-  const { data: publicMessagesData, loading: publicMessagesDataLoading } =
-    useFetch("chat-messages/public-messages", sentPublicMessage);
+  const {
+    data: publicMessagesData,
+    loading: publicMessagesDataLoading,
+    loadingOnTake,
+    setAddTake,
+  }: any = useFetch("chat-messages/public-messages", sentPublicMessage, true);
+  const {
+    data,
+    loading,
+    loadingOnTake: loadingOnTakeUsers,
+    setAddTake: setAddTakeUsers,
+  }: any = useFetch("users/to/chat", false, true);
   const [searchTerm, setSearchTerm] = useState("");
   const chatContentRef = useRef<any>(null);
   const [isSending, setIsSending] = useState(false);
   const emojiPickerRef = useRef<any>(null);
+  const loadingOnTakeRef = useRef(loadingOnTake);
+  const loadingOnTakeUsersRef = useRef(loadingOnTakeUsers);
+  const recentChatRef = useRef<any>(null);
+  const totalMessages = publicMessagesData?.messages?.length;
+  const totalData = publicMessagesData?.totalData;
+  const totalUsers = data?.users?.length;
+  const totalUsersData = data?.totalData;
+  const [backToBottom, setBackToBottom] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -51,20 +68,62 @@ const Chats = () => {
   }, []);
 
   useEffect(() => {
-    const handleInfinitScroll = () => {
-      if (chatContentRef.current) {
+    loadingOnTakeRef.current = loadingOnTake;
+    loadingOnTakeUsersRef.current = loadingOnTakeUsers;
+  }, [loadingOnTake, loadingOnTakeUsers]);
+
+  useEffect(() => {
+    const handleInfiniteScroll = () => {
+      if (
+        chatContentRef.current &&
+        !loadingOnTakeRef.current &&
+        totalMessages < totalData
+      ) {
         const { scrollTop, scrollHeight, clientHeight } =
-        chatContentRef.current;
-        if (scrollTop + scrollHeight === clientHeight + 1) {
-          console.log('reached');
+          chatContentRef.current;
+        if (scrollTop + scrollHeight - 1 <= clientHeight) {
+          setAddTake((prev: any) => prev + 5);
+        }
+      }
+
+      if (chatContentRef.current) {
+        const { scrollTop } = chatContentRef.current;
+
+        setBackToBottom(scrollTop < -200);
+      }
+
+      if (recentChatRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = recentChatRef.current;
+        if (
+          scrollHeight - scrollTop <= clientHeight &&
+          !loadingOnTakeUsersRef.current &&
+          totalUsers < totalUsersData
+        ) {
+          setAddTakeUsers((prev: any) => prev + 2);
         }
       }
     };
-    chatContentRef?.current?.addEventListener("scroll", handleInfinitScroll);
+    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
+
+    recentChatRef?.current?.addEventListener("scroll", handleInfiniteScroll);
     return () => {
-      chatContentRef?.current?.removeEventListener("scroll", handleInfinitScroll);
+      chatContentRef?.current?.removeEventListener(
+        "scroll",
+        handleInfiniteScroll
+      );
+
+      recentChatRef?.current?.removeEventListener(
+        "scroll",
+        handleInfiniteScroll
+      );
     };
-  }, []);
+  }, [totalMessages, totalData, totalUsers, totalUsersData]);
+
+  const handleBackToBottom = () => {
+    if (chatContentRef.current) {
+      chatContentRef.current.scrollTop = 0;
+    }
+  };
 
   const handleInputChange = (title: any) => (e: any) => {
     setFormInput((formInput: any) => ({
@@ -192,7 +251,7 @@ const Chats = () => {
             <i className="far fa-magnifying-glass text-gray-300 absolute left-3 top-3.5 text-xl"></i>
           </div>
         </div>
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto" ref={recentChatRef}>
           {/* Recent Chats */}
           {loading ? (
             <RecentChat />
@@ -205,6 +264,8 @@ const Chats = () => {
               {searchTerm ? `No "${searchTerm}" found` : "No conversations yet"}
             </p>
           )}
+
+          {loadingOnTakeUsers && <DoubleRecentChat />}
         </div>
       </div>
       {/* Chat Area */}
@@ -236,11 +297,19 @@ const Chats = () => {
           ref={chatContentRef}
           className="flex-1 flex flex-col-reverse p-4 overflow-y-auto bg-white dark:bg-gray-700 gap-4 border-b border-gray-200 dark:border-gray-600"
         >
+          {backToBottom && (
+            <button onClick={handleBackToBottom} className="mx-auto p-3 rounded-full bg-gray-300 dark:bg-gray-700" type="button">
+              <i className="far fa-arrow-down"></i>
+            </button>
+          )}
+          <button onClick={handleBackToBottom} className="mx-auto p-3 rounded-full bg-gray-300 dark:bg-gray-700" type="button">
+            <i className="far fa-arrow-down"></i>
+          </button>
           {isSending && <p className="text-end text-sm">Sending...</p>}
           {publicMessagesDataLoading ? (
             <Content />
-          ) : publicMessagesData && publicMessagesData.length > 0 ? (
-            publicMessagesData.map((message: any, index: number) => (
+          ) : publicMessagesData && publicMessagesData?.messages?.length > 0 ? (
+            publicMessagesData?.messages?.map((message: any, index: number) => (
               <ChatContent
                 key={index}
                 content={message?.content}
@@ -256,6 +325,11 @@ const Chats = () => {
               <strong>Public Chats</strong>. Say <strong>HI</strong>{" "}
               <i className="fas fa-hand-wave text-xl"></i>{" "}
             </p>
+          )}
+          {loadingOnTake && (
+            <div className="relative flex justify-center items-center">
+              <i className="fa-duotone fa-solid fa-spinner-third text-center animate-spin"></i>
+            </div>
           )}
         </div>
         {/* Message Input Area */}

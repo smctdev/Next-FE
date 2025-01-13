@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { ConversationProvider } from "../context/conversationContext";
 
 export const metadata: Metadata = {
   title: {
@@ -14,5 +15,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <>{children}</>;
+  return (
+    <>
+      <ConversationProvider>{children}</ConversationProvider>
+    </>
+  );
 }

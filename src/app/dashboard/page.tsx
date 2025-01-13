@@ -15,6 +15,7 @@ import {
 import withAuth from "../lib/withAuth";
 import useFetch from "./hooks/fetchData";
 import { useEffect, useState } from "react";
+import useSocket from "../chats/hooks/useSocket";
 
 ChartJS.register(
   CategoryScale,

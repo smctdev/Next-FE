@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
+import { PayloadInterface } from "../types/PayloadInterface";
 
 const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [sentMessage, setSentMessage] = useState<boolean>(false);
   const [sentPublicMessage, setSentPublicMessage] = useState<boolean>(false);
+  const [receiverId, setReceiverId] = useState<any>("");
 
   useEffect(() => {
     const token = Cookies.get("APP-TOKEN");
@@ -19,14 +21,20 @@ const useSocket = () => {
       console.log("Socket connection error:", error);
     });
 
-    setSocket(socketInstance);
-
-    socketInstance.on("sentMessage", (message: boolean) => {
-      setSentMessage(message);
+    socketInstance.on("connect", () => {
+      setSocket(socketInstance);
     });
 
-    socketInstance.on("sentPublicMessage", (message: boolean) => {
-      setSentPublicMessage(message);
+    socketInstance.on("sentMessage", (toRefresh: boolean) => {
+      setSentMessage(toRefresh);
+    });
+
+    socketInstance.on("receiverId", (receiverId: string) => {
+      setReceiverId(receiverId);
+    });
+
+    socketInstance.on("sentPublicMessage", (toRefresh: boolean) => {
+      setSentPublicMessage(toRefresh);
     });
 
     return () => {
@@ -34,12 +42,12 @@ const useSocket = () => {
     };
   }, []);
 
-  const sendMessage = (message: boolean) => {
-    socket?.emit("sendMessage", message);
+  const sendMessage = ({ toRefresh, receiverId }: PayloadInterface) => {
+    socket?.emit("sendMessage", { toRefresh, receiverId });
   };
 
-  const sendPublicMessage = (message: boolean) => {
-    socket?.emit("sendPublicMessage", message);
+  const sendPublicMessage = (toRefresh: boolean) => {
+    socket?.emit("sendPublicMessage", toRefresh);
   };
 
   return {
@@ -47,6 +55,7 @@ const useSocket = () => {
     sendMessage,
     sentPublicMessage,
     sendPublicMessage,
+    receiverId,
   };
 };
 
