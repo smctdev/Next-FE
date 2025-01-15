@@ -82,7 +82,7 @@ const Chats = () => {
         const { scrollTop, scrollHeight, clientHeight } =
           chatContentRef.current;
         if (scrollTop + scrollHeight - 1 <= clientHeight) {
-          setAddTake((prev: any) => prev + 5);
+          setAddTake((prev: any) => prev + 10);
         }
       }
 

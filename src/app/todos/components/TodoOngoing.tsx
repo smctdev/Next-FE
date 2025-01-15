@@ -33,7 +33,7 @@ export default function TodoOngoing({
                     <i className="fas fa-trash text-1xl"></i>
                   </button>
                   <hr />
-                  <p className="mt-2">{item.content}</p>
+                  <p className="mt-2 break-words whitespace-break-spaces">{item.content}</p>
                   <div className="flex justify-center gap-4 mt-5">
                     <button
                       type="button"

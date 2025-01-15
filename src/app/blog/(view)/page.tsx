@@ -12,7 +12,7 @@ const Blog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isRefresh, setIsRefresh] = useState(false);
   const { isAuthenticated, hasHigherRole }: any = useAuth();
-  const { data, loading, error }: any = useFetch("/categories", isRefresh);
+  const { data, loading, error }: any = useFetch("/categories", isRefresh, false);
   const [seemore, setSeemore] = useState<any>({});
   const [searchTerm, setSearchTerm] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);

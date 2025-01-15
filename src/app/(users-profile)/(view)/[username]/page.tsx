@@ -16,9 +16,10 @@ import Button from "../../components/buttons/Button";
 
 const UserProfile = () => {
   const { username } = useParams();
+  const [isRefresh, setIsRefresh] = useState(false);
   const { data, loading, error }: any = useFetch(
     `users/profile/${username}`,
-    false
+    isRefresh
   );
   const [active, setActive] = useState("posts");
   const [isImageLoading, setIsImageLoading] = useState(true);
@@ -174,7 +175,7 @@ const UserProfile = () => {
                   <div className="w-full md:w-2/3">
                     {data.posts?.length > 0 ? (
                       data.posts?.map((post: any, index: number) => (
-                        <PostsList key={index} post={post} />
+                        <PostsList key={index} post={post} setIsRefresh={setIsRefresh} />
                       ))
                     ) : (
                       <div className="flex items-center justify-center h-48 w-full">

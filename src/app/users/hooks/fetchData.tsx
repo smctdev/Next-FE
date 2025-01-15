@@ -6,7 +6,7 @@ const useFetch = (url: any, isRefresh: boolean, isPaginated: boolean) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (!url) return;

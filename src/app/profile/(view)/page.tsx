@@ -18,14 +18,14 @@ const Profile = () => {
   const { user, hasNormalRole, setIsRefresh, isSetProfile }: any = useAuth();
   const [isAddProfileModalOpen, setIsAddProfileModalOpen] = useState(false);
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
-  const [isAddPostRefresh, setIsAddPostRefresh] = useState(false);
+  const [isPostRefresh, setIsPostRefresh] = useState(false);
   const { data: categoriesData, loading: categoriesLoading }: any = useFetch(
     `/categories`,
     false
   );
   const { data: userPostsData, loading: userPostsDataLoading }: any = useFetch(
     "posts/own/user-posts",
-    isAddPostRefresh
+    isPostRefresh
   );
   const postButtonRef = useRef<HTMLButtonElement>(null);
   const postModalRef = useRef<HTMLDivElement>(null);
@@ -245,7 +245,7 @@ const Profile = () => {
                     <PostsList
                       key={index}
                       post={post}
-                      setIsRefresh={setIsRefresh}
+                      setIsRefresh={setIsPostRefresh}
                     />
                   ))
                 ) : (
@@ -293,11 +293,10 @@ const Profile = () => {
       <AddPost
         isOpen={isOpen}
         onClose={setIsOpen}
-        setIsRefresh={setIsRefresh}
         postModalRef={postModalRef}
         categories={categoriesData.categories}
         categoriesLoading={categoriesLoading}
-        setIsAddPostRefresh={setIsAddPostRefresh}
+        setIsRefresh={setIsPostRefresh}
       />
     </div>
   );

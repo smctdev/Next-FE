@@ -13,7 +13,7 @@ export default function CancelledStatusTodoList({
         </span>
       </div>
       <hr />
-      <p className="text-sm line-clamp-2 mt-2" title={item.content}>
+      <p className="text-sm line-clamp-2 mt-2 break-words whitespace-break-spaces" title={item.content}>
         {item.content}
       </p>
       <div className="flex justify-center space-x-5 mt-3">

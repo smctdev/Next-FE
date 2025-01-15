@@ -1,7 +1,7 @@
 import { usePathname } from "next/navigation";
 import dateWithTime from "../utils/dateWithTime";
-import formatEmojis from "../utils/formatEmojis";
 import Image from "./images/Image";
+import formatMessages from "../utils/formatMessages";
 
 export default function ChatContent({
   content,
@@ -11,7 +11,7 @@ export default function ChatContent({
   timeSent,
 }: any) {
   const pathName = usePathname();
-  const message = formatEmojis(content, 16, 16);
+  const message = formatMessages(content, 16, 16);
   const isIcon = content === "(y)";
 
   const isPublic = pathName === "/chats";
@@ -24,7 +24,7 @@ export default function ChatContent({
           <div className="flex justify-end">
             <div
               className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] ${
-                !isIcon && "bg-blue-500 shadow-md"
+                !isIcon && "bg-blue-400/50 shadow-md"
               } text-white p-3 rounded-2xl`}
             >
               <p
@@ -53,8 +53,8 @@ export default function ChatContent({
               {isPublic && <p className="text-sm font-semibold">{name}</p>}
               <div
                 className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] w-fit ${
-                  !isIcon && "bg-gray-200 shadow-md"
-                } text-gray-800 p-3 rounded-2xl`}
+                  !isIcon && "bg-gray-500/65 shadow-md"
+                } text-white p-3 rounded-2xl`}
               >
                 <p
                   className="text-sm whitespace-break-spaces break-words"

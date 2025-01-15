@@ -12,11 +12,15 @@ import { useState } from "react";
 const PostWithSlugs = () => {
   const { slug } = useParams();
   const [isRefresh, setIsRefresh] = useState(false);
-  const { data, loading, error }: any = useFetch(
+  const { data, loading, error, setAddTake, loadingOnTake }: any = useFetch(
     `/categories/${slug}`,
-    isRefresh
+    isRefresh,
+    true
   );
 
+  const handleShowMore = () => {
+    setAddTake((prev: any) => prev + 10);
+  };
   return (
     <div className="p-4 dark:bg-black mx-auto">
       <div className="flex justify-between items-center mb-4">
@@ -70,6 +74,23 @@ const PostWithSlugs = () => {
             </div>
           </div>
         )}
+        <div className="flex justify-center items-center">
+          {loadingOnTake ? (
+            <i className="fa-duotone fas fa-spinner-third animate-spin"></i>
+          ) : data?.category?.posts?.length < data?.category?._count?.posts ? (
+            <button
+              onClick={handleShowMore}
+              type="button"
+              className="p-2 bg-blue-500/30 rounded-md hover:bg-blue-500/40 hover:scale-105 transition-all duration-300 ease-in-out"
+            >
+              Show more
+            </button>
+          ) : (
+            <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">
+              All posts loaded
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

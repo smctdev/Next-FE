@@ -22,6 +22,14 @@ const Pagination = ({
     onPageChange(page);
   };
 
+  const handleLastPage = () => {
+    onPageChange(totalPages);
+  }
+
+  const handleFirstPage = () => {
+    onPageChange(1);
+  }
+
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
@@ -36,14 +44,14 @@ const Pagination = ({
         <button
           onClick={handlePrevious}
           disabled={currentPage === 1}
-          className="relative inline-flex items-center rounded-md border border-gray-300 bg-gray-100 dark:bg-gray-900 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:dark:bg-gray-800 disabled:opacity-50"
+          className="relative inline-flex items-center rounded-md border border-gray-300 bg-gray-100 dark:bg-gray-900 px-4 py-2 text-sm font-medium text-gray-800 dark:text-white hover:bg-gray-50 hover:dark:bg-gray-800 disabled:opacity-50"
         >
           Previous
         </button>
         <button
           onClick={handleNext}
           disabled={currentPage === totalPages}
-          className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-gray-100 dark:bg-gray-900 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:dark:bg-gray-800 disabled:opacity-50"
+          className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-gray-100 dark:bg-gray-900 px-4 py-2 text-sm font-medium text-gray-800 dark:text-white hover:bg-gray-50 hover:dark:bg-gray-800 disabled:opacity-50"
         >
           Next
         </button>
@@ -64,9 +72,16 @@ const Pagination = ({
             className="isolate inline-flex -space-x-px rounded-md shadow-sm"
           >
             <button
-              onClick={handlePrevious}
+              onClick={handleFirstPage}
               disabled={currentPage === 1}
               className="relative inline-flex items-center rounded-l-md px-2 py-2 dark:text-gray-200 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:dark:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+            >
+              <i className="far fa-chevrons-left" aria-hidden="true" />
+            </button>
+            <button
+              onClick={handlePrevious}
+              disabled={currentPage === 1}
+              className="relative inline-flex items-center px-2 py-2 dark:text-gray-200 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:dark:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
             >
               <span className="sr-only">Previous</span>
               <i className="far fa-chevron-left" aria-hidden="true" />
@@ -88,10 +103,17 @@ const Pagination = ({
             <button
               onClick={handleNext}
               disabled={currentPage === totalPages}
-              className="relative inline-flex items-center rounded-r-md px-2 py-2 dark:text-gray-200 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:dark:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+              className="relative inline-flex items-center px-2 py-2 dark:text-gray-200 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:dark:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
             >
               <span className="sr-only">Next</span>
               <i className="far fa-chevron-right" aria-hidden="true" />
+            </button>
+            <button
+              onClick={handleLastPage}
+              disabled={currentPage === totalPages}
+              className="relative inline-flex items-center rounded-r-md px-2 py-2 dark:text-gray-200 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:dark:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+            >
+              <i className="far fa-chevrons-right" aria-hidden="true" />
             </button>
           </nav>
         </div>
