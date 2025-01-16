@@ -11,14 +11,24 @@ export const ConversationProvider = ({ children }: any) => {
   const { sentMessage, receiverId }: any = useSocket();
   const { user }: any = useAuth();
   const [isRefresh, setIsRefresh] = useState(false);
+  const [hasParams, setHasParams] = useState(false);
   const { data, loading, loadingOnTake, setAddTake }: any = useFetch(
-    "chats/conversations",
+    hasParams && "chats/conversations",
     (user?.id === receiverId && sentMessage) || isRefresh,
     true
   );
 
   return (
-    <ConversationContext.Provider value={{ data, loading, setIsRefresh, loadingOnTake, setAddTake }}>
+    <ConversationContext.Provider
+      value={{
+        data,
+        loading,
+        setIsRefresh,
+        loadingOnTake,
+        setAddTake,
+        setHasParams,
+      }}
+    >
       {children}
     </ConversationContext.Provider>
   );

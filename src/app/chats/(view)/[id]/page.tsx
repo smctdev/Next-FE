@@ -46,6 +46,7 @@ const Chats = () => {
     setIsRefresh,
     loadingOnTake,
     setAddTake,
+    setHasParams,
   }: any = useConversation();
   const loadingOnTakeRef = useRef(loadingOnTake);
   const [backToBottom, setBackToBottom] = useState(false);
@@ -120,7 +121,10 @@ const Chats = () => {
     if (data.statusCode === 404) {
       navigate.back();
     }
-  }, [data]);
+    if (id) {
+      setHasParams(true);
+    }
+  }, [data, id]);
 
   const handleInputChange = (title: any) => (e: any) => {
     setFormInput((formInput) => ({
@@ -305,7 +309,9 @@ const Chats = () => {
                   alt={data?.user?.name}
                 />
                 <div className="ml-3">
-                  <p className="text-lg font-semibold">{data?.user?.name || "Anonymous"}</p>
+                  <p className="text-lg font-semibold">
+                    {data?.user?.name || "Anonymous"}
+                  </p>
 
                   <p className="text-sm text-gray-200">Online</p>
                 </div>

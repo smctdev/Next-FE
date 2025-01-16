@@ -37,7 +37,7 @@ const Chats = () => {
     loading,
     loadingOnTake: loadingOnTakeUsers,
     setAddTake: setAddTakeUsers,
-  }: any = useFetch("users/to/chat", false, true);
+  }: any = useFetch("users/to/chat", sentPublicMessage, true);
   const [searchTerm, setSearchTerm] = useState("");
   const chatContentRef = useRef<any>(null);
   const [isSending, setIsSending] = useState(false);
@@ -262,7 +262,14 @@ const Chats = () => {
             <RecentChat />
           ) : filteredUser.length > 0 ? (
             filteredUser.map((user: any, index: number) => (
-              <RecentChatContent key={index} user={user} />
+              <RecentChatContent
+                key={index}
+                user={user}
+                lastMessage={
+                  user?._count?.messages !== 0 &&
+                  `Total messages: ${user._count.messages}`
+                }
+              />
             ))
           ) : (
             <p className="text-center font-bold text-lg mt-5 break-words px-10 w-20 md:w-full">
