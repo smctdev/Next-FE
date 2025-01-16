@@ -11,12 +11,17 @@ import publicAuth from "@/app/lib/publicAuth";
 import { formatDate } from "date-fns";
 
 const Posts = () => {
-  const { isAuthenticated }: any = useAuth();
+  const { isAuthenticated, user }: any = useAuth();
   const [isRefresh, setIsRefresh] = useState(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { data, loading }: any = useFetch(`/posts`, isRefresh);
+  const { data, loading, loadingOnTake, setAddTake }: any = useFetch(
+    `/posts`,
+    isRefresh,
+    true
+  );
   const { data: categoriesData, loading: categoriesLoading }: any = useFetch(
     `/categories`,
+    false,
     false
   );
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,7 +52,6 @@ const Posts = () => {
   const filteredPosts = data.posts
     ? data.posts.filter(
         (post: any) =>
-          post.title.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
           post.description
             .toLowerCase()
             .includes(searchTerm.trim().toLowerCase()) ||
@@ -69,6 +73,10 @@ const Posts = () => {
             .includes(searchTerm.trim().toLowerCase())
       )
     : [];
+
+  const handleShowMore = () => {
+    setAddTake((prev: any) => prev + 10);
+  };
 
   return (
     <div className="p-4 dark:bg-black mx-auto">
@@ -106,7 +114,7 @@ const Posts = () => {
         {loading ? (
           <PostLoader />
         ) : filteredPosts?.length > 0 ? (
-          filteredPosts.map((post: Post, index: number) => (
+          filteredPosts?.map((post: Post, index: number) => (
             <PostsList key={index} post={post} setIsRefresh={setIsRefresh} />
           ))
         ) : (
@@ -131,6 +139,21 @@ const Posts = () => {
             </div>
           </div>
         )}
+        <div className="flex justify-center items-center">
+          {loadingOnTake ? (
+            <i className="fa-duotone fas fa-spinner-third animate-spin"></i>
+          ) : filteredPosts?.length < data?.totalData ? (
+            <button
+              onClick={handleShowMore}
+              type="button"
+              className="p-2 bg-blue-500/30 rounded-md hover:bg-blue-500/40 hover:scale-105 transition-all duration-300 ease-in-out"
+            >
+              Show more
+            </button>
+          ) : (
+            <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">All posts loaded</p>
+          )}
+        </div>
       </div>
       <AddPost
         onClose={setIsOpen}
@@ -139,6 +162,7 @@ const Posts = () => {
         modalRef={modalRef}
         categories={categoriesData.categories}
         categoriesLoading={categoriesLoading}
+        user={user}
       />
     </div>
   );

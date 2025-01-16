@@ -12,14 +12,20 @@ import PostsList from "@/app/blog/components/PostsList";
 import AddPost from "@/app/blog/components/modals/AddPost";
 import useFetch from "../hooks/fetchData";
 import ImageProfileLoader from "../components/loaders/ImageProfileLoader";
+import PostLoader from "@/app/blog/components/loaders/PostLoader";
 
 const Profile = () => {
   const { user, hasNormalRole, setIsRefresh, isSetProfile }: any = useAuth();
   const [isAddProfileModalOpen, setIsAddProfileModalOpen] = useState(false);
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+  const [isPostRefresh, setIsPostRefresh] = useState(false);
   const { data: categoriesData, loading: categoriesLoading }: any = useFetch(
     `/categories`,
     false
+  );
+  const { data: userPostsData, loading: userPostsDataLoading }: any = useFetch(
+    "posts/own/user-posts",
+    isPostRefresh
   );
   const postButtonRef = useRef<HTMLButtonElement>(null);
   const postModalRef = useRef<HTMLDivElement>(null);
@@ -117,7 +123,7 @@ const Profile = () => {
                 ref={addButtonRef}
                 type="button"
                 onClick={openAddProfileModal}
-                className="hover:bg-gray-500 hover:scale-95 transition-all duration-300 ease-in-out absolute top-[90px] text-white rounded-full bg-gray-400 px-2 py-1 right-0"
+                className="hover:bg-gray-500 hover:scale-95 transition-all duration-300 ease-in-out absolute top-[80px] border-2 border-gray-400 dark:border-gray-700 text-white rounded-full bg-gray-400 px-2 py-1 right-0"
               >
                 <i className="fas fa-camera"></i>
               </button>
@@ -230,19 +236,27 @@ const Profile = () => {
                 <i className="far fa-plus"></i> Add post
               </button>
             </div>
-            {user?.posts.length === 0 ? (
-              <div className="flex items-center justify-center h-48 w-full">
-                <p className="text-center font-bold">You have no posts yet</p>
+            <div className="w-full flex justify-center">
+              <div className="w-full md:w-2/3">
+                {userPostsDataLoading ? (
+                  <PostLoader />
+                ) : userPostsData.length > 0 ? (
+                  userPostsData.map((post: any, index: number) => (
+                    <PostsList
+                      key={index}
+                      post={post}
+                      setIsRefresh={setIsPostRefresh}
+                    />
+                  ))
+                ) : (
+                  <div className="flex items-center justify-center h-48 w-full">
+                    <p className="text-center font-bold">
+                      You have no posts yet
+                    </p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="w-full flex justify-center">
-                <div className="md:w-2/3">
-                  {user?.posts.map((post: any, index: number) => (
-                    <PostsList key={index} post={post} setIsRefresh={setIsRefresh} />
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </>
         ) : user?.profile_pictures.length === 0 ? (
           <div className="flex items-center justify-center h-48 w-full">
@@ -279,10 +293,10 @@ const Profile = () => {
       <AddPost
         isOpen={isOpen}
         onClose={setIsOpen}
-        setIsRefresh={setIsRefresh}
         postModalRef={postModalRef}
         categories={categoriesData.categories}
         categoriesLoading={categoriesLoading}
+        setIsRefresh={setIsPostRefresh}
       />
     </div>
   );

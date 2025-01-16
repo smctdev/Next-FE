@@ -12,8 +12,15 @@ import { useState } from "react";
 const PostWithSlugs = () => {
   const { slug } = useParams();
   const [isRefresh, setIsRefresh] = useState(false);
-  const { data, loading, error }: any = useFetch(`/categories/${slug}`, isRefresh);
+  const { data, loading, error, setAddTake, loadingOnTake }: any = useFetch(
+    `/categories/${slug}`,
+    isRefresh,
+    true
+  );
 
+  const handleShowMore = () => {
+    setAddTake((prev: any) => prev + 10);
+  };
   return (
     <div className="p-4 dark:bg-black mx-auto">
       <div className="flex justify-between items-center mb-4">
@@ -27,21 +34,28 @@ const PostWithSlugs = () => {
         ) : (
           <>
             <h1 className="text-2xl font-bold">
-              {data.category.categoryName} posts
+              {error?.response?.statusText ||
+                `${data?.category?.categoryName} posts`}
             </h1>
           </>
         )}
         <span>
-          Result(s):{" "}
-          <span className="font-semibold">{data?.category?.posts?.length}</span>
+          {data?.category?.posts && (
+            <>
+              Result(s):{" "}
+              <span className="font-semibold">
+                {data?.category?.posts?.length}
+              </span>
+            </>
+          )}
         </span>
       </div>
       <hr />
       <div className="py-4 sm:w-full md:w-full lg:w-3/4 xl:w-2/4 mx-auto overflow-hidden">
         {loading ? (
           <PostLoader />
-        ) : data.category.posts?.length > 0 ? (
-          data.category.posts.map((post: Post, index: number) => (
+        ) : data?.category?.posts?.length > 0 ? (
+          data?.category?.posts?.map((post: Post, index: number) => (
             <PostsList key={index} post={post} setIsRefresh={setIsRefresh} />
           ))
         ) : (
@@ -49,17 +63,34 @@ const PostWithSlugs = () => {
             <div className="text-center">
               <h1 className="text-xl font-semibold text-gray-700 dark:text-white mb-4">
                 {error
-                  ? error.response.statusText
+                  ? error?.response?.statusText
                   : data.message || "No Posts Added Yet"}
               </h1>
               <p className="text-gray-600 dark:text-gray-300">
                 {error
-                  ? error.response.data.message
+                  ? error?.response?.data.message
                   : "It looks like there are no posts available right now. Be patient and check back later!"}
               </p>
             </div>
           </div>
         )}
+        <div className="flex justify-center items-center">
+          {loadingOnTake ? (
+            <i className="fa-duotone fas fa-spinner-third animate-spin"></i>
+          ) : data?.category?.posts?.length < data?.category?._count?.posts ? (
+            <button
+              onClick={handleShowMore}
+              type="button"
+              className="p-2 bg-blue-500/30 rounded-md hover:bg-blue-500/40 hover:scale-105 transition-all duration-300 ease-in-out"
+            >
+              Show more
+            </button>
+          ) : (
+            <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">
+              All posts loaded
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

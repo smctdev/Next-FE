@@ -88,6 +88,7 @@ export default function AvatarList({ image, setIsRefresh }: any) {
       }
     } catch (error: any) {
       console.error(error);
+      showError(error.response.data.message, "Something went wrong");
     } finally {
       setIsRefresh(false);
     }
@@ -106,7 +107,7 @@ export default function AvatarList({ image, setIsRefresh }: any) {
               ref={buttonRef}
               type="button"
               onClick={toggleDropdown}
-              className="bg-gray-500 bg-opacity-80 rounded-full px-2 py-1 hover:-translate-x-1 transition-all duration-300 ease-in-out"
+              className="bg-gray-500 bg-opacity-80 rounded-full px-2.5 py-1 hover:-translate-x-1 transition-all duration-300 ease-in-out"
             >
               <i className="far fa-pen text-white"></i>
             </button>

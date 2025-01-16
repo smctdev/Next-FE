@@ -13,9 +13,10 @@ export default function SinglePost({
   setIsRefresh,
   setIsRefreshData,
   user,
-  commentRef
+  commentRef,
 }: any) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [seeMore, setSeeMore] = useState(false);
   const router = useRouter();
 
   const isLiked = post?.likes?.some((liker: any) => liker.userId === user?.id);
@@ -49,6 +50,10 @@ export default function SinglePost({
 
   const handleNavigate = () => {
     router.push("/login");
+  };
+
+  const handleSeeMore = () => {
+    setSeeMore(!seeMore);
   };
 
   return (
@@ -124,18 +129,32 @@ export default function SinglePost({
         </div>
 
         <div className="px-4 py-2">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {post?.title}
-          </h2>
-          <p className="text-lg text-gray-700 dark:text-gray-300 whitespace-break-spaces">
-            {post?.description}
+          <p
+            className={`${
+              post.description.length < 100
+                ? "text-4xl font-bold"
+                : post.description.length > 150 && !seeMore
+                ? "line-clamp-[10] text-md"
+                : "text-md"
+            } text-gray-700 dark:text-gray-300 break-words whitespace-break-spaces`}
+          >
+            {post.description}
           </p>
+          {post.description.length > 150 && !seeMore && (
+            <button
+              onClick={handleSeeMore}
+              type="button"
+              className="text-gray-400 font-bold hover:underline dark:text-gray-500"
+            >
+              See more...
+            </button>
+          )}
         </div>
 
         <div className="p-3 flex justify-between gap-2 items-center border-t border-gray-200 dark:border-gray-700">
           <div className="text-sm text-gray-900 dark:text-gray-300 flex items-center relative">
             <span className="absolute top-1 font-bold left-2 px-2 py-1 rounded-md text-xs bg-gray-300 text-gray-700 dark:text-gray-100 dark:bg-gray-600">
-              <i className="far fa-microphone-stand -scale-x-100 text-xs"></i>{" "}
+              <i className="far fa-microphone-stand text-xs"></i>{" "}
               Author
             </span>
             <span className="px-2 pb-2 pt-8 bg-gray-100 text-gray-900 dark:text-gray-200 min-w-24 dark:bg-gray-700 rounded-lg font-bold text-xs flex gap-1 items-center">
@@ -220,7 +239,7 @@ export default function SinglePost({
                 {post?.likes.length - (isLiked ? 1 : 0) > 1 && (
                   <span className="sm:max-w-full max-w-[100px] relative group hover:underline cursor-pointer">
                     and others
-                    <div className="hidden group-hover:block absolute w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 left-0 bottom-full">
+                    <div className="hidden group-hover:block absolute max-h-[300px] overflow-y-auto w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 left-0 bottom-full">
                       <ul>
                         {post?.likes
                           .sort((a: any, b: any) => {
@@ -251,7 +270,7 @@ export default function SinglePost({
                       {post?.comments.length}{" "}
                       {post?.comments.length === 1 ? "comment" : "comments"}
                     </span>
-                    <div className="hidden group-hover:block absolute w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 right-0 bottom-full">
+                    <div className="hidden group-hover:block absolute max-h-[300px] overflow-y-auto w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 right-0 bottom-full">
                       <ul>
                         {post?.comments
                           .filter(
@@ -273,10 +292,12 @@ export default function SinglePost({
                           })
                           .map((commenter: any, index: number) => (
                             <li key={index}>
-                              {commenter?.user?.id === user?.id
+                              {commenter?.userId === user?.id
                                 ? "You"
                                 : commenter?.user?.name === null
                                 ? "Anonymous"
+                                : commenter?.user === null
+                                ? "Deleted User"
                                 : commenter?.user?.name}
                             </li>
                           ))}
@@ -294,7 +315,10 @@ export default function SinglePost({
             </div>
           </div>
         )}
-        <div ref={commentRef} className="border-t flex justify-between items-center border-gray-200 dark:border-gray-700 py-1">
+        <div
+          ref={commentRef}
+          className="border-t flex justify-between items-center border-gray-200 dark:border-gray-700 py-1"
+        >
           <PostButton
             type="button"
             onClick={user ? handleLike(post?.id) : handleNavigate}

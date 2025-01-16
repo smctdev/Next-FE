@@ -19,8 +19,8 @@ const sessionAuth = (WrappedComponent: any) => {
       const token = urlParams.get("token");
       const rememberToken = urlParams.get("rememberToken");
       if (token && rememberToken) {
-        Cookies.set("APP-TOKEN", token);
-        Cookies.set("APP-REMEMBER-TOKEN", rememberToken);
+        Cookies.set("APP-TOKEN", token, { sameSite: "Lax" });
+        Cookies.set("APP-REMEMBER-TOKEN", rememberToken, { sameSite: "Lax" });
       }
     }, [router]);
 

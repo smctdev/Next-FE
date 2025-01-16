@@ -8,9 +8,9 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   ).then((res) => res.json());
 
   return {
-    title: `${data.category?.categoryName} posts`,
-    description: data.category.description,
-    keywords: `${data.category.slug}, ${data.category.categoryName}, ${data.category.categoryName}, ${data.category.description}`,
+    title: `${data?.category?.categoryName || slug} posts`,
+    description: data?.category?.description,
+    keywords: `${data?.category?.slug}, ${data?.category?.categoryName}, ${data?.category?.categoryName}, ${data?.category?.description}`,
     authors: {
       name: "Allan Justine Mascariñas",
     },

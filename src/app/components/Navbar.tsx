@@ -76,6 +76,7 @@ const Navbar = () => {
               Blog App
             </span>
           </Link>
+
           <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse relative">
             {isAuthenticated ? (
               <button
@@ -86,7 +87,12 @@ const Navbar = () => {
                 aria-expanded={dropdownOpen ? "true" : "false"}
               >
                 <span className="sr-only">Open user menu</span>
-                <Image avatar={isSetProfile && isSetProfile[0]?.avatar} alt={user?.name} h={8} w={8} />
+                <Image
+                  avatar={isSetProfile && isSetProfile[0]?.avatar}
+                  alt={user?.name}
+                  h={8}
+                  w={8}
+                />
               </button>
             ) : (
               <Link
@@ -121,6 +127,16 @@ const Navbar = () => {
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                     >
                       Dashboard
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      onClick={toggleDropdown}
+                      href="/chats"
+                      target="_blank"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                    >
+                      Chats
                     </Link>
                   </li>
                   <li>

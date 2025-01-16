@@ -14,6 +14,7 @@ import ViewPostComments from "./modals/ViewPostComments";
 export default function PostsList({ post, setIsRefresh }: any) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isCommentOpen, setIsCommentOpen] = useState<any>({});
+  const [seeMore, setSeeMore] = useState(false);
   const [comment, setComment] = useState("");
   const [error, setError] = useState<any>("");
   const { user }: any = useAuth();
@@ -142,6 +143,10 @@ export default function PostsList({ post, setIsRefresh }: any) {
     setIsViewCommentOpen(!isViewCommentOpen);
   };
 
+  const handleSeeMore = () => {
+    setSeeMore(!seeMore);
+  };
+
   return (
     <div className="mb-5">
       <div
@@ -218,36 +223,74 @@ export default function PostsList({ post, setIsRefresh }: any) {
         </div>
 
         <div className="px-4 py-2">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {post.title}
-          </h2>
-          <p className="text-lg text-gray-700 dark:text-gray-300 whitespace-break-spaces">
+          <p
+            className={`${
+              post.description.length < 100
+                ? "text-4xl font-bold"
+                : post.description.length > 150 && !seeMore
+                ? "line-clamp-[10] text-md"
+                : "text-md"
+            } text-gray-700 dark:text-gray-300 whitespace-break-spaces break-words`}
+          >
             {post.description}
           </p>
+          {post.description.length > 150 && !seeMore && (
+            <button
+              onClick={handleSeeMore}
+              type="button"
+              className="text-gray-400 font-bold hover:underline dark:text-gray-500"
+            >
+              See more...
+            </button>
+          )}
         </div>
 
         <div className="p-3 flex justify-between gap-2 items-center border-t border-gray-200 dark:border-gray-700">
           <div className="text-sm text-gray-900 dark:text-gray-300 flex items-center relative">
             <span className="absolute top-1 font-bold left-2 px-2 py-1 rounded-md text-xs bg-gray-300 text-gray-700 dark:text-gray-100 dark:bg-gray-600">
-              <i className="far fa-microphone-stand -scale-x-100 text-xs"></i>{" "}
-              Author
+              <i className="far fa-microphone-stand text-xs"></i> Author
             </span>
-            <span className="px-2 pb-2 pt-8 bg-gray-100 text-gray-900 dark:text-gray-200 min-w-24 dark:bg-gray-700 rounded-lg font-bold text-xs flex gap-1 items-center">
-              <Image
-                avatar={post?.user?.profile_pictures[0]?.avatar}
-                alt={post?.user?.name}
-                h={5}
-                w={5}
-              />{" "}
-              <span className="truncate" title={post?.user?.name}>
-                {post?.user?.id === user?.id
-                  ? "You"
-                  : post?.user === null
-                  ? "Deleted User"
-                  : post?.user?.name === null
-                  ? "Anonymous"
-                  : post?.user?.name}
-              </span>
+            <span className="px-2 pb-2 pt-8 bg-gray-100 text-gray-900 dark:text-gray-200 min-w-24 dark:bg-gray-700 rounded-lg font-bold">
+              {post?.user ? (
+                <Link
+                  href={`/${post?.user?.username}`}
+                  className="text-xs flex gap-1 items-center"
+                >
+                  <Image
+                    avatar={post?.user?.profile_pictures[0]?.avatar}
+                    alt={post?.user?.name}
+                    h={5}
+                    w={5}
+                  />{" "}
+                  <span className="truncate" title={post?.user?.name}>
+                    {post?.user?.id === user?.id
+                      ? "You"
+                      : post?.user === null
+                      ? "Deleted User"
+                      : post?.user?.name === null
+                      ? "Anonymous"
+                      : post?.user?.name}
+                  </span>
+                </Link>
+              ) : (
+                <span className="text-xs flex gap-1 items-center">
+                  <Image
+                    avatar={post?.user?.profile_pictures[0]?.avatar}
+                    alt={post?.user?.name}
+                    h={5}
+                    w={5}
+                  />{" "}
+                  <span className="truncate" title={post?.user?.name}>
+                    {post?.user?.id === user?.id
+                      ? "You"
+                      : post?.user === null
+                      ? "Deleted User"
+                      : post?.user?.name === null
+                      ? "Anonymous"
+                      : post?.user?.name}
+                  </span>
+                </span>
+              )}
             </span>
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-300 truncate">
@@ -299,22 +342,22 @@ export default function PostsList({ post, setIsRefresh }: any) {
                     })
                     .slice(0, isLiked ? 2 : 1)
                     .map((liker: any, index: number) => (
-                      <span
-                        key={index}
-                        className="truncate sm:max-w-full max-w-[100px]"
-                        title={liker.user.name}
-                      >
-                        {liker.userId === user?.id
-                          ? `You${post.likes.length > 1 ? "," : ""}`
-                          : liker.user.name === null
-                          ? "Anonymous"
-                          : `${liker.user.name}`}
-                      </span>
+                      <Link key={index} href={`/${liker?.user?.username}`} className="truncate sm:max-w-full max-w-[100px]">
+                        <span
+                          title={liker.user.name}
+                        >
+                          {liker.userId === user?.id
+                            ? `You${post.likes.length > 1 ? "," : ""}`
+                            : liker.user.name === null
+                            ? "Anonymous"
+                            : `${liker.user.name}`}
+                        </span>
+                      </Link>
                     ))}
                 {post.likes.length - (isLiked ? 1 : 0) > 1 && (
                   <span className="sm:max-w-full max-w-[100px] relative group hover:underline cursor-pointer">
                     and others
-                    <div className="hidden group-hover:block absolute w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 left-0 bottom-full">
+                    <div className="hidden group-hover:block absolute w-auto max-h-[300px] overflow-y-auto  min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 left-0 bottom-full">
                       <ul>
                         {post.likes
                           .sort((a: any, b: any) => {
@@ -328,7 +371,11 @@ export default function PostsList({ post, setIsRefresh }: any) {
                           })
                           .slice(isLiked ? 2 : 1)
                           .map((liker: any, index: number) => (
-                            <li key={index}>{liker.user.name}</li>
+                            <li key={index}>
+                              <Link href={`/${liker?.user?.username}`}>
+                                {liker.user.name}
+                              </Link>
+                            </li>
                           ))}
                       </ul>
                     </div>
@@ -337,40 +384,45 @@ export default function PostsList({ post, setIsRefresh }: any) {
               </div>
             </div>
             <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={user ? handleViewComment(post.id) : handleNavigate}
-                ref={buttonRef}
-              >
-                {post.comments.length > 0 && (
-                  <span className="hover:border-b border-gray-600 dark:border-gray-300 relative group">
-                    <i className="far fa-comment"></i>
-                    <span className="ml-1">
-                      {post.comments.length}{" "}
-                      {post.comments.length === 1 ? "comment" : "comments"}
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={user ? handleViewComment(post.id) : handleNavigate}
+                  ref={buttonRef}
+                >
+                  {post.comments.length > 0 && (
+                    <span className="hover:border-b border-gray-600 dark:border-gray-300">
+                      <i className="far fa-comment"></i>
+                      <span className="ml-1">
+                        {post.comments.length}{" "}
+                        {post.comments.length === 1 ? "comment" : "comments"}
+                      </span>
                     </span>
-                    <div className="hidden group-hover:block absolute w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 right-0 bottom-full">
-                      <ul>
-                        {post.comments
-                          .filter(
-                            (value: any, index: any, self: any) =>
-                              index ===
-                              self.findIndex(
-                                (comment: any) =>
-                                  comment.userId === value.userId
-                              )
+                  )}
+                </button>
+                <div className="hidden group-hover:block absolute max-h-[300px] overflow-y-auto w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 right-0 bottom-full">
+                  <ul>
+                    {post.comments
+                      .filter(
+                        (value: any, index: any, self: any) =>
+                          index ===
+                          self.findIndex(
+                            (comment: any) => comment.userId === value.userId
                           )
-                          .sort((a: any, b: any) => {
-                            if (a.userId === user?.id) {
-                              return -1;
-                            }
-                            if (b.userId === user?.id) {
-                              return 1;
-                            }
-                            return 0;
-                          })
-                          .map((commenter: any, index: number) => (
-                            <li key={index}>
+                      )
+                      .sort((a: any, b: any) => {
+                        if (a.userId === user?.id) {
+                          return -1;
+                        }
+                        if (b.userId === user?.id) {
+                          return 1;
+                        }
+                        return 0;
+                      })
+                      .map((commenter: any, index: number) => (
+                        <li key={index}>
+                          {commenter?.user ? (
+                            <Link href={`/${commenter?.user?.username}`}>
                               {commenter?.userId === user?.id
                                 ? "You"
                                 : commenter?.user?.name === null
@@ -378,13 +430,21 @@ export default function PostsList({ post, setIsRefresh }: any) {
                                 : commenter?.user === null
                                 ? "Deleted User"
                                 : commenter?.user?.name}
-                            </li>
-                          ))}
-                      </ul>
-                    </div>
-                  </span>
-                )}
-              </button>
+                            </Link>
+                          ) : commenter?.userId === user?.id ? (
+                            "You"
+                          ) : commenter?.user?.name === null ? (
+                            "Anonymous"
+                          ) : commenter?.user === null ? (
+                            "Deleted User"
+                          ) : (
+                            commenter?.user?.name
+                          )}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              </div>
               <button type="button">
                 <span className="hover:border-b border-gray-600 dark:border-gray-300">
                   <i className="far fa-share"></i>{" "}
