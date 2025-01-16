@@ -17,7 +17,8 @@ export default function ViewPostComments({
   const [isRefreshData, setIsRefreshData] = useState(false);
   const { data, loading }: any = useFetch(
     isOpen && `/posts/${postId}`,
-    isRefreshData
+    isRefreshData,
+    false
   );
   const [comment, setComment] = useState("");
   const [error, setError] = useState<any>("");
