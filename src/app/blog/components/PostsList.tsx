@@ -357,7 +357,7 @@ export default function PostsList({ post, setIsRefresh }: any) {
                 {post.likes.length - (isLiked ? 1 : 0) > 1 && (
                   <span className="sm:max-w-full max-w-[100px] relative group hover:underline cursor-pointer">
                     and others
-                    <div className="hidden group-hover:block absolute w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 left-0 bottom-full">
+                    <div className="hidden group-hover:block absolute w-auto max-h-[300px] overflow-y-auto  min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 left-0 bottom-full">
                       <ul>
                         {post.likes
                           .sort((a: any, b: any) => {
@@ -400,7 +400,7 @@ export default function PostsList({ post, setIsRefresh }: any) {
                     </span>
                   )}
                 </button>
-                <div className="hidden group-hover:block absolute w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 right-0 bottom-full">
+                <div className="hidden group-hover:block absolute max-h-[300px] overflow-y-auto w-auto min-w-60 rounded-lg z-50 text-start text-sm text-gray-100 dark:bg-black/75 bg-black/50 px-4 py-2 right-0 bottom-full">
                   <ul>
                     {post.comments
                       .filter(
