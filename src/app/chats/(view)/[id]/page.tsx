@@ -305,7 +305,7 @@ const Chats = () => {
                   alt={data?.user?.name}
                 />
                 <div className="ml-3">
-                  <p className="text-lg font-semibold">{data?.user?.name}</p>
+                  <p className="text-lg font-semibold">{data?.user?.name || "Anonymous"}</p>
 
                   <p className="text-sm text-gray-200">Online</p>
                 </div>
