@@ -18,12 +18,15 @@ import RecentChat from "../../components/loaders/RecentChat";
 import Emoji from "@/app/components/emoji-picker/Emoji";
 import Link from "next/link";
 import { useConversation } from "../../context/conversationContext";
+import useToastr from "../../hooks/Toastr";
+import DoubleRecentChat from "../../components/loaders/DoubleRecentChat";
 
 const Chats = () => {
   const { id }: any = useParams();
   const { sendMessage }: any = useSocket();
   const { data, loading }: any = useFetch(
     id && `/users/for/seo/${id}`,
+    false,
     false,
     false
   );
@@ -36,7 +39,6 @@ const Chats = () => {
   const textareaRef = useRef<any>("");
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const chatContentRef = useRef<any>(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useRouter();
   const [isSending, setIsSending] = useState(false);
   const emojiPickerRef = useRef<any>(null);
@@ -47,9 +49,17 @@ const Chats = () => {
     loadingOnTake,
     setAddTake,
     setHasParams,
+    setSearchTerm,
+    searchTerm,
+    loadingOnSearch,
+    setAddTakeMessages,
+    loadingOnTakeMessages
   }: any = useConversation();
   const loadingOnTakeRef = useRef(loadingOnTake);
   const [backToBottom, setBackToBottom] = useState(false);
+  const { showError }: any = useToastr();
+  const searchRef = useRef<any>(null);
+  const recentChatRef = useRef<any>(null);
 
   const getDataPerUser = convos?.conversations?.filter(
     (chat: any) =>
@@ -61,6 +71,10 @@ const Chats = () => {
     (getDataPerUser && getDataPerUser[0]?.messages?.length) || 0;
   const totalData =
     (getDataPerUser && getDataPerUser[0]?._count?.messages) || 0;
+
+  const totalUsersData = convos?.totalSearchedData || 0;
+  const totalConvosData = convos?.totalConvosData || 0;
+  const totalConvos = convos?.conversations?.length || 0;
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -83,7 +97,7 @@ const Chats = () => {
   }, [loadingOnTake]);
 
   useEffect(() => {
-    const handleInfinitScroll = () => {
+    const handleInfiniteScroll = () => {
       if (
         chatContentRef.current &&
         !loadingOnTakeRef.current &&
@@ -92,7 +106,7 @@ const Chats = () => {
         const { scrollTop, scrollHeight, clientHeight } =
           chatContentRef.current;
         if (scrollTop + scrollHeight - 1 <= clientHeight) {
-          setAddTake((prev: any) => prev + 10);
+          setAddTakeMessages((prev: any) => prev + 10);
         }
       }
 
@@ -101,15 +115,33 @@ const Chats = () => {
 
         setBackToBottom(scrollTop < -200);
       }
+
+      if (recentChatRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = recentChatRef.current;
+        if (
+          scrollHeight - scrollTop <= clientHeight &&
+          !loadingOnTakeRef.current &&
+          totalConvos < totalConvosData
+        ) {
+          setAddTake((prev: any) => prev + 2);
+        }
+      }
     };
-    chatContentRef?.current?.addEventListener("scroll", handleInfinitScroll);
+    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
+
+    recentChatRef?.current?.addEventListener("scroll", handleInfiniteScroll);
     return () => {
       chatContentRef?.current?.removeEventListener(
         "scroll",
-        handleInfinitScroll
+        handleInfiniteScroll
+      );
+
+      recentChatRef?.current?.removeEventListener(
+        "scroll",
+        handleInfiniteScroll
       );
     };
-  }, [totalMessages, totalData]);
+  }, [totalMessages, totalData, totalConvosData, totalConvos]);
 
   const handleBackToBottom = () => {
     if (chatContentRef.current) {
@@ -186,6 +218,9 @@ const Chats = () => {
     } catch (error: any) {
       console.error(error);
       setError(error.response.data);
+      if (error.response.status === 413) {
+        showError("Payload too large. Please try again", "Error");
+      }
     } finally {
       sendMessage({
         toRefresh: false,
@@ -226,10 +261,20 @@ const Chats = () => {
     }
   };
 
+  // const messages = convos?.conversations?.filter(
+  //   (chat: any) =>
+  //     (chat.senderId === user?.id || chat.receiverId === user?.id) &&
+  //     (chat.senderId === data?.user?.id || chat.receiverId === data?.user?.id)
+  // );
+
   const messages = convos?.conversations?.filter(
     (chat: any) =>
-      (chat.senderId === user?.id || chat.receiverId === user?.id) &&
-      (chat.senderId === data?.user?.id || chat.receiverId === data?.user?.id)
+      ((chat.senderId === user?.id || chat.receiverId === user?.id) &&
+        (chat.senderId === data?.user?.id ||
+          chat.receiverId === data?.user?.id) &&
+        chat.senderId === user?.id &&
+        chat.receiverId === data?.user?.id) ||
+      (chat.senderId === data?.user?.id && chat.receiverId === user?.id)
   );
 
   const handleEmojiSelect = (emoji: any) => {
@@ -247,7 +292,12 @@ const Chats = () => {
   };
 
   const handleSearchTerm = (e: any) => {
-    setSearchTerm(e.target.value);
+    if (searchRef.current) clearTimeout(searchRef.current);
+
+    searchRef.current = setTimeout(() => {
+      setSearchTerm(e.target.value);
+      setAddTake(totalUsersData);
+    }, 500);
   };
 
   return (
@@ -272,26 +322,50 @@ const Chats = () => {
           </div>
         </div>
         {/* Recent Chats */}
-        <div className="overflow-y-auto">
-          {loadingConvos ? (
-            <RecentChat />
-          ) : convos?.conversations && convos?.conversations.length > 0 ? (
-            convos?.conversations.map((convo: any, index: number) => (
-              <RecentChatContent
-                key={index}
-                user={
-                  convo.senderId === user?.id ? convo.receiver : convo.sender
-                }
-                lastMessage={convo?.messages[0]?.content}
-                timeSent={convo?.messages[0]?.createdAt}
-              />
-            ))
-          ) : (
-            <p className="text-center font-bold text-lg mt-5 break-words px-10 w-20 md:w-full">
-              {searchTerm ? `No "${searchTerm}" found` : "No conversations yet"}
-            </p>
-          )}
-        </div>
+        {!searchTerm ? (
+          <div className="overflow-y-auto" ref={recentChatRef}>
+            {loadingConvos || loadingOnSearch ? (
+              <RecentChat />
+            ) : convos?.conversations && convos?.conversations.length > 0 ? (
+              convos?.conversations.map((convo: any, index: number) => (
+                <RecentChatContent
+                  key={index}
+                  user={
+                    convo.senderId === user?.id ? convo.receiver : convo.sender
+                  }
+                  lastMessage={convo?.messages[0]?.content}
+                  timeSent={convo?.messages[0]?.createdAt}
+                />
+              ))
+            ) : (
+              <p className="text-center font-bold text-lg mt-5 break-words px-10 w-20 md:w-full">
+                {searchTerm
+                  ? `No "${searchTerm}" found`
+                  : "No conversations yet"}
+              </p>
+            )}
+
+            {loadingOnTake && <DoubleRecentChat />}
+          </div>
+        ) : (
+          <div className="overflow-y-auto" ref={recentChatRef}>
+            {loadingConvos || loadingOnSearch ? (
+              <RecentChat />
+            ) : convos?.searchedData?.length > 0 ? (
+              convos?.searchedData?.map((user: any, index: number) => (
+                <RecentChatContent key={index} user={user} setSearchTerm={setSearchTerm} searchTerm={searchTerm} />
+              ))
+            ) : (
+              <p className="text-center font-bold text-lg mt-5 break-words px-10 w-20 md:w-full">
+                {searchTerm
+                  ? `No "${searchTerm}" found`
+                  : "No conversations yet"}
+              </p>
+            )}
+
+            {loadingOnTake && <DoubleRecentChat />}
+          </div>
+        )}
       </div>
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
@@ -336,7 +410,7 @@ const Chats = () => {
           className="flex-1 flex flex-col-reverse gap-4 p-4 overflow-y-auto bg-white dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
         >
           {isSending && <p className="text-end text-sm">Sending...</p>}
-          {loading ? (
+          {loading || loadingConvos ? (
             <Content />
           ) : messages && messages.length > 0 ? (
             messages.map((content: any) =>
@@ -359,7 +433,7 @@ const Chats = () => {
             </p>
           )}
 
-          {loadingOnTake && (
+          {loadingOnTakeMessages && (
             <div className="relative flex justify-center items-center">
               <i className="fa-duotone fa-solid fa-spinner-third text-center animate-spin"></i>
             </div>
@@ -395,6 +469,7 @@ const Chats = () => {
                 onKeyDown={handleKeyDown}
                 onInput={handleInput}
                 disabled={loading}
+                maxLength={85000}
               />
 
               {loading && (

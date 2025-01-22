@@ -1,25 +1,44 @@
 import { useState, useEffect } from "react";
 import api from "../../lib/axiosCall";
 
-const useFetch = (url: any, isRefresh: boolean, isPaginated: boolean) => {
+const useFetch = (
+  url: any,
+  isRefresh: boolean,
+  isPaginated: boolean,
+  isSearched: boolean
+) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingOnTake, setLoadingOnTake] = useState(false);
+  const [loadingOnTakeMessages, setLoadingOnTakeMessages] = useState(false);
+  const [loadingOnSearch, setLoadingOnSearch] = useState(false);
   const [error, setError] = useState(null);
   const [addTake, setAddTake] = useState(0);
+  const [addTakeMessages, setAddTakeMessages] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
   const defaultTake = 20;
 
   useEffect(() => {
     if (!url) return;
     setError(null);
-    if (addTake) {
+    if (addTake && !isRefresh) {
       setLoadingOnTake(true);
+    }
+    if (addTakeMessages && !isRefresh) {
+      setLoadingOnTakeMessages(true);
+    }
+    if (searchTerm) {
+      setLoadingOnSearch(true);
     }
     const fetchData = async () => {
       const params: any = {};
 
       if (isPaginated) {
         params.take = defaultTake + addTake;
+        params.takeMessages = defaultTake + addTakeMessages;
+      }
+      if (isSearched) {
+        params.searchTerm = searchTerm;
       }
 
       try {
@@ -35,13 +54,30 @@ const useFetch = (url: any, isRefresh: boolean, isPaginated: boolean) => {
         if (addTake) {
           setLoadingOnTake(false);
         }
+        if (addTakeMessages) {
+          setLoadingOnTakeMessages(false);
+        }
+        if (searchTerm) {
+          setLoadingOnSearch(false);
+        }
       }
     };
 
     fetchData();
-  }, [url, isRefresh, addTake]);
+  }, [url, isRefresh, addTake, searchTerm, addTakeMessages]);
 
-  return { data, loading, error, setAddTake, loadingOnTake };
+  return {
+    data,
+    loading,
+    error,
+    setAddTake,
+    loadingOnTake,
+    setSearchTerm,
+    searchTerm,
+    loadingOnSearch,
+    setAddTakeMessages,
+    loadingOnTakeMessages,
+  };
 };
 
 export default useFetch;

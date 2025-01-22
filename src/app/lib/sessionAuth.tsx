@@ -26,7 +26,12 @@ const sessionAuth = (WrappedComponent: any) => {
 
     if (loading) return <LoadingLoaders />;
 
-    if (!isAuthenticated && !isLogout) return <UnauthorizedPage />;
+    if (!isAuthenticated) {
+      if (isLogout) {
+        return <LoadingLoaders />;
+      }
+      return <UnauthorizedPage />;
+    }
 
     return <WrappedComponent {...props} />;
   };

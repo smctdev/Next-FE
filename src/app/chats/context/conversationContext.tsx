@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
 import useSocket from "../hooks/useSocket";
 import { useAuth } from "@/app/context/AuthContext";
+import { usePathname } from "next/navigation";
 
 const ConversationContext = createContext<any>(undefined);
 
@@ -12,11 +13,27 @@ export const ConversationProvider = ({ children }: any) => {
   const { user }: any = useAuth();
   const [isRefresh, setIsRefresh] = useState(false);
   const [hasParams, setHasParams] = useState(false);
-  const { data, loading, loadingOnTake, setAddTake }: any = useFetch(
+  const {
+    data,
+    loading,
+    loadingOnTake,
+    setAddTake,
+    searchTerm,
+    setSearchTerm,
+    loadingOnSearch,
+    setAddTakeMessages,
+    loadingOnTakeMessages,
+  }: any = useFetch(
     hasParams && "chats/conversations",
     (user?.id === receiverId && sentMessage) || isRefresh,
+    true,
     true
   );
+  const pathName = usePathname();
+
+  useEffect(() => {
+    pathName === "/chats" && setSearchTerm("");
+  }, [pathName]);
 
   return (
     <ConversationContext.Provider
@@ -27,6 +44,11 @@ export const ConversationProvider = ({ children }: any) => {
         loadingOnTake,
         setAddTake,
         setHasParams,
+        searchTerm,
+        setSearchTerm,
+        loadingOnSearch,
+        setAddTakeMessages,
+        loadingOnTakeMessages,
       }}
     >
       {children}

@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import SideBarChat from "../../components/SideBarChat";
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const { id } = await params;

@@ -15,6 +15,7 @@ import api from "@/app/lib/axiosCall";
 import Content from "../components/loaders/Content";
 import { useAuth } from "@/app/context/AuthContext";
 import DoubleRecentChat from "../components/loaders/DoubleRecentChat";
+import useToastr from "../hooks/Toastr";
 
 const Chats = () => {
   const { user }: any = useAuth();
@@ -31,14 +32,21 @@ const Chats = () => {
     loading: publicMessagesDataLoading,
     loadingOnTake,
     setAddTake,
-  }: any = useFetch("chat-messages/public-messages", sentPublicMessage, true);
+  }: any = useFetch(
+    "chat-messages/public-messages",
+    sentPublicMessage,
+    true,
+    false
+  );
   const {
     data,
     loading,
     loadingOnTake: loadingOnTakeUsers,
     setAddTake: setAddTakeUsers,
-  }: any = useFetch("users/to/chat", sentPublicMessage, true);
-  const [searchTerm, setSearchTerm] = useState("");
+    setSearchTerm,
+    searchTerm,
+    loadingOnSearch,
+  }: any = useFetch("users/to/chat", sentPublicMessage, true, true);
   const chatContentRef = useRef<any>(null);
   const [isSending, setIsSending] = useState(false);
   const emojiPickerRef = useRef<any>(null);
@@ -48,8 +56,10 @@ const Chats = () => {
   const totalMessages = publicMessagesData?.messages?.length;
   const totalData = publicMessagesData?.totalData;
   const totalUsers = data?.users?.length;
-  const totalUsersData = data?.totalData;
+  const totalUsersData = data?.totalData || 0;
   const [backToBottom, setBackToBottom] = useState(false);
+  const searchRef = useRef<any>(null);
+  const { showError }: any = useToastr();
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -117,7 +127,7 @@ const Chats = () => {
         handleInfiniteScroll
       );
     };
-  }, [totalMessages, totalData, totalUsers, totalUsersData]);
+  }, [totalMessages, totalData, totalUsers, totalUsersData, searchTerm]);
 
   const handleBackToBottom = () => {
     if (chatContentRef.current) {
@@ -196,6 +206,10 @@ const Chats = () => {
     } catch (error: any) {
       console.error(error);
       setError(error.response.data);
+      if(error.response.status === 413) {
+        showError('Payload too large. Please try again', "Error");
+      }
+      setError(error.response.data);
     } finally {
       sendPublicMessage(false);
       setIsSending(false);
@@ -224,18 +238,13 @@ const Chats = () => {
     }
   };
   const handleSearchTerm = (e: any) => {
-    setSearchTerm(e.target.value);
-  };
-  const filteredUser = searchTerm
-    ? data.users.filter((user: any) => {
-        const userName = user?.name || "Anonymous";
+    if (searchRef.current) clearTimeout(searchRef.current);
 
-        return userName
-          ?.toLowerCase()
-          .trim()
-          .includes(searchTerm.trim().toLowerCase());
-      })
-    : data.users || [];
+    searchRef.current = setTimeout(() => {
+      setSearchTerm(e.target.value);
+      setAddTakeUsers(totalUsersData);
+    }, 500);
+  };
 
   return (
     <div className="flex h-screen">
@@ -258,10 +267,10 @@ const Chats = () => {
         </div>
         <div className="overflow-y-auto" ref={recentChatRef}>
           {/* Recent Chats */}
-          {loading ? (
+          {loading || loadingOnSearch ? (
             <RecentChat />
-          ) : filteredUser.length > 0 ? (
-            filteredUser.map((user: any, index: number) => (
+          ) : data?.users?.length > 0 ? (
+            data?.users?.map((user: any, index: number) => (
               <RecentChatContent
                 key={index}
                 user={user}
@@ -288,7 +297,7 @@ const Chats = () => {
             <div className="ml-3">
               <p className="text-lg font-semibold">Public Chats</p>
               <p className="text-sm text-gray-200">
-                {data?.users?.length} people to chat
+                {data?.totalUsersChatted} people chatted
               </p>
             </div>
           </div>
@@ -364,6 +373,8 @@ const Chats = () => {
               error={error?.content?.message}
               onKeyDown={handleKeyDown}
               onInput={handleInput}
+              maxLength={85000}
+              disabled={loading}
             />
             <div className="absolute right-2 bottom-1">
               <Emoji

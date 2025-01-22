@@ -7,10 +7,18 @@ export default function RecentChatContent({
   user,
   lastMessage,
   timeSent,
+  setSearchTerm,
+  searchTerm,
 }: any) {
   const message = formatRecentMessages(lastMessage, 4, 4);
+
+  const handleRemoveSearchTerm = () => setSearchTerm("");
+
   return (
-    <Link href={`/chats/${user?.id}`}>
+    <Link
+      href={`/chats/${user?.id}`}
+      onClick={searchTerm ? handleRemoveSearchTerm : undefined}
+    >
       <div className="flex items-center mt-2 p-2 rounded-lg cursor-pointer hover:dark:bg-gray-600 hover:bg-gray-100 md:mx-3">
         <Image
           avatar={user?.profile_pictures[0]?.avatar}
