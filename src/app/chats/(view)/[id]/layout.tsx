@@ -1,4 +1,4 @@
-import useMetaData from "@/app/hooks/MetaData";
+import useMetaData from "@/app/lib/MetaData";
 import { Metadata } from "next";
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
