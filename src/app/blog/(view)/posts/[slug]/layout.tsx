@@ -1,11 +1,10 @@
+import useMetaData from "@/app/hooks/MetaData";
 import { Metadata } from "next";
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const { slug } = await params;
 
-  const data = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/${slug}`
-  ).then((res) => res.json());
+  const data: any = await useMetaData(`categories/${slug}`);
 
   return {
     title: `${data?.category?.categoryName || slug} posts`,

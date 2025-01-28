@@ -64,7 +64,7 @@ const Login = () => {
       }
     } catch (error: any) {
       console.error(error);
-      setError(error.response.data || `${error.message} or server error.`);
+      setError(error?.response?.data || `${error.message} or server error.`);
       if (error.message === "Network Error") {
         setFlashError(`${error.message} or server error.`);
       }

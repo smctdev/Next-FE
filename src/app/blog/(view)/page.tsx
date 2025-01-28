@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import AddCategory from "../components/modals/AddCategory";
 import useFetch from "../hooks/fetchData";
@@ -12,7 +12,11 @@ const Blog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isRefresh, setIsRefresh] = useState(false);
   const { isAuthenticated, hasHigherRole }: any = useAuth();
-  const { data, loading, error }: any = useFetch("/categories", isRefresh, false);
+  const { data, loading, error }: any = useFetch(
+    "/categories",
+    isRefresh,
+    false
+  );
   const [seemore, setSeemore] = useState<any>({});
   const [searchTerm, setSearchTerm] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -61,20 +65,20 @@ const Blog = () => {
 
   return (
     <div className="mx-auto p-4 dark:bg-black">
-      {isAuthenticated && hasHigherRole && (
-        <div className="flex justify-between flex-wrap gap-5 items-center mb-4">
-          <h1 className="text-2xl font-bold">Blog Categories</h1>
-          <div className="relative">
-            <i className="far fa-magnifying-glass left-3 top-3 absolute text-gray-400"></i>
-            <input
-              maxLength={255}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              type="search"
-              className="py-2 pl-9 pr-2 rounded-lg active:ring-1 active:ring-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none border border-gray-400"
-              placeholder="Search..."
-            />
-          </div>
+      <div className="flex justify-between flex-wrap gap-5 items-center mb-4">
+        <h1 className="text-2xl font-bold">Blog Categories</h1>
+        <div className="relative">
+          <i className="far fa-magnifying-glass left-3 top-3 absolute text-gray-400"></i>
+          <input
+            maxLength={255}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            type="search"
+            className="py-2 pl-9 pr-2 rounded-lg active:ring-1 active:ring-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none border border-gray-400"
+            placeholder="Search..."
+          />
+        </div>
+        {isAuthenticated && hasHigherRole && (
           <button
             ref={buttonRef}
             className="bg-blue-600 text-white px-4 text-sm py-2 rounded-lg hover:bg-blue-700 focus:outline-none"
@@ -82,8 +86,8 @@ const Blog = () => {
           >
             <i className="far fa-plus"></i> Add Category
           </button>
-        </div>
-      )}
+        )}
+      </div>
       <hr />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 my-8 overflow-hidden">
         {loading ? (
