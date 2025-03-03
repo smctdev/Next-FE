@@ -11,7 +11,7 @@ export default function ChatContent({
   timeSent,
 }: any) {
   const pathName = usePathname();
-  const message = formatMessages(content, 16, 16);
+  const message = formatMessages(content.trim(), 16, 16);
   const isIcon = content === "(y)";
 
   const isPublic = pathName === "/chats";
@@ -33,10 +33,10 @@ export default function ChatContent({
               className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] ${
                 !isIcon && "dark:bg-blue-400/50 bg-blue-400/80 shadow-md"
               } text-white p-3 rounded-2xl`}
+              title={timeSent && dateWithTime(timeSent)}
             >
               <p
                 className="text-sm whitespace-break-spaces break-words"
-                title={timeSent && dateWithTime(timeSent)}
               >
                 {message}
               </p>
@@ -63,10 +63,10 @@ export default function ChatContent({
                   className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] w-fit ${
                     !isIcon && "bg-gray-500/65 shadow-md"
                   } text-white p-3 rounded-2xl`}
+                  title={timeSent && dateWithTime(timeSent)}
                 >
                   <p
                     className="text-sm whitespace-break-spaces break-words"
-                    title={timeSent && dateWithTime(timeSent)}
                   >
                     {message}
                   </p>
