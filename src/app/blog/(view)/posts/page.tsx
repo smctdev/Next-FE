@@ -151,7 +151,7 @@ const Posts = () => {
               >
                 Show more
               </button>
-            ) : (
+            ) : filteredPosts?.length > 0 && (
               <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">
                 All posts loaded
               </p>

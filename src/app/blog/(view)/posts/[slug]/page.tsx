@@ -87,7 +87,7 @@ const PostWithSlugs = () => {
               >
                 Show more
               </button>
-            ) : (
+            ) : data?.category?.posts?.length > 0 && (
               <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">
                 All posts loaded
               </p>
