@@ -29,11 +29,11 @@ export const ConversationProvider = ({ children }: any) => {
     true,
     true
   );
-  const pathName = usePathname();
+  const pathname = usePathname();
 
   useEffect(() => {
-    pathName === "/chats" && setSearchTerm("");
-  }, [pathName]);
+    pathname === "/chats" && setSearchTerm("");
+  }, [pathname]);
 
   return (
     <ConversationContext.Provider

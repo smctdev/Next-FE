@@ -9,14 +9,13 @@ import DropUpButton from "./DropUpButton";
 
 const BaseContent = ({ children }: any) => {
   const { hasHigherRole, hasNormalRole }: any = useAuth();
-  const pathName = usePathname();
+  const pathname = usePathname();
 
-  const isChat = pathName.startsWith("/chat");
+  const isChat = pathname.startsWith("/chat");
 
   if (isChat) {
     return <>{children}</>;
   }
-
   return (
     <>
       <DropUpButton />

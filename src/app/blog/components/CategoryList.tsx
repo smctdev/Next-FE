@@ -1,11 +1,22 @@
 import Link from "next/link";
 
-export default function CategoryList({ post, handleSeemore, seemore }: any) {
+export default function CategoryList({
+  post,
+  handleSeemore,
+  seemore,
+  hasHigherRole,
+  handleDeleteCategory
+}: any) {
   return (
     <div
       data-aos="fade-up"
       className="bg-white hover:bg-gray-100 relative dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 p-6 rounded-lg shadow-md transition-all duration-300 ease-in-out hover:shadow-2xl dark:bg-gray-900"
     >
+      {hasHigherRole && (
+        <button className="absolute top-3 right-4" onClick={handleDeleteCategory} type="button">
+          <i className="far fa-xmark"></i>
+        </button>
+      )}
       <div className="h-auto min-h-32 overflow-hidden mb-5">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4 dark:text-white">
           {post.categoryName}

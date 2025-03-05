@@ -7,7 +7,7 @@ import Footer from "./Footer";
 import { usePathname } from "next/navigation";
 
 const SideBar = ({ children }: any) => {
-  const pathName = usePathname();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -37,7 +37,7 @@ const SideBar = ({ children }: any) => {
     setSidebarOpen(!sidebarOpen);
   };
   const toogleDropdown = () => {
-    if (pathName === "/todos") {
+    if (pathname === "/todos") {
       setDropdownOpen(!dropdownOpen);
     } else {
       setDropdownOpen(true);

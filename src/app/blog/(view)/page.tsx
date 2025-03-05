@@ -7,6 +7,9 @@ import useFetch from "../hooks/fetchData";
 import CategoryLoader from "../components/loaders/CategoryLoader";
 import publicAuth from "@/app/lib/publicAuth";
 import CategoryList from "../components/CategoryList";
+import ConfirmDelete from "../components/modals/ConfirmDelete";
+import api from "@/app/lib/axiosCall";
+import useToastr from "../hooks/Toastr";
 
 const Blog = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,8 +20,15 @@ const Blog = () => {
     isRefresh,
     false
   );
+  const { showSuccess, showError } = useToastr();
   const [seemore, setSeemore] = useState<any>({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [isDeleteOpen, setIsDeleteOpen] = useState({
+    id: 0,
+    open: false,
+  });
+  const [categoryName, setCategoryName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -63,6 +73,37 @@ const Blog = () => {
       )
     : [];
 
+  const handleDeleteCategory = (id: number, categoryName: string) => () => {
+    setIsDeleteOpen({
+      id,
+      open: isDeleteOpen.id === id ? !isDeleteOpen.open : true,
+    });
+    setCategoryName(categoryName);
+  };
+
+  const handleProceedDeleteCategory = (id: number) => async () => {
+    setIsLoading(true);
+    setIsRefresh(true);
+    try {
+      const response = await api.delete(`/categories/${id}`);
+
+      if (response.data.statusCode === 200) {
+        setIsDeleteOpen({
+          id: 0,
+          open: false,
+        });
+        setCategoryName("");
+        showSuccess(response.data.message, "Deleted");
+      }
+    } catch (error: any) {
+      console.error(error);
+      showError(error?.response?.data || `${error.message} or server error.`, "Error");
+    } finally {
+      setIsLoading(false);
+      setIsRefresh(false);
+    }
+  };
+
   return (
     <div className="mx-auto p-4 dark:bg-black">
       <div className="flex justify-between flex-wrap gap-5 items-center mb-4">
@@ -98,7 +139,12 @@ const Blog = () => {
               key={index}
               post={post}
               handleSeemore={handleSeemore}
+              hasHigherRole={hasHigherRole}
               seemore={seemore}
+              handleDeleteCategory={handleDeleteCategory(
+                post.id,
+                post.categoryName
+              )}
             />
           ))
         ) : (
@@ -131,6 +177,16 @@ const Blog = () => {
         onClose={setIsOpen}
         setIsRefresh={setIsRefresh}
       />
+
+      <ConfirmDelete
+        title={`Are you sure you want to delete ${categoryName}?`}
+        handleProceedDeleteCategory={handleProceedDeleteCategory(isDeleteOpen.id)}
+        isOpen={isDeleteOpen.open}
+        isLoading={isLoading}
+        onClose={handleDeleteCategory(isDeleteOpen.id, categoryName)}
+      >
+        If you delete this category, you will not be able to recover it!
+      </ConfirmDelete>
     </div>
   );
 };

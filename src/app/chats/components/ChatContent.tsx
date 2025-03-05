@@ -10,11 +10,11 @@ export default function ChatContent({
   name,
   timeSent,
 }: any) {
-  const pathName = usePathname();
+  const pathname = usePathname();
   const message = formatMessages(content.trim(), 16, 16);
   const isIcon = content === "(y)";
 
-  const isPublic = pathName === "/chats";
+  const isPublic = pathname === "/chats";
 
   return (
     <div>
