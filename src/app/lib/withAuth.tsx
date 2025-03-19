@@ -17,7 +17,8 @@ const withAuth = (WrappedComponent: any) => {
 
     if (loading) return <LoadingLoaders />;
 
-    if (!isAuthenticated && !isLogout) {
+    if (!isAuthenticated) {
+      if (isLogout) return <LoadingLoaders />;
       return <UnauthorizedPage />;
     }
 

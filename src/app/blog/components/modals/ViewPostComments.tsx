@@ -115,7 +115,7 @@ export default function ViewPostComments({
                 : data?.post?.user?.name === null
                 ? "Anonymous"
                 : "Deleted User"}
-              &apos;s
+              &apos;s post
             </>
           )}
         </h2>

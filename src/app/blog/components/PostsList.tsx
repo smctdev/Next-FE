@@ -232,7 +232,7 @@ export default function PostsList({ post, setIsRefresh }: any) {
                 : "text-md"
             } text-gray-700 dark:text-gray-300 whitespace-break-spaces break-words`}
           >
-            {post.description}
+            {post.description.trim()}
           </p>
           {post.description.length > 150 && !seeMore && (
             <button

@@ -1,11 +1,10 @@
+import useMetaData from "@/app/lib/MetaData";
 import { Metadata } from "next";
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const { id } = await params;
 
-  const data = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/for/seo/${id}`
-  ).then((res) => res.json());
+  const data = await useMetaData(`users/for/seo/${id}`);
 
   return {
     title: `${data?.user?.name || id}`,

@@ -25,11 +25,8 @@ const withRoleAuth = (WrappedComponent: any) => {
       return <LoadingLoaders />;
     }
 
-    if (
-      (!isAuthenticated && !isLogout) ||
-      (!isLogout && !hasHigherRole) ||
-      hasNormalRole
-    ) {
+    if (!isAuthenticated || (!isLogout && !hasHigherRole) || hasNormalRole) {
+      if (isLogout) return <LoadingLoaders />;
       return <UnauthorizedPage />;
     }
 

@@ -21,7 +21,8 @@ export const metadata = {
     default: "Blog App",
     template: "Blog App | %s",
   },
-  description: "Add post to a blog",
+  description:
+    "Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content",
 };
 
 export default function RootLayout({
@@ -36,6 +37,13 @@ export default function RootLayout({
 
         <meta
           name="keywords"
+          content="Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content"
+        />
+
+        <meta property="og:title" content="Blog App" />
+
+        <meta
+          property="og:description"
           content="Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content"
         />
 

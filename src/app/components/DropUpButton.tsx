@@ -9,7 +9,7 @@ export default function DropUpButton() {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [mounted, setMounted] = useState(false);
-  const { setTheme, resolvedTheme } = useTheme();
+  const { setTheme } = useTheme();
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
 
   useEffect(() => {

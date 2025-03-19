@@ -138,7 +138,7 @@ export default function SinglePost({
                 : "text-md"
             } text-gray-700 dark:text-gray-300 break-words whitespace-break-spaces`}
           >
-            {post.description}
+            {post.description.trim()}
           </p>
           {post.description.length > 150 && !seeMore && (
             <button

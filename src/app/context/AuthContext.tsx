@@ -74,6 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     Cookies.set("APP-TOKEN", token, { sameSite: "Lax" });
     Cookies.set("APP-REMEMBER-TOKEN", rememberToken, { sameSite: "Lax" });
     fetchUserProfile();
+    setIsLogout(false);
   };
 
   const logout = () => {
@@ -83,12 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRoles(null);
     Cookies.remove("APP-TOKEN");
     Cookies.remove("APP-REMEMBER-TOKEN");
-
     router.push("/login");
-
-    setTimeout(() => {
-      setIsLogout(false);
-    }, 500);
   };
 
   const hasHigherRole = userRoles?.some((role: any) =>

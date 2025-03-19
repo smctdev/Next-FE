@@ -8,14 +8,14 @@ const ChildActiveLink = ({
   href: string;
   children: React.ReactNode;
 }) => {
-  const pathName = usePathname();
+  const pathname = usePathname();
 
   const normalizePath = (path: string) => path.replace(/\/$/, "");
 
   const isActive =
     href === "/"
-      ? pathName === href
-      : normalizePath(pathName).startsWith(normalizePath(href));
+      ? pathname === href
+      : normalizePath(pathname).startsWith(normalizePath(href));
 
   return (
     <Link

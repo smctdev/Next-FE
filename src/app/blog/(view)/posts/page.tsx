@@ -14,7 +14,7 @@ const Posts = () => {
   const { isAuthenticated, user }: any = useAuth();
   const [isRefresh, setIsRefresh] = useState(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { data, loading, loadingOnTake, setAddTake }: any = useFetch(
+  const { data, loading, loadingOnTake, setAddTake, error }: any = useFetch(
     `/posts`,
     isRefresh,
     true
@@ -27,27 +27,7 @@ const Posts = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node) &&
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleOpenModal = () => {
-    setIsOpen(!isOpen);
-  };
+  const sentinelRef = useRef<HTMLSpanElement>(null);
 
   const filteredPosts = data.posts
     ? data.posts.filter(
@@ -74,9 +54,54 @@ const Posts = () => {
       )
     : [];
 
-  const handleShowMore = () => {
-    setAddTake((prev: any) => prev + 10);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node) &&
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !error &&
+          !loadingOnTake &&
+          filteredPosts?.length < data?.totalData
+        ) {
+          setAddTake((prev: any) => prev + 10);
+        }
+      },
+      {
+        threshold: 1.0,
+      }
+    );
+
+    if (sentinelRef.current) {
+      observer.observe(sentinelRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [loadingOnTake, sentinelRef, filteredPosts, data]);
+
+  const handleOpenModal = () => {
+    setIsOpen(!isOpen);
   };
+
+  // const handleShowMore = () => {
+  //   setAddTake((prev: any) => prev + 10);
+  // };
 
   return (
     <div className="p-4 dark:bg-black mx-auto">
@@ -139,21 +164,24 @@ const Posts = () => {
             </div>
           </div>
         )}
-        <div className="flex justify-center items-center">
-          {loadingOnTake ? (
-            <i className="fa-duotone fas fa-spinner-third animate-spin"></i>
-          ) : filteredPosts?.length < data?.totalData ? (
-            <button
-              onClick={handleShowMore}
-              type="button"
-              className="p-2 bg-blue-500/30 rounded-md hover:bg-blue-500/40 hover:scale-105 transition-all duration-300 ease-in-out"
-            >
-              Show more
-            </button>
-          ) : (
-            <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">All posts loaded</p>
-          )}
-        </div>
+        {data?.posts && (
+          <div className="flex justify-center items-center">
+            {loadingOnTake ? (
+              <i className="fa-duotone fas fa-spinner-third animate-spin"></i>
+            ) : error ? (
+              <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">
+                {error.message}
+              </p>
+            ) : (
+              filteredPosts?.length >= data?.totalData && (
+                <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">
+                  All posts loaded
+                </p>
+              )
+            )}
+          </div>
+        )}
+        <span ref={sentinelRef} className="bg-transparent"></span>
       </div>
       <AddPost
         onClose={setIsOpen}

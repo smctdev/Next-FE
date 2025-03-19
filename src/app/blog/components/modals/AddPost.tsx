@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { PostValidationType } from "../../types/PostValidationType";
 import useToastr from "../../hooks/Toastr";
 import Image from "../images/Image";
+import formatFileSize from "@/app/utils/formatFileSize";
 
 export default function AddPost({
   isOpen,
@@ -274,7 +275,7 @@ export default function AddPost({
                               <small>{image.name}</small>
                             </p>
                             <p>
-                              <small>{(image.size / 1024).toFixed(2)} KB</small>
+                              <small>{formatFileSize(image.size)}</small>
                             </p>
                           </div>
                         ))}
