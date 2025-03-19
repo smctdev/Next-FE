@@ -5,13 +5,13 @@ const useFetch = (url: any, isRefresh: boolean, isPaginated: boolean) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingOnTake, setLoadingOnTake] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
   const [addTake, setAddTake] = useState(0);
   const defaultTake = 10;
 
   useEffect(() => {
     if (!url) return;
-    setError(null);
+    setError("");
     if (addTake) {
       setLoadingOnTake(true);
     }
