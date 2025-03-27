@@ -8,13 +8,14 @@ import api from "@/app/lib/axiosCall";
 import useToastr from "../hooks/Toastr";
 import withRoleAuth from "@/app/lib/withRoleAuth";
 import AddUser from "../components/modals/AddUser";
-import DeleteConfirmation from "../utils/DeleteConfirmation";
+import DeleteConfirmation from "../components/modals/DeleteConfirmation";
 import Pagination from "@/app/components/pagination/Pagination";
 
 const Users = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [id, setId] = useState("");
   const {
     data,
@@ -49,6 +50,7 @@ const Users = () => {
 
   const handleVerifyUser = async (id: string) => {
     setIsRefresh(true);
+    setIsLoading(true);
     try {
       const response = await api.post(`/users/verify-user/${id}`, {
         id,
@@ -64,11 +66,13 @@ const Users = () => {
       console.error(e);
     } finally {
       setIsRefresh(false);
+      setIsLoading(false);
     }
   };
 
   const handleDeleteUser = async (id: string) => {
     setIsRefresh(true);
+    setIsLoading(true);
     try {
       const response = await api.delete(`/users/${id}`);
 
@@ -85,6 +89,7 @@ const Users = () => {
       }
     } finally {
       setIsRefresh(false);
+      setIsLoading(false);
     }
   };
 
@@ -137,6 +142,7 @@ const Users = () => {
                   handleVerifyUser={handleVerifyUser}
                   handleConfirmDelete={handleConfirmDelete}
                   setIsRefresh={setIsRefresh}
+                  isLoading={isLoading}
                 />
               ))
             ) : (
@@ -167,6 +173,7 @@ const Users = () => {
         id={id}
         isOpen={isOpenConfirmDelete}
         onClose={handleConfirmDelete}
+        isLoading={isLoading}
       />
     </div>
   );
