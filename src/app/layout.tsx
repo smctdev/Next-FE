@@ -47,6 +47,15 @@ export default function RootLayout({
           content="Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content"
         />
 
+        <meta
+          property="og:image"
+          content="https://cdn-icons-png.flaticon.com/128/2065/2065254.png"
+        />
+
+        <meta property="og:type" content="website"/>
+
+        <meta property="og:site_name" content="Blog App - Todos - NBA - Posts - Chats"/>
+
         <link
           rel="stylesheet"
           href="https://site-assets.fontawesome.com/releases/v6.6.0/css/all.css"
