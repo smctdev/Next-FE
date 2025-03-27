@@ -12,7 +12,7 @@ export default function commentDateFormat(date: any) {
   } else if (unit === "day" || unit === "days") {
     return `${amount}d`;
   } else if (unit === "month" || unit === "months") {
-    return `${amount}m`;
+    return `${amount}mos`;
   } else if (unit === "year" || unit === "years") {
     return `${amount}y`;
   }
