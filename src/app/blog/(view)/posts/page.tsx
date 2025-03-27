@@ -78,7 +78,8 @@ const Posts = () => {
           entries[0].isIntersecting &&
           !error &&
           !loadingOnTake &&
-          filteredPosts?.length < data?.totalData
+          filteredPosts?.length < data?.totalData &&
+          !searchTerm
         ) {
           setAddTake((prev: any) => prev + 10);
         }
