@@ -78,7 +78,8 @@ const Posts = () => {
           entries[0].isIntersecting &&
           !error &&
           !loadingOnTake &&
-          filteredPosts?.length < data?.totalData
+          filteredPosts?.length < data?.totalData &&
+          !searchTerm
         ) {
           setAddTake((prev: any) => prev + 10);
         }
@@ -93,7 +94,7 @@ const Posts = () => {
     }
 
     return () => observer.disconnect();
-  }, [loadingOnTake, sentinelRef, filteredPosts, data]);
+  }, [loadingOnTake, sentinelRef, filteredPosts, data, error]);
 
   const handleOpenModal = () => {
     setIsOpen(!isOpen);

@@ -7,7 +7,7 @@ import { Post } from "@/app/blog/types/PostType";
 import PostsList from "@/app/blog/components/PostsList";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const PostWithSlugs = () => {
   const { slug } = useParams();
@@ -17,10 +17,35 @@ const PostWithSlugs = () => {
     isRefresh,
     true
   );
+  const sentinelRef = useRef<HTMLSpanElement>(null);
 
-  const handleShowMore = () => {
-    setAddTake((prev: any) => prev + 10);
-  };
+  useEffect(() => {
+    if (!sentinelRef?.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !loadingOnTake &&
+          !error &&
+          data?.category?.posts?.length < data?.category?._count?.posts
+        ) {
+          setAddTake((prev: any) => prev + 10);
+        }
+      },
+      {
+        threshold: 1.0,
+      }
+    );
+
+    if (sentinelRef.current) {
+      observer.observe(sentinelRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [sentinelRef, data, loadingOnTake, setAddTake, error]);
   return (
     <div className="p-4 dark:bg-black mx-auto">
       <div className="flex justify-between items-center mb-4">
@@ -78,22 +103,21 @@ const PostWithSlugs = () => {
           <div className="flex justify-center items-center">
             {loadingOnTake ? (
               <i className="fa-duotone fas fa-spinner-third animate-spin"></i>
-            ) : data?.category?.posts?.length <
-              data?.category?._count?.posts ? (
-              <button
-                onClick={handleShowMore}
-                type="button"
-                className="p-2 bg-blue-500/30 rounded-md hover:bg-blue-500/40 hover:scale-105 transition-all duration-300 ease-in-out"
-              >
-                Show more
-              </button>
-            ) : data?.category?.posts?.length > 0 && (
+            ) : error ? (
               <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">
-                All posts loaded
+                {error.message}
               </p>
+            ) : (
+              data?.category?.posts?.length >=
+                data?.category?._count?.posts && (
+                <p className="text-sm dark:text-gray-500 text-gray-400 font-bold">
+                  All posts loaded
+                </p>
+              )
             )}
           </div>
         )}
+        <span ref={sentinelRef}></span>
       </div>
     </div>
   );
