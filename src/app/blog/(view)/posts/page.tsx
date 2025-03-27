@@ -94,7 +94,7 @@ const Posts = () => {
     }
 
     return () => observer.disconnect();
-  }, [loadingOnTake, sentinelRef, filteredPosts, data]);
+  }, [loadingOnTake, sentinelRef, filteredPosts, data, error]);
 
   const handleOpenModal = () => {
     setIsOpen(!isOpen);

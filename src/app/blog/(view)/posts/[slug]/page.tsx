@@ -27,6 +27,7 @@ const PostWithSlugs = () => {
         if (
           entries[0].isIntersecting &&
           !loadingOnTake &&
+          !error &&
           data?.category?.posts?.length < data?.category?._count?.posts
         ) {
           setAddTake((prev: any) => prev + 10);
@@ -44,7 +45,7 @@ const PostWithSlugs = () => {
     return () => {
       observer.disconnect();
     };
-  }, [sentinelRef, data, loadingOnTake, setAddTake]);
+  }, [sentinelRef, data, loadingOnTake, setAddTake, error]);
   return (
     <div className="p-4 dark:bg-black mx-auto">
       <div className="flex justify-between items-center mb-4">
