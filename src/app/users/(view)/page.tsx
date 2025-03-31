@@ -51,6 +51,7 @@ const Users = () => {
   const handleVerifyUser = async (id: string) => {
     setIsRefresh(true);
     setIsLoading(true);
+    setId(id);
     try {
       const response = await api.post(`/users/verify-user/${id}`, {
         id,
@@ -58,9 +59,11 @@ const Users = () => {
 
       if (response.data.statusCode === 200) {
         showSuccess(response.data.message, "Verified");
+        setId("");
       }
       if (response.data.statusCode === 400) {
         showError(response.data.message, "Error");
+        setId("");
       }
     } catch (e: any) {
       console.error(e);
@@ -143,6 +146,7 @@ const Users = () => {
                   handleConfirmDelete={handleConfirmDelete}
                   setIsRefresh={setIsRefresh}
                   isLoading={isLoading}
+                  userId={id}
                 />
               ))
             ) : (

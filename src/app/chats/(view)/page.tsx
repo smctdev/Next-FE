@@ -16,6 +16,7 @@ import Content from "../components/loaders/Content";
 import { useAuth } from "@/app/context/AuthContext";
 import DoubleRecentChat from "../components/loaders/DoubleRecentChat";
 import useToastr from "../hooks/Toastr";
+import { formatChatTimestamp } from "../utils/formatChatTimestamp";
 
 const Chats = () => {
   const { user }: any = useAuth();
@@ -59,6 +60,7 @@ const Chats = () => {
   const totalUsersData = data?.totalData || 0;
   const [backToBottom, setBackToBottom] = useState(false);
   const searchRef = useRef<any>(null);
+  const sentinelRef = useRef<HTMLSpanElement>(null);
   const { showError }: any = useToastr();
 
   useEffect(() => {
@@ -83,19 +85,32 @@ const Chats = () => {
   }, [loadingOnTake, loadingOnTakeUsers]);
 
   useEffect(() => {
-    const handleInfiniteScroll = () => {
-      if (
-        chatContentRef.current &&
-        !loadingOnTakeRef.current &&
-        totalMessages < totalData
-      ) {
-        const { scrollTop, scrollHeight, clientHeight } =
-          chatContentRef.current;
-        if (scrollTop + scrollHeight - 1 <= clientHeight) {
+    if (!sentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !loadingOnTake &&
+          totalMessages < totalData
+        ) {
           setAddTake((prev: any) => prev + 10);
         }
+      },
+      {
+        threshold: 1.0,
       }
+    );
 
+    observer.observe(sentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [sentinelRef, loadingOnTake, totalMessages, totalData]);
+
+  useEffect(() => {
+    const handleInfiniteScroll = () => {
       if (chatContentRef.current) {
         const { scrollTop } = chatContentRef.current;
 
@@ -113,21 +128,20 @@ const Chats = () => {
         }
       }
     };
-    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
 
     recentChatRef?.current?.addEventListener("scroll", handleInfiniteScroll);
+    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
     return () => {
-      chatContentRef?.current?.removeEventListener(
-        "scroll",
-        handleInfiniteScroll
-      );
-
       recentChatRef?.current?.removeEventListener(
         "scroll",
         handleInfiniteScroll
       );
+      chatContentRef?.current?.removeEventListener(
+        "scroll",
+        handleInfiniteScroll
+      );
     };
-  }, [totalMessages, totalData, totalUsers, totalUsersData, searchTerm]);
+  }, [totalUsers, totalUsersData, chatContentRef]);
 
   const handleBackToBottom = () => {
     if (chatContentRef.current) {
@@ -206,8 +220,8 @@ const Chats = () => {
     } catch (error: any) {
       console.error(error);
       setError(error.response.data);
-      if(error.response.status === 413) {
-        showError('Payload too large. Please try again', "Error");
+      if (error.response.status === 413) {
+        showError("Payload too large. Please try again", "Error");
       }
       setError(error.response.data);
     } finally {
@@ -322,16 +336,35 @@ const Chats = () => {
           {publicMessagesDataLoading ? (
             <Content />
           ) : publicMessagesData && publicMessagesData?.messages?.length > 0 ? (
-            publicMessagesData?.messages?.map((message: any, index: number) => (
-              <ChatContent
-                key={index}
-                content={message?.content}
-                sender={message?.userId === user?.id}
-                name={message?.sentBy?.name}
-                avatar={message?.sentBy?.profile_pictures[0]?.avatar}
-                timeSent={message?.createdAt}
-              />
-            ))
+            publicMessagesData?.messages?.map((message: any, index: number) => {
+              const currentTime = new Date(message.createdAt);
+              const prevTime =
+                index > 0
+                  ? new Date(publicMessagesData?.messages[index - 1].createdAt)
+                  : null;
+
+              const shouldShowTime =
+                !prevTime ||
+                currentTime.getMinutes() !== prevTime.getMinutes() ||
+                currentTime.toDateString() !== prevTime.toDateString();
+
+              return (
+                <div key={index}>
+                  {shouldShowTime && (
+                    <div className="flex justify-center text-gray-300 text-xs my-2">
+                      {formatChatTimestamp(currentTime)}
+                    </div>
+                  )}
+                  <ChatContent
+                    content={message?.content}
+                    sender={message?.userId === user?.id}
+                    name={message?.sentBy?.name}
+                    avatar={message?.sentBy?.profile_pictures[0]?.avatar}
+                    timeSent={message?.createdAt}
+                  />
+                </div>
+              );
+            })
           ) : (
             <p className="text-center mb-20 items-center">
               Be the first to start a conversation in{" "}
@@ -344,6 +377,7 @@ const Chats = () => {
               <i className="fa-duotone fa-solid fa-spinner-third text-center animate-spin"></i>
             </div>
           )}
+          <span ref={sentinelRef}></span>
         </div>
         {/* Message Input Area */}
         <div className="bg-white dark:bg-gray-700 px-4 py-2 gap-2 flex items-center relative">

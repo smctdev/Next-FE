@@ -23,6 +23,16 @@ export const metadata = {
   },
   description:
     "Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content",
+  keywords:
+    "Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content",
+  openGraph: {
+    title: "Blog App",
+    description:
+      "Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content",
+    image: "https://cdn-icons-png.flaticon.com/128/2065/2065254.png",
+    type: "website",
+    siteName: "Blog App - Todos - NBA - Posts - Chats",
+  },
 };
 
 export default function RootLayout({
@@ -34,27 +44,6 @@ export default function RootLayout({
     <html lang="en" suppressContentEditableWarning>
       <head>
         <meta name="author" content="Allan Justine Mascariñas" />
-
-        <meta
-          name="keywords"
-          content="Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content"
-        />
-
-        <meta property="og:title" content="Blog App" />
-
-        <meta
-          property="og:description"
-          content="Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content"
-        />
-
-        <meta
-          property="og:image"
-          content="https://cdn-icons-png.flaticon.com/128/2065/2065254.png"
-        />
-
-        <meta property="og:type" content="website"/>
-
-        <meta property="og:site_name" content="Blog App - Todos - NBA - Posts - Chats"/>
 
         <link
           rel="stylesheet"

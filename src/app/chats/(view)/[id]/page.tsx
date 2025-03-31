@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useConversation } from "../../context/conversationContext";
 import useToastr from "../../hooks/Toastr";
 import DoubleRecentChat from "../../components/loaders/DoubleRecentChat";
+import { formatChatTimestamp } from "../../utils/formatChatTimestamp";
 
 const Chats = () => {
   const { id }: any = useParams();
@@ -53,18 +54,25 @@ const Chats = () => {
     searchTerm,
     loadingOnSearch,
     setAddTakeMessages,
-    loadingOnTakeMessages
+    loadingOnTakeMessages,
   }: any = useConversation();
   const loadingOnTakeRef = useRef(loadingOnTake);
   const [backToBottom, setBackToBottom] = useState(false);
   const { showError }: any = useToastr();
   const searchRef = useRef<any>(null);
   const recentChatRef = useRef<any>(null);
+  const sentinelRef = useRef<HTMLSpanElement>(null);
+  const unreadMessageRef = useRef<HTMLDivElement>(null);
+  const [messageDetails, setMessageDetails] = useState({
+    chatId: 0,
+    receiverId: "",
+  });
+  let firstUnreadIndex: any = null;
 
   const getDataPerUser = convos?.conversations?.filter(
     (chat: any) =>
-      (chat.senderId === user?.id || chat.receiverId === user?.id) &&
-      (chat.senderId === data?.user?.id || chat.receiverId === data?.user?.id)
+      (chat.senderId === user?.id && chat.receiverId === data?.user?.id) ||
+      (chat.senderId === data?.user?.id && chat.receiverId === user?.id)
   );
 
   const totalMessages =
@@ -96,20 +104,81 @@ const Chats = () => {
     loadingOnTakeRef.current = loadingOnTake;
   }, [loadingOnTake]);
 
+  const handleSeenMessage =
+    (receiverId: string, chatId: number) => async () => {
+      setIsRefresh(true);
+      try {
+        console.log(receiverId, chatId);
+        const response = await api.patch(
+          `chat-messages/seen-message/${receiverId}/${chatId}`
+        );
+        if (response.status === 200) {
+          setMessageDetails({
+            chatId: 0,
+            receiverId: "",
+          });
+          firstUnreadIndex = null;
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsRefresh(false);
+      }
+    };
+
   useEffect(() => {
-    const handleInfiniteScroll = () => {
-      if (
-        chatContentRef.current &&
-        !loadingOnTakeRef.current &&
-        totalMessages < totalData
-      ) {
-        const { scrollTop, scrollHeight, clientHeight } =
-          chatContentRef.current;
-        if (scrollTop + scrollHeight - 1 <= clientHeight) {
+    if (!sentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !loadingOnTakeMessages &&
+          totalMessages < totalData
+        ) {
           setAddTakeMessages((prev: any) => prev + 10);
         }
+      },
+      {
+        threshold: 1.0,
       }
+    );
 
+    observer.observe(sentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [loadingOnTakeMessages, totalMessages, totalData, sentinelRef]);
+
+  useEffect(() => {
+    if (!unreadMessageRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          firstUnreadIndex !== -1 &&
+          messageDetails.receiverId &&
+          messageDetails.chatId !== 0
+        ) {
+          handleSeenMessage(messageDetails.receiverId, messageDetails.chatId)();
+        }
+      },
+      {
+        threshold: 1.0,
+      }
+    );
+
+    observer.observe(unreadMessageRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [unreadMessageRef, firstUnreadIndex, messageDetails, handleSeenMessage]);
+
+  useEffect(() => {
+    const handleInfiniteScroll = () => {
       if (chatContentRef.current) {
         const { scrollTop } = chatContentRef.current;
 
@@ -127,21 +196,20 @@ const Chats = () => {
         }
       }
     };
-    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
 
     recentChatRef?.current?.addEventListener("scroll", handleInfiniteScroll);
+    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
     return () => {
-      chatContentRef?.current?.removeEventListener(
-        "scroll",
-        handleInfiniteScroll
-      );
-
       recentChatRef?.current?.removeEventListener(
         "scroll",
         handleInfiniteScroll
       );
+      chatContentRef?.current?.removeEventListener(
+        "scroll",
+        handleInfiniteScroll
+      );
     };
-  }, [totalMessages, totalData, totalConvosData, totalConvos]);
+  }, [totalMessages, totalData, totalConvosData, totalConvos, chatContentRef]);
 
   const handleBackToBottom = () => {
     if (chatContentRef.current) {
@@ -261,19 +329,9 @@ const Chats = () => {
     }
   };
 
-  // const messages = convos?.conversations?.filter(
-  //   (chat: any) =>
-  //     (chat.senderId === user?.id || chat.receiverId === user?.id) &&
-  //     (chat.senderId === data?.user?.id || chat.receiverId === data?.user?.id)
-  // );
-
   const messages = convos?.conversations?.filter(
     (chat: any) =>
-      ((chat.senderId === user?.id || chat.receiverId === user?.id) &&
-        (chat.senderId === data?.user?.id ||
-          chat.receiverId === data?.user?.id) &&
-        chat.senderId === user?.id &&
-        chat.receiverId === data?.user?.id) ||
+      (chat.senderId === user?.id && chat.receiverId === data?.user?.id) ||
       (chat.senderId === data?.user?.id && chat.receiverId === user?.id)
   );
 
@@ -299,6 +357,23 @@ const Chats = () => {
       setAddTake(totalUsersData);
     }, 500);
   };
+
+  const allMessages = messages
+    ? messages.flatMap((content: any) => content.messages)
+    : [];
+  firstUnreadIndex = allMessages.findLastIndex(
+    (msg: any) => msg.userId !== user.id && !msg.isSeen
+  );
+
+  useEffect(() => {
+    if (firstUnreadIndex !== -1) {
+      const unreadMessage = allMessages[firstUnreadIndex];
+      setMessageDetails({
+        chatId: unreadMessage.chatId,
+        receiverId: unreadMessage.userId,
+      });
+    }
+  }, [firstUnreadIndex]);
 
   return (
     <div className="flex h-screen">
@@ -353,7 +428,12 @@ const Chats = () => {
               <RecentChat />
             ) : convos?.searchedData?.length > 0 ? (
               convos?.searchedData?.map((user: any, index: number) => (
-                <RecentChatContent key={index} user={user} setSearchTerm={setSearchTerm} searchTerm={searchTerm} />
+                <RecentChatContent
+                  key={index}
+                  user={user}
+                  setSearchTerm={setSearchTerm}
+                  searchTerm={searchTerm}
+                />
               ))
             ) : (
               <p className="text-center font-bold text-lg mt-5 break-words px-10 w-20 md:w-full">
@@ -412,19 +492,51 @@ const Chats = () => {
           {isSending && <p className="text-end text-sm">Sending...</p>}
           {loading || loadingConvos ? (
             <Content />
-          ) : messages && messages.length > 0 ? (
-            messages.map((content: any) =>
-              content.messages.map((message: any, index: number) => (
-                <ChatContent
-                  key={index}
-                  content={message?.content}
-                  avatar={data?.user?.profile_pictures[0]?.avatar}
-                  sender={message?.userId === user?.id}
-                  name={data?.user?.name}
-                  timeSent={message?.createdAt}
-                />
-              ))
-            )
+          ) : allMessages && allMessages.length > 0 ? (
+            allMessages.map((message: any, index: number) => {
+              const currentTime = new Date(message.createdAt);
+              const nextTime =
+                index < allMessages.length - 1
+                  ? new Date(allMessages[index + 1].createdAt)
+                  : null;
+
+              const isFirstInGroup =
+                !nextTime ||
+                currentTime.getMinutes() !== nextTime.getMinutes() ||
+                currentTime.toDateString() !== nextTime.toDateString();
+
+              return (
+                <div key={index}>
+                  {index === firstUnreadIndex && message.userId !== user.id && (
+                    <div
+                      className="flex justify-center mb-2"
+                      ref={unreadMessageRef}
+                    >
+                      <div className="w-full flex justify-center items-center gap-2">
+                        <div className="border-b w-2/6 border-gray-400"></div>
+                        <div className="text-gray-400 text-xs">
+                          Unread messages
+                        </div>
+                        <div className="border-b w-2/6 border-gray-400"></div>
+                      </div>
+                    </div>
+                  )}
+                  {isFirstInGroup && (
+                    <div className="flex justify-center text-gray-300 text-xs my-2">
+                      {formatChatTimestamp(currentTime)}
+                    </div>
+                  )}
+                  <ChatContent
+                    content={message?.content}
+                    avatar={data?.user?.profile_pictures[0]?.avatar}
+                    sender={message?.userId === user?.id}
+                    name={data?.user?.name}
+                    timeSent={message?.createdAt}
+                    isNotSeen={message?.isSeen === false}
+                  />
+                </div>
+              );
+            })
           ) : (
             <p className="text-center mb-20 items-center">
               Start an conversation with <strong>{data?.user?.name}</strong>.{" "}
@@ -438,6 +550,7 @@ const Chats = () => {
               <i className="fa-duotone fa-solid fa-spinner-third text-center animate-spin"></i>
             </div>
           )}
+          <span ref={sentinelRef}></span>
         </div>
         {/* Message Input Area */}
         <div className="bg-white dark:bg-gray-700 px-4 py-2 gap-2 flex items-center relative">
