@@ -37,9 +37,11 @@ const Login = () => {
   }, []);
 
   const handleInputChange = (title: any) => (e: any) => {
+    const value = e.target.value;
+
     setFormInput((formInput: any) => ({
       ...formInput,
-      [title]: e.target.value,
+      [title]: value,
     }));
   };
 
@@ -58,6 +60,10 @@ const Login = () => {
         const rememberToken = response.data.rememberToken;
 
         login(token, rememberToken);
+        setFormInput({
+          usernameOrEmail: "",
+          password: "",
+        });
       } else {
         setFlashError(response.data.message);
         setError("");
@@ -164,6 +170,7 @@ const Login = () => {
                 onChange={handleInputChange("usernameOrEmail")}
                 id="email"
                 placeholder="Enter your username/email"
+                value={formInput.usernameOrEmail}
               />
               <Input
                 error={error?.password?.message}
@@ -172,6 +179,7 @@ const Login = () => {
                 onChange={handleInputChange("password")}
                 id="password"
                 placeholder="Enter your password"
+                value={formInput.password}
               />
             </div>
             <button

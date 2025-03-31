@@ -35,17 +35,6 @@ const Register = () => {
       });
 
       if (response.status === 201) {
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          confirmButtonText: "Ok",
-          confirmButtonColor: "#1E90FF",
-          html: "You have successfully registered. You will be redirected to the login page. <br> Thank you!",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            router.push("/login");
-          }
-        });
         setError("");
         setFormInput({
           email: "",
@@ -56,6 +45,17 @@ const Register = () => {
           dateOfBirth: "",
           password: "",
           confirmPassword: "",
+        });
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          confirmButtonText: "Ok",
+          confirmButtonColor: "#1E90FF",
+          html: "You have successfully registered. You will be redirected to the login page. <br> Thank you!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push("/login");
+          }
         });
       } else {
         setFlashError(response.data.message);
@@ -78,15 +78,18 @@ const Register = () => {
   };
 
   const handleChange = (title: any) => async (e: any) => {
+    const value = e.target.value;
+
     setFormInput((formInput: any) => ({
       ...formInput,
-      [title]: e.target.value,
+      [title]: value,
     }));
   };
 
   const handleCloseFlashError = () => {
     setFlashError("");
   };
+  console.log(formInput);
 
   return (
     <div
@@ -127,6 +130,7 @@ const Register = () => {
             error={error?.email?.message}
             type="email"
             onChange={handleChange("email")}
+            value={formInput.email}
             id="email"
             placeholder="Enter your email"
           />
@@ -135,6 +139,7 @@ const Register = () => {
             error={error?.name?.message}
             type="text"
             onChange={handleChange("name")}
+            value={formInput.name}
             id="name"
             placeholder="Enter your name"
           />
@@ -145,6 +150,7 @@ const Register = () => {
             onChange={handleChange("username")}
             id="username"
             placeholder="Enter your username"
+            value={formInput.username}
           />
           <Input
             icon="location-dot"
@@ -153,6 +159,7 @@ const Register = () => {
             onChange={handleChange("address")}
             id="address"
             placeholder="Enter your address"
+            value={formInput.address}
           />
           <Input
             icon="phone"
@@ -161,6 +168,7 @@ const Register = () => {
             onChange={handleChange("phoneNumber")}
             id="phoneNumber"
             placeholder="Enter your phone number"
+            value={formInput.phoneNumber}
           />
           <Input
             icon="calendar"
@@ -169,6 +177,7 @@ const Register = () => {
             onChange={handleChange("dateOfBirth")}
             id="dateOfBirth"
             placeholder="Enter your date of birth"
+            value={formInput.dateOfBirth}
           />
           <Input
             icon="lock"
@@ -177,6 +186,7 @@ const Register = () => {
             onChange={handleChange("password")}
             id="password"
             placeholder="Enter your password"
+            value={formInput.password}
           />
           <Input
             icon="lock"
@@ -185,6 +195,7 @@ const Register = () => {
             onChange={handleChange("confirmPassword")}
             id="confirmPassword"
             placeholder="Enter your confirm password"
+            value={formInput.confirmPassword}
           />
 
           <Button

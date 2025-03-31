@@ -35,9 +35,7 @@ export default function ChatContent({
               } text-white p-3 rounded-2xl`}
               title={timeSent && dateWithTime(timeSent)}
             >
-              <p
-                className="text-sm whitespace-break-spaces break-words"
-              >
+              <p className="text-sm whitespace-break-spaces break-words">
                 {message}
               </p>
             </div>
@@ -65,9 +63,7 @@ export default function ChatContent({
                   } text-white p-3 rounded-2xl`}
                   title={timeSent && dateWithTime(timeSent)}
                 >
-                  <p
-                    className="text-sm whitespace-break-spaces break-words"
-                  >
+                  <p className="text-sm whitespace-break-spaces break-words">
                     {message}
                   </p>
                 </div>
