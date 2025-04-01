@@ -106,9 +106,10 @@ const Chats = () => {
 
   const handleSeenMessage =
     (receiverId: string, chatId: number) => async () => {
-      setIsRefresh(true);
+      if (id === receiverId) {
+        setIsRefresh(true);
+      }
       try {
-        console.log(receiverId, chatId);
         const response = await api.patch(
           `chat-messages/seen-message/${receiverId}/${chatId}`
         );
@@ -122,7 +123,9 @@ const Chats = () => {
       } catch (error) {
         console.error(error);
       } finally {
-        setIsRefresh(false);
+        if (id === receiverId) {
+          setIsRefresh(false);
+        }
       }
     };
 
