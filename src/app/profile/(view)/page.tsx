@@ -97,7 +97,7 @@ const Profile = () => {
 
   return (
     <div
-      className={`min-h-screen p-6 bg-gray-100 dark:bg-gray-700 my-3 rounded-md ${
+      className={`min-h-screen p-6 bg-gray-100 dark:bg-gray-700 my-3 md:ml-2 rounded-md ${
         hasNormalRole ? "max-w-5xl" : ""
       } mx-auto`}
     >
