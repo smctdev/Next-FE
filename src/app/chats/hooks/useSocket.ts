@@ -8,6 +8,7 @@ const useSocket = () => {
   const [sentMessage, setSentMessage] = useState<boolean>(false);
   const [sentPublicMessage, setSentPublicMessage] = useState<boolean>(false);
   const [receiverId, setReceiverId] = useState<any>("");
+  const [isSeenSentMessage, setIsSeenSentMessage] = useState(false);
 
   useEffect(() => {
     const token = Cookies.get("APP-TOKEN");
@@ -33,6 +34,13 @@ const useSocket = () => {
       setReceiverId(receiverId);
     });
 
+    socketInstance.on(
+      "isSeenForSentMessage",
+      (isSeenForSentMessage: boolean) => {
+        setIsSeenSentMessage(isSeenForSentMessage);
+      }
+    );
+
     socketInstance.on("sentPublicMessage", (toRefresh: boolean) => {
       setSentPublicMessage(toRefresh);
     });
@@ -42,8 +50,16 @@ const useSocket = () => {
     };
   }, []);
 
-  const sendMessage = ({ toRefresh, receiverId }: PayloadInterface) => {
-    socket?.emit("sendMessage", { toRefresh, receiverId });
+  const sendMessage = ({
+    toRefresh,
+    receiverId,
+    isSeenForSentMessage,
+  }: PayloadInterface) => {
+    socket?.emit("sendMessage", {
+      toRefresh,
+      receiverId,
+      isSeenForSentMessage,
+    });
   };
 
   const sendPublicMessage = (toRefresh: boolean) => {
@@ -56,6 +72,7 @@ const useSocket = () => {
     sentPublicMessage,
     sendPublicMessage,
     receiverId,
+    isSeenSentMessage,
   };
 };
 

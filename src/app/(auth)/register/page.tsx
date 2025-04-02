@@ -89,7 +89,6 @@ const Register = () => {
   const handleCloseFlashError = () => {
     setFlashError("");
   };
-  console.log(formInput);
 
   return (
     <div

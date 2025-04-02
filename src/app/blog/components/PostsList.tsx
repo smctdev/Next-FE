@@ -165,7 +165,7 @@ export default function PostsList({ post, setIsRefresh }: any) {
         <div className="shadow-sm p-2">
           {post.image.length !== 0 && (
             <>
-              <div className="relative w-full h-[450px] overflow-hidden rounded-lg">
+              <div className="relative w-full h-auto overflow-hidden rounded-lg">
                 <div
                   className="w-full h-full flex transition-transform duration-300"
                   style={{
