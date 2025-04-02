@@ -7,7 +7,7 @@ const useFetch = (
   isPaginated: boolean,
   isSearched: boolean
 ) => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const [loadingOnTake, setLoadingOnTake] = useState(false);
   const [loadingOnTakeMessages, setLoadingOnTakeMessages] = useState(false);

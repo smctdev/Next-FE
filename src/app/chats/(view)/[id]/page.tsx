@@ -24,7 +24,7 @@ import { formatChatTimestamp } from "../../utils/formatChatTimestamp";
 
 const Chats = () => {
   const { id }: any = useParams();
-  const { sendMessage }: any = useSocket();
+  const { sendMessage, isSeenSentMessage }: any = useSocket();
   const { data, loading }: any = useFetch(
     id && `/users/for/seo/${id}`,
     false,
@@ -80,6 +80,8 @@ const Chats = () => {
   const totalData =
     (getDataPerUser && getDataPerUser[0]?._count?.messages) || 0;
 
+  // const totalUnseenMessage =
+
   const totalUsersData = convos?.totalSearchedData || 0;
   const totalConvosData = convos?.totalConvosData || 0;
   const totalConvos = convos?.conversations?.length || 0;
@@ -106,8 +108,12 @@ const Chats = () => {
 
   const handleSeenMessage =
     (receiverId: string, chatId: number) => async () => {
-      if (id === receiverId) {
+      if (receiverId === id && isSeenSentMessage) {
         setIsRefresh(true);
+      } else {
+        setTimeout(() => {
+          setIsRefresh(true);
+        }, 10000);
       }
       try {
         const response = await api.patch(
@@ -123,9 +129,17 @@ const Chats = () => {
       } catch (error) {
         console.error(error);
       } finally {
-        if (id === receiverId) {
+        if (receiverId === id && isSeenSentMessage) {
           setIsRefresh(false);
+        } else {
+          setTimeout(() => {
+            setIsRefresh(false);
+          }, 10000);
         }
+        sendMessage({
+          toRefresh: false,
+          isSeenForSentMessage: false,
+        });
       }
     };
 
@@ -263,6 +277,7 @@ const Chats = () => {
     sendMessage({
       toRefresh: true,
       receiverId: id,
+      isSeenForSentMessage: true,
     });
     setIsSending(true);
     setIsRefresh(true);
@@ -296,6 +311,7 @@ const Chats = () => {
       sendMessage({
         toRefresh: false,
         receiverId: "",
+        isSeenForSentMessage: true,
       });
       setIsSending(false);
       setIsRefresh(false);
@@ -306,6 +322,7 @@ const Chats = () => {
     sendMessage({
       toRefresh: true,
       receiverId: id,
+      isSeenForSentMessage: true,
     });
     setIsSending(true);
     setIsRefresh(true);
@@ -326,6 +343,7 @@ const Chats = () => {
       sendMessage({
         toRefresh: false,
         receiverId: "",
+        isSeenForSentMessage: true,
       });
       setIsSending(false);
       setIsRefresh(false);
@@ -412,6 +430,7 @@ const Chats = () => {
                     convo.senderId === user?.id ? convo.receiver : convo.sender
                   }
                   lastMessage={convo?.messages[0]?.content}
+                  unreadMessages={convo?.messages[0]?.chat?._count?.messages}
                   timeSent={convo?.messages[0]?.createdAt}
                 />
               ))
