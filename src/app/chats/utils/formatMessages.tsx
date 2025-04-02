@@ -15,15 +15,17 @@ export default function formatMessages(
       const link = part.startsWith("http") ? part : `https://${part}`;
 
       return (
-        <span key={index}>
-          <Link
-            href={link}
-            className="font-bold underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {part}
-          </Link>
+        <span key={index} className="relative">
+          <span>
+            <Link
+              href={link}
+              className="font-bold underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {part}
+            </Link>
+          </span>
         </span>
       );
     }

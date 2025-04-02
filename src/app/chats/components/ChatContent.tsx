@@ -1,7 +1,9 @@
 import { usePathname } from "next/navigation";
-import dateWithTime from "../utils/dateWithTime";
-import Image from "./images/Image";
 import formatMessages from "../utils/formatMessages";
+import MessageBody from "./MessageBody";
+// import useLinkPreview from "../hooks/useLinkPreview";
+// import MessageLinkPreview from "./MessageLinkPreview";
+import MessageBody2 from "./MessageBody2";
 
 export default function ChatContent({
   content,
@@ -10,73 +12,40 @@ export default function ChatContent({
   name,
   timeSent,
 }: any) {
+  // const urlPattern =
+  //   /\b(https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(?:\/[^\s]*)?|https?:\/\/(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?(?:\/[^\s]*)?|(?<!@)\b[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b(?!@))\b/g;
+  // const contentFormat = content.match(urlPattern) || [];
+  // const link = contentFormat[0]?.startsWith("http")
+  //   ? contentFormat[0]
+  //   : contentFormat?.length !== 0
+  //   ? `https://${contentFormat[0]}`
+  //   : null;
   const pathname = usePathname();
   const message = formatMessages(content.trim(), 16, 16);
   const isIcon = content === "(y)";
-
   const isPublic = pathname === "/chats";
+  // const { previewData }: any = useLinkPreview(link && link);
 
   return (
     <div>
       {sender ? (
         <>
           {/* Sent Message */}
-          <div className="flex justify-end group">
-            <div className="justify-center flex mr-1 items-center">
-              <div className="group-hover:block hidden">
-                <button className="px-3.5 py-1 hover:dark:bg-gray-600 hover:bg-gray-200 rounded-full">
-                  <i className="far fa-ellipsis-vertical"></i>
-                </button>
-              </div>
-            </div>
-            <div
-              className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] ${
-                !isIcon && "dark:bg-blue-400/50 bg-blue-400/80 shadow-md"
-              } text-white p-3 rounded-2xl`}
-              title={timeSent && dateWithTime(timeSent)}
-            >
-              <p className="text-sm whitespace-break-spaces break-words">
-                {message}
-              </p>
-            </div>
-          </div>
+          <MessageBody isIcon={isIcon} timeSent={timeSent} message={message} />
+
+          {/* {previewData && <MessageLinkPreview preview={previewData} />} */}
         </>
       ) : (
         <>
           {/* Received Message */}
-          <div className="flex justify-start gap-2 group">
-            <div className="flex flex-col justify-end">
-              <Image
-                avatar={avatar}
-                alt={name}
-                width={10}
-                height={10}
-                title={name}
-              />
-            </div>
-            <div>
-              {isPublic && <p className="text-sm font-semibold">{name}</p>}
-              <div className="flex">
-                <div
-                  className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] w-fit ${
-                    !isIcon && "bg-gray-500/65 shadow-md"
-                  } text-white p-3 rounded-2xl`}
-                  title={timeSent && dateWithTime(timeSent)}
-                >
-                  <p className="text-sm whitespace-break-spaces break-words">
-                    {message}
-                  </p>
-                </div>
-                <div className="justify-center flex ml-1 items-center">
-                  <div className="group-hover:block hidden">
-                    <button className="px-3.5 py-1 hover:dark:bg-gray-600 hover:bg-gray-200 rounded-full">
-                      <i className="far fa-ellipsis-vertical"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MessageBody2
+            avatar={avatar}
+            name={name}
+            isPublic={isPublic}
+            isIcon={isIcon}
+            timeSent={timeSent}
+            message={message}
+          />
         </>
       )}
     </div>

@@ -62,6 +62,7 @@ const Chats = () => {
   const searchRef = useRef<any>(null);
   const sentinelRef = useRef<HTMLSpanElement>(null);
   const { showError }: any = useToastr();
+  const messageRef = useRef<any>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -194,6 +195,11 @@ const Chats = () => {
   };
 
   const handleSendMessage = async () => {
+    setFormInput({
+      content: "",
+      attachment: "",
+    });
+    messageRef.current = formInput?.content;
     sendPublicMessage(true);
     setIsSending(true);
     textareaRef.current.focus();
@@ -206,12 +212,7 @@ const Chats = () => {
         ...formInput,
       });
       if (response.status === 201) {
-        setFormInput({
-          content: "",
-          attachment: "",
-        });
         setError("");
-
         setTimeout(() => {
           chatContentRef.current.scrollTop =
             chatContentRef.current.scrollHeight;
@@ -227,6 +228,7 @@ const Chats = () => {
     } finally {
       sendPublicMessage(false);
       setIsSending(false);
+      messageRef.current = null;
     }
   };
 
@@ -333,6 +335,24 @@ const Chats = () => {
           className="flex-1 flex flex-col-reverse p-4 overflow-y-auto bg-white dark:bg-gray-700 gap-4 border-b border-gray-200 dark:border-gray-600"
         >
           {isSending && <p className="text-end text-sm">Sending...</p>}
+          {isSending && messageRef?.current && (
+            <div className="flex justify-end group">
+              <div className="justify-center flex mr-1 items-center">
+                <div className="group-hover:block hidden">
+                  <button className="px-3.5 py-1 hover:dark:bg-gray-600 hover:bg-gray-200 rounded-full">
+                    <i className="far fa-ellipsis-vertical"></i>
+                  </button>
+                </div>
+              </div>
+              <div
+                className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] text-white p-3 rounded-2xl dark:bg-blue-400/50 bg-blue-400/80 shadow-md`}
+              >
+                <p className="text-sm whitespace-break-spaces break-words">
+                  {messageRef?.current}
+                </p>
+              </div>
+            </div>
+          )}
           {publicMessagesDataLoading ? (
             <Content />
           ) : publicMessagesData && publicMessagesData?.messages?.length > 0 ? (
