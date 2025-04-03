@@ -34,7 +34,7 @@ export default function ChatContent({
     if (!link) return;
 
     setPreviewData((prevUrls: any[]) => [...prevUrls, { link, messageId }]);
-  }, [link, setPreviewData]);
+  }, [link, setPreviewData, messageId]);
 
   const getPreviewData = preview?.find(
     (item: any) => item.messageId === messageId

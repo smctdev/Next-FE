@@ -114,7 +114,6 @@ const Chats = () => {
 
   const handleSeenMessage =
     (receiverId: string, chatId: number) => async () => {
-      console.log(receiverId, chatId)
       if (receiverId === id && isSeenSentMessage) {
         setIsRefresh(true);
       } else {
