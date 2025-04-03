@@ -17,6 +17,8 @@ import { useAuth } from "@/app/context/AuthContext";
 import DoubleRecentChat from "../components/loaders/DoubleRecentChat";
 import useToastr from "../hooks/Toastr";
 import { formatChatTimestamp } from "../utils/formatChatTimestamp";
+import axios from "axios";
+import usePreviewLink from "../hooks/usePreviewLink";
 
 const Chats = () => {
   const { user }: any = useAuth();
@@ -48,6 +50,10 @@ const Chats = () => {
     searchTerm,
     loadingOnSearch,
   }: any = useFetch("users/to/chat", sentPublicMessage, true, true);
+  const { setPreviewData, preview }: any = usePreviewLink(
+    "chat-messages/link-preview",
+    sentPublicMessage
+  );
   const chatContentRef = useRef<any>(null);
   const [isSending, setIsSending] = useState(false);
   const emojiPickerRef = useRef<any>(null);
@@ -371,11 +377,14 @@ const Chats = () => {
               return (
                 <div key={index}>
                   {shouldShowTime && (
-                    <div className="flex justify-center text-gray-300 text-xs my-2">
+                    <div className="flex justify-center text-gray-500 dark:text-gray-300 text-xs my-2">
                       {formatChatTimestamp(currentTime)}
                     </div>
                   )}
                   <ChatContent
+                    setPreviewData={setPreviewData}
+                    preview={preview}
+                    messageId={message?.id}
                     content={message?.content}
                     sender={message?.userId === user?.id}
                     name={message?.sentBy?.name}

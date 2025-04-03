@@ -29,7 +29,11 @@ export const metadata = {
     title: "Blog App",
     description:
       "Allan Justine Mascariñas, Website, Blog App, Tallies, NBA Teams, NBA Schedules, NBA Games, Todo List, Todos, React, Next.js, Laravel, Livewire, Tailwind CSS, Bootstrap, Post a Blog, Postings, Post a content",
-    image: "https://cdn-icons-png.flaticon.com/128/2065/2065254.png",
+    images: [
+      {
+        url: "https://cdn-icons-png.flaticon.com/128/2065/2065254.png",
+      },
+    ],
     type: "website",
     siteName: "Blog App - Todos - NBA - Posts - Chats",
   },
