@@ -21,6 +21,7 @@ import { useConversation } from "../../context/conversationContext";
 import useToastr from "../../hooks/Toastr";
 import DoubleRecentChat from "../../components/loaders/DoubleRecentChat";
 import { formatChatTimestamp } from "../../utils/formatChatTimestamp";
+import usePreviewLink from "../../hooks/usePreviewLink";
 
 const Chats = () => {
   const { id }: any = useParams();
@@ -56,6 +57,10 @@ const Chats = () => {
     setAddTakeMessages,
     loadingOnTakeMessages,
   }: any = useConversation();
+  const { setPreviewData, preview }: any = usePreviewLink(
+    "chat-messages/link-preview",
+    isSeenSentMessage
+  );
   const loadingOnTakeRef = useRef(loadingOnTake);
   const [backToBottom, setBackToBottom] = useState(false);
   const { showError }: any = useToastr();
@@ -63,6 +68,7 @@ const Chats = () => {
   const recentChatRef = useRef<any>(null);
   const sentinelRef = useRef<HTMLSpanElement>(null);
   const unreadMessageRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<any>(null);
   const [messageDetails, setMessageDetails] = useState({
     chatId: 0,
     receiverId: "",
@@ -108,6 +114,7 @@ const Chats = () => {
 
   const handleSeenMessage =
     (receiverId: string, chatId: number) => async () => {
+      console.log(receiverId, chatId)
       if (receiverId === id && isSeenSentMessage) {
         setIsRefresh(true);
       } else {
@@ -274,6 +281,14 @@ const Chats = () => {
   };
 
   const handleSendMessage = async () => {
+    if (messageDetails.receiverId && messageDetails.chatId !== 0) {
+      handleSeenMessage(messageDetails.receiverId, messageDetails.chatId)();
+    }
+    setFormInput({
+      content: "",
+      attachment: "",
+    });
+    messageRef.current = formInput?.content;
     sendMessage({
       toRefresh: true,
       receiverId: id,
@@ -292,10 +307,6 @@ const Chats = () => {
       });
       if (response.status === 201) {
         setError("");
-        setFormInput({
-          content: "",
-          attachment: "",
-        });
         setTimeout(() => {
           chatContentRef.current.scrollTop =
             chatContentRef.current.scrollHeight;
@@ -315,6 +326,7 @@ const Chats = () => {
       });
       setIsSending(false);
       setIsRefresh(false);
+      messageRef.current = null;
     }
   };
 
@@ -512,6 +524,25 @@ const Chats = () => {
           className="flex-1 flex flex-col-reverse gap-4 p-4 overflow-y-auto bg-white dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
         >
           {isSending && <p className="text-end text-sm">Sending...</p>}
+
+          {isSending && messageRef?.current && (
+            <div className="flex justify-end group">
+              <div className="justify-center flex mr-1 items-center">
+                <div className="group-hover:block hidden">
+                  <button className="px-3.5 py-1 hover:dark:bg-gray-600 hover:bg-gray-200 rounded-full">
+                    <i className="far fa-ellipsis-vertical"></i>
+                  </button>
+                </div>
+              </div>
+              <div
+                className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] text-white p-3 rounded-2xl dark:bg-blue-400/50 bg-blue-400/80 shadow-md`}
+              >
+                <p className="text-sm whitespace-break-spaces break-words">
+                  {messageRef?.current}
+                </p>
+              </div>
+            </div>
+          )}
           {loading || loadingConvos ? (
             <Content />
           ) : allMessages && allMessages.length > 0 ? (
@@ -549,6 +580,9 @@ const Chats = () => {
                     </div>
                   )}
                   <ChatContent
+                    setPreviewData={setPreviewData}
+                    preview={preview}
+                    messageId={message?.id}
                     content={message?.content}
                     avatar={data?.user?.profile_pictures[0]?.avatar}
                     sender={message?.userId === user?.id}
