@@ -364,20 +364,20 @@ const Chats = () => {
           ) : publicMessagesData && publicMessagesData?.messages?.length > 0 ? (
             publicMessagesData?.messages?.map((message: any, index: number) => {
               const currentTime = new Date(message.createdAt);
-              const prevTime =
-                index > 0
-                  ? new Date(publicMessagesData?.messages[index - 1].createdAt)
+              const nextTime =
+                index < publicMessagesData.length - 1
+                  ? new Date(publicMessagesData[index + 1].createdAt)
                   : null;
 
-              const shouldShowTime =
-                !prevTime ||
-                currentTime.getMinutes() !== prevTime.getMinutes() ||
-                currentTime.toDateString() !== prevTime.toDateString();
+              const isFirstInGroup =
+                !nextTime ||
+                currentTime.getMinutes() !== nextTime.getMinutes() ||
+                currentTime.toDateString() !== nextTime.toDateString();
 
               return (
                 <div key={index}>
-                  {shouldShowTime && (
-                    <div className="flex justify-center text-gray-500 dark:text-gray-300 text-xs my-2">
+                  {isFirstInGroup && (
+                    <div className="flex justify-center text-gray-300 text-xs my-2">
                       {formatChatTimestamp(currentTime)}
                     </div>
                   )}
