@@ -97,9 +97,9 @@ const Profile = () => {
 
   return (
     <div
-      className={`min-h-screen p-6 bg-gray-100 dark:bg-gray-700 my-3 md:ml-2 rounded-md ${
-        hasNormalRole ? "max-w-5xl" : ""
-      } mx-auto`}
+      className={`min-h-screen p-6 bg-gray-100 dark:bg-gray-700 my-3 rounded-md ${
+        hasNormalRole ? "max-w-5xl mx-auto" : "md:ml-2"
+      }`}
     >
       <div className="flex flex-col sm:flex-row items-center space-y-2 justify-between">
         <div className="flex flex-col sm:flex-row items-center space-x-4">
