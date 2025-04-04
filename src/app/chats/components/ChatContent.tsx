@@ -58,10 +58,10 @@ export default function ChatContent({
                       <img
                         src={getPreviewData.images[0]}
                         alt={getPreviewData.title}
-                        className="w-[230px] md:w-72 h-40 object-contain rounded-md"
+                        className="w-[200px] md:w-72 h-40 object-contain rounded-md"
                       />
                     )}
-                    <div className="w-[230px] md:w-72 flex flex-col border-t bg-gray-100 dark:bg-gray-900/20">
+                    <div className="w-[200px] md:w-72 flex flex-col border-t bg-gray-100 dark:bg-gray-900/20">
                       <span
                         className="p-2 text-md font-bold truncate"
                         title={getPreviewData.title === "Error" ? getPreviewData.url : getPreviewData.title}
@@ -108,10 +108,10 @@ export default function ChatContent({
                       <img
                         src={getPreviewData.images[0]}
                         alt={getPreviewData.title}
-                        className="w-[230px] md:w-72 h-40 object-contain rounded-md"
+                        className="w-[200px] md:w-72 h-40 object-contain rounded-md"
                       />
                     )}
-                    <div className="w-[230px] md:w-72 flex flex-col border-t bg-gray-100 dark:bg-gray-900/20">
+                    <div className="w-[200px] md:w-72 flex flex-col border-t bg-gray-100 dark:bg-gray-900/20">
                       <span
                         className="p-2 text-md font-bold truncate"
                         title={getPreviewData.title === "Error" ? getPreviewData.url : getPreviewData.title}

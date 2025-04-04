@@ -73,6 +73,7 @@ const Chats = () => {
     chatId: 0,
     receiverId: "",
   });
+  const [isOpenRecentChat, setIsOpenRecentChat] = useState(false);
   let firstUnreadIndex: any = null;
 
   const getDataPerUser = convos?.conversations?.filter(
@@ -407,10 +408,14 @@ const Chats = () => {
     }
   }, [firstUnreadIndex]);
 
+  const handleOpenRecentChat = () => {
+    setIsOpenRecentChat(!isOpenRecentChat);
+  };
+
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80">
+      <div className={`bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80 ${isOpenRecentChat ? "" : "w-0"}`}>
         {/* Profile Header */}
         <div className="border p-4 border-b border-gray-200 dark:border-gray-600">
           <div>
@@ -418,7 +423,7 @@ const Chats = () => {
               <p className="text-2xl font-bold">Chats</p>
             </Link>
           </div>
-          <div className="w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500">
+          <div className={`w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500 ${isOpenRecentChat ? "" : "hidden md:block"}`}>
             <input
               type="search"
               className="focus:outline-none bg-transparent w-full"
@@ -489,6 +494,13 @@ const Chats = () => {
               <ChatHeader />
             ) : (
               <>
+                <button type="button" className="mr-3 block md:hidden" onClick={handleOpenRecentChat}>
+                  <i
+                    className={`far ${
+                      isOpenRecentChat ? "fa-arrow-left" : "fa-arrow-right"
+                    }`}
+                  ></i>
+                </button>
                 <Image
                   avatar={data?.user?.profile_pictures[0]?.avatar}
                   width={10}

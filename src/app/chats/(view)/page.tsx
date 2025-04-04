@@ -69,6 +69,7 @@ const Chats = () => {
   const sentinelRef = useRef<HTMLSpanElement>(null);
   const { showError }: any = useToastr();
   const messageRef = useRef<any>(null);
+  const [isOpenRecentChat, setIsOpenRecentChat] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -268,16 +269,20 @@ const Chats = () => {
     }, 500);
   };
 
+  const handleOpenRecentChat = () => {
+    setIsOpenRecentChat(!isOpenRecentChat);
+  };
+
   return (
     <div className="flex h-screen">
-      <div className="bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80">
+      <div className={`bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80 ${isOpenRecentChat ? "" : "w-0"}`}>
         <div className="p-4 border border-b border-gray-200 dark:border-gray-600">
           <div>
             <Link href="/chats">
               <p className="text-2xl font-bold">Chats</p>
             </Link>
           </div>
-          <div className="w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500">
+          <div className={`w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500 ${isOpenRecentChat ? "" : "hidden md:block"}`}>
             <input
               type="search"
               className="focus:outline-none bg-transparent w-full"
@@ -316,6 +321,17 @@ const Chats = () => {
         {/* Chat Header */}
         <div className="bg-sky-700 text-white p-4 flex items-center justify-between">
           <div className="flex items-center">
+            <button
+              type="button"
+              className="block md:hidden"
+              onClick={handleOpenRecentChat}
+            >
+              <i
+                className={`far ${
+                  isOpenRecentChat ? "fa-arrow-left" : "fa-arrow-right"
+                }`}
+              ></i>
+            </button>
             <div className="ml-3">
               <p className="text-lg font-semibold">Public Chats</p>
               <p className="text-sm text-gray-200">
