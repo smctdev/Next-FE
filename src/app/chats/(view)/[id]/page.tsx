@@ -415,7 +415,11 @@ const Chats = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className={`bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80 ${isOpenRecentChat ? "" : "w-0"}`}>
+      <div
+        className={`bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80 ${
+          isOpenRecentChat ? "" : "w-0"
+        }`}
+      >
         {/* Profile Header */}
         <div className="border p-4 border-b border-gray-200 dark:border-gray-600">
           <div>
@@ -423,7 +427,11 @@ const Chats = () => {
               <p className="text-2xl font-bold">Chats</p>
             </Link>
           </div>
-          <div className={`w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500 ${isOpenRecentChat ? "" : "hidden md:block"}`}>
+          <div
+            className={`w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500 ${
+              isOpenRecentChat ? "" : "hidden md:block"
+            }`}
+          >
             <input
               type="search"
               className="focus:outline-none bg-transparent w-full"
@@ -448,6 +456,12 @@ const Chats = () => {
                   lastMessage={convo?.messages[0]?.content}
                   unreadMessages={convo?.messages[0]?.chat?._count?.messages}
                   timeSent={convo?.messages[0]?.createdAt}
+                  isActive={
+                    (convo.senderId === user?.id &&
+                      convo.receiverId === data?.user?.id) ||
+                    (convo.senderId === data?.user?.id &&
+                      convo.receiverId === user?.id)
+                  }
                 />
               ))
             ) : (
@@ -466,12 +480,14 @@ const Chats = () => {
               <RecentChat />
             ) : convos?.searchedData?.length > 0 ? (
               convos?.searchedData?.map((user: any, index: number) => (
-                <RecentChatContent
-                  key={index}
-                  user={user}
-                  setSearchTerm={setSearchTerm}
-                  searchTerm={searchTerm}
-                />
+                <>
+                  <RecentChatContent
+                    key={index}
+                    user={user}
+                    setSearchTerm={setSearchTerm}
+                    searchTerm={searchTerm}
+                  />
+                </>
               ))
             ) : (
               <p className="text-center font-bold text-lg mt-5 break-words px-10 w-20 md:w-full">
@@ -494,7 +510,11 @@ const Chats = () => {
               <ChatHeader />
             ) : (
               <>
-                <button type="button" className="mr-3 block md:hidden" onClick={handleOpenRecentChat}>
+                <button
+                  type="button"
+                  className="mr-3 block md:hidden"
+                  onClick={handleOpenRecentChat}
+                >
                   <i
                     className={`far ${
                       isOpenRecentChat ? "fa-arrow-left" : "fa-arrow-right"
