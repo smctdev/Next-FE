@@ -29,7 +29,12 @@ const Chats = () => {
   });
   const textareaRef = useRef<any>("");
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
-  const { sentPublicMessage, sendPublicMessage }: any = useSocket();
+  const {
+    sentPublicMessage,
+    sendPublicMessage,
+    userTyping,
+    userTypingInfo,
+  }: any = useSocket();
   const {
     data: publicMessagesData,
     loading: publicMessagesDataLoading,
@@ -70,6 +75,13 @@ const Chats = () => {
   const { showError }: any = useToastr();
   const messageRef = useRef<any>(null);
   const [isOpenRecentChat, setIsOpenRecentChat] = useState(false);
+  const isTyping = Object.keys(userTypingInfo || {}).length > 0;
+
+  useEffect(() => {
+    if (!userTyping || !formInput?.content || !user) return;
+
+    userTyping({ chatId: null, user });
+  }, [userTyping, formInput, user]);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -275,14 +287,22 @@ const Chats = () => {
 
   return (
     <div className="flex h-screen">
-      <div className={`bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80 ${isOpenRecentChat ? "" : "w-0"}`}>
+      <div
+        className={`bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80 ${
+          isOpenRecentChat ? "" : "w-0"
+        }`}
+      >
         <div className="p-4 border border-b border-gray-200 dark:border-gray-600">
           <div>
             <Link href="/chats">
               <p className="text-2xl font-bold">Chats</p>
             </Link>
           </div>
-          <div className={`w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500 ${isOpenRecentChat ? "" : "hidden md:block"}`}>
+          <div
+            className={`w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500 ${
+              isOpenRecentChat ? "" : "hidden md:block"
+            }`}
+          >
             <input
               type="search"
               className="focus:outline-none bg-transparent w-full"
@@ -376,6 +396,27 @@ const Chats = () => {
                     {messageRef?.current}
                   </p>
                 </div>
+              </div>
+            </div>
+          )}
+          {isTyping && userTypingInfo && Object.values(userTypingInfo)?.some((item: any) => item?.id !== user?.id) && (
+            <div className="relative">
+              <div className="text-start absolute left-0 -bottom-2 flex gap-1">
+                {Object.values(userTypingInfo)
+                  .slice(0, 2)
+                  .map((user: any, index: number) => (
+                    <p key={user?.id} className="text-xs">
+                      {user?.name}
+                      {index < Object.values(userTypingInfo).length - 1 && ","}
+                    </p>
+                  ))}
+                <p className="text-xs">
+                  {Object.values(userTypingInfo)?.length > 2 &&
+                    `and ${
+                      Object.values(userTypingInfo)?.length - 2
+                    } more`}{" "}
+                  is typing...
+                </p>
               </div>
             </div>
           )}
