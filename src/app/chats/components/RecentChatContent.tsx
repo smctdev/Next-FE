@@ -10,6 +10,7 @@ export default function RecentChatContent({
   setSearchTerm,
   searchTerm,
   unreadMessages,
+  isActive,
 }: any) {
   const message = formatRecentMessages(lastMessage, 4, 4);
 
@@ -20,7 +21,7 @@ export default function RecentChatContent({
       href={`/chats/${user?.id}`}
       onClick={searchTerm ? handleRemoveSearchTerm : undefined}
     >
-      <div className="flex items-center mt-2 p-2 rounded-lg cursor-pointer hover:dark:bg-gray-600 hover:bg-gray-100 md:mx-3 relative">
+      <div className={`flex items-center mt-2 p-2 rounded-lg cursor-pointer hover:dark:bg-gray-600 hover:bg-gray-100 md:mx-3 relative ${isActive && "bg-gray-100 dark:bg-gray-600"}`}>
         <Image
           avatar={user?.profile_pictures[0]?.avatar}
           alt={user?.name || "Anonymous"}
