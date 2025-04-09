@@ -19,6 +19,7 @@ import useToastr from "../hooks/Toastr";
 import { formatChatTimestamp } from "../utils/formatChatTimestamp";
 import axios from "axios";
 import usePreviewLink from "../hooks/usePreviewLink";
+import Image from "../components/images/Image";
 
 const Chats = () => {
   const { user }: any = useAuth();
@@ -80,7 +81,7 @@ const Chats = () => {
   useEffect(() => {
     if (!userTyping || !formInput?.content || !user) return;
 
-    userTyping({ chatId: null, user });
+    userTyping({ chatReference: null, user });
   }, [userTyping, formInput, user]);
 
   useEffect(() => {
@@ -285,6 +286,12 @@ const Chats = () => {
     setIsOpenRecentChat(!isOpenRecentChat);
   };
 
+  const typingUsers =
+    userTypingInfo &&
+    Object.values(userTypingInfo)?.filter((userType: any) => {
+      return userType?.id !== user?.id;
+    });
+
   return (
     <div className="flex h-screen">
       <div
@@ -399,27 +406,40 @@ const Chats = () => {
               </div>
             </div>
           )}
-          {isTyping && userTypingInfo && Object.values(userTypingInfo)?.some((item: any) => item?.id !== user?.id) && (
-            <div className="relative">
-              <div className="text-start absolute left-0 -bottom-2 flex gap-1">
-                {Object.values(userTypingInfo)
-                  .slice(0, 2)
-                  .map((user: any, index: number) => (
-                    <p key={user?.id} className="text-xs">
-                      {user?.name}
-                      {index < Object.values(userTypingInfo).length - 1 && ","}
-                    </p>
-                  ))}
-                <p className="text-xs">
-                  {Object.values(userTypingInfo)?.length > 2 &&
-                    `and ${
-                      Object.values(userTypingInfo)?.length - 2
-                    } more`}{" "}
-                  is typing...
-                </p>
+          {isTyping &&
+            userTypingInfo &&
+            Object.values(userTypingInfo)?.some(
+              (item: any) => item?.id !== user?.id
+            ) && (
+              <div className="relative">
+                <div className="text-start absolute left-0 -bottom-2 flex gap-1">
+                  {Object.values(userTypingInfo)
+                    .slice(0, 5)
+                    .map(
+                      (userType: any) =>
+                        userType?.id !== user?.id && (
+                          <div
+                            key={userType?.id}
+                            className="flex items-center -ml-2"
+                          >
+                            <Image
+                              avatar={userType?.profile_pictures[0]?.avatar}
+                              alt={userType?.name}
+                              width={5}
+                              height={5}
+                              title={userType?.name}
+                            />
+                          </div>
+                        )
+                    )}
+                  <p className="text-xs">
+                    {typingUsers?.length > 5 &&
+                      `and ${typingUsers?.length - 5} more`}{" "}
+                    is typing...
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           {publicMessagesDataLoading ? (
             <Content />
           ) : publicMessagesData && publicMessagesData?.messages?.length > 0 ? (
