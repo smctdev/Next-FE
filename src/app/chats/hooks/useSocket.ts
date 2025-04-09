@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
 import { PayloadInterface } from "../types/PayloadInterface";
+import { PrivateChatIds } from "../utils/chatConstants";
+import { useAuth } from "@/app/context/AuthContext";
 
 const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -10,7 +12,11 @@ const useSocket = () => {
   const [receiverId, setReceiverId] = useState<any>("");
   const [isSeenSentMessage, setIsSeenSentMessage] = useState(false);
   const [userTypingInfo, setUserTypingInfo] = useState<any>(null);
+  const [userTypingInfoPrivate, setUserTypingInfoPrivate] = useState<any>(null);
+  const [privateChatIds, setPrivateChatIds] = useState(PrivateChatIds);
+  const { user: currentUser }: any = useAuth();
   const typingTimeouts = useRef<{ [key: string]: NodeJS.Timeout }>({});
+  const typingTimeoutsPrivate = useRef<{ [key: string]: NodeJS.Timeout }>({});
 
   useEffect(() => {
     const token = Cookies.get("APP-TOKEN");
@@ -47,8 +53,8 @@ const useSocket = () => {
       setSentPublicMessage(toRefresh);
     });
 
-    socketInstance.on("userTypeToChat", ({ chatId, user }: any) => {
-      if (chatId || !user?.id) return;
+    socketInstance.on("userTypeToChat", ({ chatReference, user }: any) => {
+      if (chatReference || !user?.id) return;
 
       if (typingTimeouts.current[user.id]) {
         clearTimeout(typingTimeouts.current[user.id]);
@@ -68,10 +74,37 @@ const useSocket = () => {
       }, 500);
     });
 
+    socketInstance.on(
+      "userTypeToChatPrivate",
+      ({ receiverId, senderId, user }: any) => {
+        if (!receiverId || !senderId || !user?.id || !currentUser) return;
+
+        const isChattingWith =
+          receiverId === currentUser?.id && senderId === user?.id;
+
+        if (!isChattingWith) return;
+
+        if (typingTimeoutsPrivate.current[user.id]) {
+          clearTimeout(typingTimeoutsPrivate.current[user.id]);
+        }
+        //tangtangon mga user id sa pag typing kay naka private na dile na public
+        setUserTypingInfoPrivate(user);
+        setPrivateChatIds({
+          receiverId,
+          senderId,
+        });
+
+        typingTimeoutsPrivate.current[user.id] = setTimeout(() => {
+          setUserTypingInfoPrivate("");
+          setPrivateChatIds(PrivateChatIds);
+        }, 500);
+      }
+    );
+
     return () => {
       socketInstance.disconnect();
     };
-  }, [typingTimeouts]);
+  }, [typingTimeoutsPrivate, currentUser]);
 
   const sendMessage = ({
     toRefresh,
@@ -89,8 +122,12 @@ const useSocket = () => {
     socket?.emit("sendPublicMessage", toRefresh);
   };
 
-  const userTyping = ({ chatId, user }: any) => {
-    socket?.emit("userTyping", { chatId, user });
+  const userTyping = ({ chatReference, user }: any) => {
+    socket?.emit("userTyping", { chatReference, user });
+  };
+
+  const userTypingPrivate = ({ receiverId, senderId, user }: any) => {
+    socket?.emit("userTypingPrivate", { receiverId, senderId, user });
   };
 
   return {
@@ -102,6 +139,9 @@ const useSocket = () => {
     isSeenSentMessage,
     userTyping,
     userTypingInfo,
+    userTypingInfoPrivate,
+    userTypingPrivate,
+    privateChatIds,
   };
 };
 

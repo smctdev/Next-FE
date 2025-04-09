@@ -25,7 +25,13 @@ import usePreviewLink from "../../hooks/usePreviewLink";
 
 const Chats = () => {
   const { id }: any = useParams();
-  const { sendMessage, isSeenSentMessage }: any = useSocket();
+  const {
+    sendMessage,
+    isSeenSentMessage,
+    userTypingPrivate,
+    userTypingInfoPrivate,
+    privateChatIds,
+  }: any = useSocket();
   const { data, loading }: any = useFetch(
     id && `/users/for/seo/${id}`,
     false,
@@ -92,6 +98,12 @@ const Chats = () => {
   const totalUsersData = convos?.totalSearchedData || 0;
   const totalConvosData = convos?.totalConvosData || 0;
   const totalConvos = convos?.conversations?.length || 0;
+
+  useEffect(() => {
+    if (!userTypingPrivate || !formInput?.content || !user) return;
+
+    userTypingPrivate({ receiverId: id, senderId: user?.id, user });
+  }, [userTypingPrivate, formInput, user, id]);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -412,6 +424,9 @@ const Chats = () => {
     setIsOpenRecentChat(!isOpenRecentChat);
   };
 
+  const isPrivateChatting =
+    privateChatIds?.receiverId === user?.id && privateChatIds?.senderId === id;
+
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
@@ -573,6 +588,29 @@ const Chats = () => {
                   <p className="text-sm whitespace-break-spaces break-words">
                     {messageRef?.current}
                   </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {isPrivateChatting && (
+            <div className="relative">
+              <div className="text-start absolute left-0 -bottom-2 flex gap-1">
+                <div
+                  key={userTypingInfoPrivate?.id}
+                  className="flex items-center gap-1"
+                >
+                  <div className="flex items-center -ml-2">
+                    <Image
+                      avatar={
+                        userTypingInfoPrivate?.profile_pictures[0]?.avatar
+                      }
+                      alt={userTypingInfoPrivate?.name}
+                      width={5}
+                      height={5}
+                      title={userTypingInfoPrivate?.name}
+                    />
+                  </div>{" "}
+                  <span className="text-xs">is typing...</span>
                 </div>
               </div>
             </div>
