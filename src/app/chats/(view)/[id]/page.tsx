@@ -31,7 +31,6 @@ const Chats = () => {
     userTypingPrivate,
     userTypingInfoPrivate,
     privateChatIds,
-    setPrivateTyping,
   }: any = useSocket();
   const { data, loading }: any = useFetch(
     id && `/users/for/seo/${id}`,
@@ -94,17 +93,21 @@ const Chats = () => {
   const totalData =
     (getDataPerUser && getDataPerUser[0]?._count?.messages) || 0;
 
-  // const totalUnseenMessage =
-
   const totalUsersData = convos?.totalSearchedData || 0;
   const totalConvosData = convos?.totalConvosData || 0;
   const totalConvos = convos?.conversations?.length || 0;
 
   useEffect(() => {
-    if (!userTypingPrivate || !formInput.content || !user) return;
-    setPrivateTyping(true);
-    userTypingPrivate({ receiverId: id, senderId: user?.id, user });
-  }, [userTypingPrivate, formInput, user, id, setPrivateTyping]);
+    if (!formInput.content || !user) return;
+    const handleTyping = () => {
+      userTypingPrivate({ receiverId: id, senderId: user?.id, user });
+    };
+    document.addEventListener("keydown", handleTyping);
+
+    return () => {
+      document.removeEventListener("keydown", handleTyping);
+    };
+  }, [userTypingPrivate, formInput, user, id]);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
