@@ -411,7 +411,7 @@ const Chats = () => {
             Object.values(userTypingInfo)?.some(
               (item: any) => item?.id !== user?.id
             ) && (
-              <div className="relative">
+              <div className="relative pt-4">
                 <div className="text-start absolute left-0 -bottom-2 flex gap-1">
                   {Object.values(userTypingInfo)
                     .slice(0, 5)
@@ -432,11 +432,21 @@ const Chats = () => {
                           </div>
                         )
                     )}
-                  <p className="text-xs">
-                    {typingUsers?.length > 5 &&
-                      `and ${typingUsers?.length - 5} more`}{" "}
-                    is typing...
-                  </p>
+                  <div className="text-xs flex gap-1 items-center">
+                    <span className="p-0.5 bg-gray-300 dark:bg-gray-400 rounded-full">
+                      {typingUsers?.length > 5 &&
+                        `${typingUsers?.length - 5}+`}{" "}
+                    </span>
+                    <div className="flex gap-1 items-center py-3 px-2 rounded-xl bg-gray-600 dark:bg-gray-300 w-fit">
+                      {Array.from(Array(3)).map((_, index) => (
+                        <span
+                          className="rounded-full p-1 dark:bg-gray-800 bg-gray-200 animate-bounce"
+                          key={index}
+                          style={{ animationDelay: 0.3 * index + "s" }}
+                        ></span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
