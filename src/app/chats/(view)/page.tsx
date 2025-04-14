@@ -220,7 +220,7 @@ const Chats = () => {
       attachment: "",
     });
     messageRef.current = formInput?.content;
-    sendPublicMessage(true);
+    sendPublicMessage(true, user?.id);
     setIsSending(true);
     textareaRef.current.focus();
     textareaRef.current.style.height = "18px";
@@ -246,14 +246,14 @@ const Chats = () => {
       }
       setError(error.response.data);
     } finally {
-      sendPublicMessage(false);
+      sendPublicMessage(false, user?.id);
       setIsSending(false);
       messageRef.current = null;
     }
   };
 
   const handleSendLike = async () => {
-    sendPublicMessage(true);
+    sendPublicMessage(true, user?.id);
     setIsSending(true);
     try {
       const response = await api.post("chat-messages/send-public-message", {
@@ -269,7 +269,7 @@ const Chats = () => {
     } catch (error: any) {
       console.error(error);
     } finally {
-      sendPublicMessage(false);
+      sendPublicMessage(false, user?.id);
       setIsSending(false);
     }
   };
@@ -434,8 +434,7 @@ const Chats = () => {
                     )}
                   <div className="text-xs flex gap-1 items-center">
                     <span className="p-0.5 bg-gray-300 dark:bg-gray-400 rounded-full">
-                      {typingUsers?.length > 5 &&
-                        `${typingUsers?.length - 5}+`}{" "}
+                      {typingUsers?.length > 5 && `${typingUsers?.length - 5}+`}{" "}
                     </span>
                     <div className="flex gap-1 items-center py-3 px-2 rounded-xl bg-gray-600 dark:bg-gray-300 w-fit">
                       {Array.from(Array(3)).map((_, index) => (

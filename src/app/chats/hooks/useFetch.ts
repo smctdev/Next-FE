@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import api from "../../lib/axiosCall";
-import PlayMessageTone from "../utils/playMessageTone";
 
 const useFetch = (
   url: any,
@@ -30,9 +29,6 @@ const useFetch = (
     }
     if (searchTerm) {
       setLoadingOnSearch(true);
-    }
-    if(isRefresh) {
-      PlayMessageTone();
     }
     const fetchData = async () => {
       const params: any = {};

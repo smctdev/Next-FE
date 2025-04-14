@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import { PayloadInterface } from "../types/PayloadInterface";
 import { PrivateChatIds } from "../utils/chatConstants";
 import { useAuth } from "@/app/context/AuthContext";
+import PlayMessageTone from "../utils/playMessageTone";
 
 const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -15,9 +16,21 @@ const useSocket = () => {
   const [userTypingInfoPrivate, setUserTypingInfoPrivate] = useState<any>(null);
   const [privateChatIds, setPrivateChatIds] = useState(PrivateChatIds);
   const [privateTyping, setPrivateTyping] = useState<any>(true);
+  const [senderId, setSenderId] = useState<any>(null);
   const { user: currentUser }: any = useAuth();
   const typingTimeouts = useRef<{ [key: string]: NodeJS.Timeout }>({});
   const typingTimeoutsPrivate = useRef<any>(null);
+
+  console.log(senderId);
+
+  useEffect(() => {
+    if (
+      (sentPublicMessage && senderId !== currentUser?.id) ||
+      (sentMessage && receiverId === currentUser?.id)
+    ) {
+      PlayMessageTone();
+    }
+  }, [sentMessage, sentPublicMessage, receiverId, senderId]);
 
   useEffect(() => {
     const token = Cookies.get("APP-TOKEN");
@@ -54,6 +67,10 @@ const useSocket = () => {
       setSentPublicMessage(toRefresh);
     });
 
+    socketInstance.on("publicSenderId", (publicSenderId: boolean) => {
+      setSenderId(publicSenderId);
+    });
+
     socketInstance.on("userTypeToChat", ({ chatReference, user }: any) => {
       if (chatReference || !user?.id) return;
 
@@ -86,10 +103,10 @@ const useSocket = () => {
           !currentUser ||
           isOwnMessage ||
           !sentMessage
-        ){
+        ) {
           return;
         }
-        
+
         const isChattingWith =
           receiverId === currentUser?.id && senderId === user?.id;
 
@@ -114,7 +131,13 @@ const useSocket = () => {
     return () => {
       socketInstance.disconnect();
     };
-  }, [typingTimeoutsPrivate, currentUser, typingTimeouts, privateTyping, sentMessage]);
+  }, [
+    typingTimeoutsPrivate,
+    currentUser,
+    typingTimeouts,
+    privateTyping,
+    sentMessage,
+  ]);
 
   const sendMessage = ({
     toRefresh,
@@ -128,8 +151,8 @@ const useSocket = () => {
     });
   };
 
-  const sendPublicMessage = (toRefresh: boolean) => {
-    socket?.emit("sendPublicMessage", toRefresh);
+  const sendPublicMessage = (toRefresh: boolean, publicSenderId: string) => {
+    socket?.emit("sendPublicMessage", { toRefresh, publicSenderId });
   };
 
   const userTyping = ({ chatReference, user }: any) => {
@@ -152,7 +175,7 @@ const useSocket = () => {
     userTypingInfoPrivate,
     userTypingPrivate,
     privateChatIds,
-    setPrivateTyping
+    setPrivateTyping,
   };
 };
 
