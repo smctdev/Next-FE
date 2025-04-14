@@ -21,8 +21,6 @@ const useSocket = () => {
   const typingTimeouts = useRef<{ [key: string]: NodeJS.Timeout }>({});
   const typingTimeoutsPrivate = useRef<any>(null);
 
-  console.log(senderId);
-
   useEffect(() => {
     if (
       (sentPublicMessage && senderId !== currentUser?.id) ||
