@@ -15,7 +15,6 @@ const useSocket = () => {
   const [userTypingInfo, setUserTypingInfo] = useState<any>(null);
   const [userTypingInfoPrivate, setUserTypingInfoPrivate] = useState<any>(null);
   const [privateChatIds, setPrivateChatIds] = useState(PrivateChatIds);
-  const [privateTyping, setPrivateTyping] = useState<any>(true);
   const [senderId, setSenderId] = useState<any>(null);
   const { user: currentUser }: any = useAuth();
   const typingTimeouts = useRef<{ [key: string]: NodeJS.Timeout }>({});
@@ -99,8 +98,7 @@ const useSocket = () => {
           !senderId ||
           !user?.id ||
           !currentUser ||
-          isOwnMessage ||
-          !sentMessage
+          isOwnMessage
         ) {
           return;
         }
@@ -129,13 +127,7 @@ const useSocket = () => {
     return () => {
       socketInstance.disconnect();
     };
-  }, [
-    typingTimeoutsPrivate,
-    currentUser,
-    typingTimeouts,
-    privateTyping,
-    sentMessage,
-  ]);
+  }, [typingTimeoutsPrivate, currentUser, typingTimeouts]);
 
   const sendMessage = ({
     toRefresh,
@@ -173,7 +165,6 @@ const useSocket = () => {
     userTypingInfoPrivate,
     userTypingPrivate,
     privateChatIds,
-    setPrivateTyping,
   };
 };
 

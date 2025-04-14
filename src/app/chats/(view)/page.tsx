@@ -81,7 +81,15 @@ const Chats = () => {
   useEffect(() => {
     if (!userTyping || !formInput?.content || !user) return;
 
-    userTyping({ chatReference: null, user });
+    const handleTyping = () => {
+      userTyping({ chatReference: null, user });
+    };
+
+    document.addEventListener("keydown", handleTyping);
+
+    return () => {
+      document.removeEventListener("keydown", handleTyping);
+    };
   }, [userTyping, formInput, user]);
 
   useEffect(() => {
@@ -433,9 +441,11 @@ const Chats = () => {
                         )
                     )}
                   <div className="text-xs flex gap-1 items-center">
-                    <span className="p-0.5 bg-gray-300 dark:bg-gray-400 rounded-full">
-                      {typingUsers?.length > 5 && `${typingUsers?.length - 5}+`}{" "}
-                    </span>
+                    {typingUsers?.length > 5 && (
+                      <span className="p-0.5 bg-gray-300 dark:bg-gray-400 rounded-full">
+                        {typingUsers?.length - 5}+{" "}
+                      </span>
+                    )}
                     <div className="flex gap-1 items-center py-3 px-2 rounded-xl bg-gray-600 dark:bg-gray-300 w-fit">
                       {Array.from(Array(3)).map((_, index) => (
                         <span
