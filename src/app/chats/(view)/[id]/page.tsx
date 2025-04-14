@@ -31,6 +31,7 @@ const Chats = () => {
     userTypingPrivate,
     userTypingInfoPrivate,
     privateChatIds,
+    setPrivateTyping,
   }: any = useSocket();
   const { data, loading }: any = useFetch(
     id && `/users/for/seo/${id}`,
@@ -100,10 +101,10 @@ const Chats = () => {
   const totalConvos = convos?.conversations?.length || 0;
 
   useEffect(() => {
-    if (!userTypingPrivate || !formInput?.content || !user) return;
-
+    if (!userTypingPrivate || !formInput.content || !user) return;
+    setPrivateTyping(true);
     userTypingPrivate({ receiverId: id, senderId: user?.id, user });
-  }, [userTypingPrivate, formInput, user, id]);
+  }, [userTypingPrivate, formInput, user, id, setPrivateTyping]);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -593,7 +594,7 @@ const Chats = () => {
             </div>
           )}
           {isPrivateChatting && (
-            <div className="relative">
+            <div className="relative pt-4">
               <div className="text-start absolute left-0 -bottom-2 flex gap-1">
                 <div
                   key={userTypingInfoPrivate?.id}
@@ -610,7 +611,15 @@ const Chats = () => {
                       title={userTypingInfoPrivate?.name}
                     />
                   </div>{" "}
-                  <span className="text-xs">is typing...</span>
+                  <div className="flex gap-1 items-center py-3 px-2 rounded-xl bg-gray-600 dark:bg-gray-300 w-fit">
+                    {Array.from(Array(3)).map((_, index) => (
+                      <span
+                        className="rounded-full p-1 dark:bg-gray-800 bg-gray-200 animate-bounce"
+                        key={index}
+                        style={{ animationDelay: 0.3 * index + "s" }}
+                      ></span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
