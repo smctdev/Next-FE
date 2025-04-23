@@ -6,29 +6,30 @@ export default function formatMessages(
   height: number,
   width: number
 ) {
+  // More precise URL regex (ensures proper domain or IP format)
   const urlPattern =
-    /\b(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.[a-zA-Z]{2,}|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(?::\d+)?(?:\/[^\s]*)?\b/g;
+    /\b(https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(?:\/[^\s]*)?|https?:\/\/(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?(?:\/[^\s]*)?|(?<!@)\b[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b(?!@))\b/g;
 
-  const hasHttpOrHttpsPattern = /\b(?:https?:\/\/)/i;
+  return content.split(urlPattern).map((part, index) => {
+    if (urlPattern.test(part)) {
+      const link = part.startsWith("http") ? part : `https://${part}`;
 
-  const hasHttpOrHttpsUrl = hasHttpOrHttpsPattern.test(content);
+      return (
+        <span key={index} className="relative">
+          <span>
+            <Link
+              href={link}
+              className="font-bold underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {part}
+            </Link>
+          </span>
+        </span>
+      );
+    }
 
-  const isUrl = urlPattern.test(content);
-
-  const formattedContent = hasHttpOrHttpsUrl ? content : `https://${content}`;
-
-  if (isUrl) {
-    return (
-      <Link
-        href={`${formattedContent}`}
-        className="font-bold underline"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {content}
-      </Link>
-    );
-  } else {
-    return formatEmojis(content, height, width);
-  }
+    return <span key={index}>{formatEmojis(part, height, width)}</span>;
+  });
 }

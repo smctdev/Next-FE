@@ -16,6 +16,10 @@ import Content from "../components/loaders/Content";
 import { useAuth } from "@/app/context/AuthContext";
 import DoubleRecentChat from "../components/loaders/DoubleRecentChat";
 import useToastr from "../hooks/Toastr";
+import { formatChatTimestamp } from "../utils/formatChatTimestamp";
+import axios from "axios";
+import usePreviewLink from "../hooks/usePreviewLink";
+import Image from "../components/images/Image";
 
 const Chats = () => {
   const { user }: any = useAuth();
@@ -26,7 +30,12 @@ const Chats = () => {
   });
   const textareaRef = useRef<any>("");
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
-  const { sentPublicMessage, sendPublicMessage }: any = useSocket();
+  const {
+    sentPublicMessage,
+    sendPublicMessage,
+    userTyping,
+    userTypingInfo,
+  }: any = useSocket();
   const {
     data: publicMessagesData,
     loading: publicMessagesDataLoading,
@@ -47,6 +56,10 @@ const Chats = () => {
     searchTerm,
     loadingOnSearch,
   }: any = useFetch("users/to/chat", sentPublicMessage, true, true);
+  const { setPreviewData, preview }: any = usePreviewLink(
+    "chat-messages/link-preview",
+    sentPublicMessage
+  );
   const chatContentRef = useRef<any>(null);
   const [isSending, setIsSending] = useState(false);
   const emojiPickerRef = useRef<any>(null);
@@ -59,7 +72,25 @@ const Chats = () => {
   const totalUsersData = data?.totalData || 0;
   const [backToBottom, setBackToBottom] = useState(false);
   const searchRef = useRef<any>(null);
+  const sentinelRef = useRef<HTMLSpanElement>(null);
   const { showError }: any = useToastr();
+  const messageRef = useRef<any>(null);
+  const [isOpenRecentChat, setIsOpenRecentChat] = useState(false);
+  const isTyping = Object.keys(userTypingInfo || {}).length > 0;
+
+  useEffect(() => {
+    if (!userTyping || !formInput?.content || !user) return;
+
+    const handleTyping = () => {
+      userTyping({ chatReference: null, user });
+    };
+
+    document.addEventListener("keydown", handleTyping);
+
+    return () => {
+      document.removeEventListener("keydown", handleTyping);
+    };
+  }, [userTyping, formInput, user]);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -83,19 +114,32 @@ const Chats = () => {
   }, [loadingOnTake, loadingOnTakeUsers]);
 
   useEffect(() => {
-    const handleInfiniteScroll = () => {
-      if (
-        chatContentRef.current &&
-        !loadingOnTakeRef.current &&
-        totalMessages < totalData
-      ) {
-        const { scrollTop, scrollHeight, clientHeight } =
-          chatContentRef.current;
-        if (scrollTop + scrollHeight - 1 <= clientHeight) {
+    if (!sentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !loadingOnTake &&
+          totalMessages < totalData
+        ) {
           setAddTake((prev: any) => prev + 10);
         }
+      },
+      {
+        threshold: 1.0,
       }
+    );
 
+    observer.observe(sentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [sentinelRef, loadingOnTake, totalMessages, totalData]);
+
+  useEffect(() => {
+    const handleInfiniteScroll = () => {
       if (chatContentRef.current) {
         const { scrollTop } = chatContentRef.current;
 
@@ -113,21 +157,20 @@ const Chats = () => {
         }
       }
     };
-    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
 
     recentChatRef?.current?.addEventListener("scroll", handleInfiniteScroll);
+    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
     return () => {
-      chatContentRef?.current?.removeEventListener(
-        "scroll",
-        handleInfiniteScroll
-      );
-
       recentChatRef?.current?.removeEventListener(
         "scroll",
         handleInfiniteScroll
       );
+      chatContentRef?.current?.removeEventListener(
+        "scroll",
+        handleInfiniteScroll
+      );
     };
-  }, [totalMessages, totalData, totalUsers, totalUsersData, searchTerm]);
+  }, [totalUsers, totalUsersData, chatContentRef]);
 
   const handleBackToBottom = () => {
     if (chatContentRef.current) {
@@ -180,7 +223,12 @@ const Chats = () => {
   };
 
   const handleSendMessage = async () => {
-    sendPublicMessage(true);
+    setFormInput({
+      content: "",
+      attachment: "",
+    });
+    messageRef.current = formInput?.content;
+    sendPublicMessage(true, user?.id);
     setIsSending(true);
     textareaRef.current.focus();
     textareaRef.current.style.height = "18px";
@@ -192,12 +240,7 @@ const Chats = () => {
         ...formInput,
       });
       if (response.status === 201) {
-        setFormInput({
-          content: "",
-          attachment: "",
-        });
         setError("");
-
         setTimeout(() => {
           chatContentRef.current.scrollTop =
             chatContentRef.current.scrollHeight;
@@ -206,18 +249,19 @@ const Chats = () => {
     } catch (error: any) {
       console.error(error);
       setError(error.response.data);
-      if(error.response.status === 413) {
-        showError('Payload too large. Please try again', "Error");
+      if (error.response.status === 413) {
+        showError("Payload too large. Please try again", "Error");
       }
       setError(error.response.data);
     } finally {
-      sendPublicMessage(false);
+      sendPublicMessage(false, user?.id);
       setIsSending(false);
+      messageRef.current = null;
     }
   };
 
   const handleSendLike = async () => {
-    sendPublicMessage(true);
+    sendPublicMessage(true, user?.id);
     setIsSending(true);
     try {
       const response = await api.post("chat-messages/send-public-message", {
@@ -233,7 +277,7 @@ const Chats = () => {
     } catch (error: any) {
       console.error(error);
     } finally {
-      sendPublicMessage(false);
+      sendPublicMessage(false, user?.id);
       setIsSending(false);
     }
   };
@@ -246,16 +290,34 @@ const Chats = () => {
     }, 500);
   };
 
+  const handleOpenRecentChat = () => {
+    setIsOpenRecentChat(!isOpenRecentChat);
+  };
+
+  const typingUsers =
+    userTypingInfo &&
+    Object.values(userTypingInfo)?.filter((userType: any) => {
+      return userType?.id !== user?.id;
+    });
+
   return (
     <div className="flex h-screen">
-      <div className="bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80">
+      <div
+        className={`bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80 ${
+          isOpenRecentChat ? "" : "w-0"
+        }`}
+      >
         <div className="p-4 border border-b border-gray-200 dark:border-gray-600">
           <div>
             <Link href="/chats">
               <p className="text-2xl font-bold">Chats</p>
             </Link>
           </div>
-          <div className="w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500">
+          <div
+            className={`w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500 ${
+              isOpenRecentChat ? "" : "hidden md:block"
+            }`}
+          >
             <input
               type="search"
               className="focus:outline-none bg-transparent w-full"
@@ -294,6 +356,17 @@ const Chats = () => {
         {/* Chat Header */}
         <div className="bg-sky-700 text-white p-4 flex items-center justify-between">
           <div className="flex items-center">
+            <button
+              type="button"
+              className="block md:hidden"
+              onClick={handleOpenRecentChat}
+            >
+              <i
+                className={`far ${
+                  isOpenRecentChat ? "fa-arrow-left" : "fa-arrow-right"
+                }`}
+              ></i>
+            </button>
             <div className="ml-3">
               <p className="text-lg font-semibold">Public Chats</p>
               <p className="text-sm text-gray-200">
@@ -318,20 +391,109 @@ const Chats = () => {
           ref={chatContentRef}
           className="flex-1 flex flex-col-reverse p-4 overflow-y-auto bg-white dark:bg-gray-700 gap-4 border-b border-gray-200 dark:border-gray-600"
         >
-          {isSending && <p className="text-end text-sm">Sending...</p>}
+          {isSending && messageRef?.current && (
+            <div className="relative">
+              <p className="text-end text-xs absolute right-0 -bottom-4">
+                Sending...
+              </p>
+              <div className="flex justify-end group">
+                <div className="justify-center flex mr-1 items-center">
+                  <div className="group-hover:block hidden">
+                    <button className="px-3.5 py-1 hover:dark:bg-gray-600 hover:bg-gray-200 rounded-full">
+                      <i className="far fa-ellipsis-vertical"></i>
+                    </button>
+                  </div>
+                </div>
+                <div
+                  className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] text-white p-3 rounded-2xl dark:bg-blue-400/50 bg-blue-400/80 shadow-md`}
+                >
+                  <p className="text-sm whitespace-break-spaces break-words">
+                    {messageRef?.current}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {isTyping &&
+            userTypingInfo &&
+            Object.values(userTypingInfo)?.some(
+              (item: any) => item?.id !== user?.id
+            ) && (
+              <div className="relative pt-4">
+                <div className="text-start absolute left-0 -bottom-2 flex gap-1">
+                  {Object.values(userTypingInfo)
+                    .slice(0, 5)
+                    .map(
+                      (userType: any) =>
+                        userType?.id !== user?.id && (
+                          <div
+                            key={userType?.id}
+                            className="flex items-center -ml-2"
+                          >
+                            <Image
+                              avatar={userType?.profile_pictures[0]?.avatar}
+                              alt={userType?.name}
+                              width={5}
+                              height={5}
+                              title={userType?.name}
+                            />
+                          </div>
+                        )
+                    )}
+                  <div className="text-xs flex gap-1 items-center">
+                    {typingUsers?.length > 5 && (
+                      <span className="p-0.5 bg-gray-300 dark:bg-gray-400 rounded-full">
+                        {typingUsers?.length - 5}+{" "}
+                      </span>
+                    )}
+                    <div className="flex gap-1 items-center py-3 px-2 rounded-xl bg-gray-600 dark:bg-gray-300 w-fit">
+                      {Array.from(Array(3)).map((_, index) => (
+                        <span
+                          className="rounded-full p-1 dark:bg-gray-800 bg-gray-200 animate-bounce"
+                          key={index}
+                          style={{ animationDelay: 0.3 * index + "s" }}
+                        ></span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           {publicMessagesDataLoading ? (
             <Content />
           ) : publicMessagesData && publicMessagesData?.messages?.length > 0 ? (
-            publicMessagesData?.messages?.map((message: any, index: number) => (
-              <ChatContent
-                key={index}
-                content={message?.content}
-                sender={message?.userId === user?.id}
-                name={message?.sentBy?.name}
-                avatar={message?.sentBy?.profile_pictures[0]?.avatar}
-                timeSent={message?.createdAt}
-              />
-            ))
+            publicMessagesData?.messages?.map((message: any, index: number) => {
+              const currentTime = new Date(message.createdAt);
+              const nextTime =
+                index < publicMessagesData?.messages.length - 1
+                  ? new Date(publicMessagesData?.messages[index + 1].createdAt)
+                  : null;
+
+              const isFirstInGroup =
+                !nextTime ||
+                currentTime.getMinutes() !== nextTime.getMinutes() ||
+                currentTime.toDateString() !== nextTime.toDateString();
+
+              return (
+                <div key={index}>
+                  {isFirstInGroup && (
+                    <div className="flex justify-center text-gray-300 text-xs my-2">
+                      {formatChatTimestamp(currentTime)}
+                    </div>
+                  )}
+                  <ChatContent
+                    setPreviewData={setPreviewData}
+                    preview={preview}
+                    messageId={message?.id}
+                    content={message?.content}
+                    sender={message?.userId === user?.id}
+                    name={message?.sentBy?.name}
+                    avatar={message?.sentBy?.profile_pictures[0]?.avatar}
+                    timeSent={message?.createdAt}
+                  />
+                </div>
+              );
+            })
           ) : (
             <p className="text-center mb-20 items-center">
               Be the first to start a conversation in{" "}
@@ -344,6 +506,7 @@ const Chats = () => {
               <i className="fa-duotone fa-solid fa-spinner-third text-center animate-spin"></i>
             </div>
           )}
+          <span ref={sentinelRef}></span>
         </div>
         {/* Message Input Area */}
         <div className="bg-white dark:bg-gray-700 px-4 py-2 gap-2 flex items-center relative">

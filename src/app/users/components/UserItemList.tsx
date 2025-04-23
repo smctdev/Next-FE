@@ -8,6 +8,8 @@ export default function UserItemList({
   handleVerifyUser,
   handleConfirmDelete,
   setIsRefresh,
+  isLoading,
+  userId,
 }: any) {
   const { hasHigherRole }: any = useAuth();
   const [isUpdateUserModal, setIsUpdateUserModal] = useState(false);
@@ -101,11 +103,12 @@ export default function UserItemList({
             hasHigherRole && (
               <button
                 type="button"
+                disabled={item.id === userId && isLoading}
                 onClick={() => handleVerifyUser(item.id)}
                 className="text-sm bg-violet-500 text-white px-2 py-1 rounded-md hover:bg-violet-600 hover:scale-105 transition-all duration-200 ease-in-out"
               >
                 <span className="flex gap-1 items-center">
-                  <i className="far fa-check"></i> Verify
+                  {item.id === userId && isLoading ? <><i className="far fa-spinner animate-spin"></i> Verifying...</> : <><i className="far fa-check"></i> Verify</>}
                 </span>
               </button>
             )}

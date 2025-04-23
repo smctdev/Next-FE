@@ -20,10 +20,18 @@ import Link from "next/link";
 import { useConversation } from "../../context/conversationContext";
 import useToastr from "../../hooks/Toastr";
 import DoubleRecentChat from "../../components/loaders/DoubleRecentChat";
+import { formatChatTimestamp } from "../../utils/formatChatTimestamp";
+import usePreviewLink from "../../hooks/usePreviewLink";
 
 const Chats = () => {
   const { id }: any = useParams();
-  const { sendMessage }: any = useSocket();
+  const {
+    sendMessage,
+    isSeenSentMessage,
+    userTypingPrivate,
+    userTypingInfoPrivate,
+    privateChatIds,
+  }: any = useSocket();
   const { data, loading }: any = useFetch(
     id && `/users/for/seo/${id}`,
     false,
@@ -53,18 +61,31 @@ const Chats = () => {
     searchTerm,
     loadingOnSearch,
     setAddTakeMessages,
-    loadingOnTakeMessages
+    loadingOnTakeMessages,
   }: any = useConversation();
+  const { setPreviewData, preview }: any = usePreviewLink(
+    "chat-messages/link-preview",
+    isSeenSentMessage
+  );
   const loadingOnTakeRef = useRef(loadingOnTake);
   const [backToBottom, setBackToBottom] = useState(false);
   const { showError }: any = useToastr();
   const searchRef = useRef<any>(null);
   const recentChatRef = useRef<any>(null);
+  const sentinelRef = useRef<HTMLSpanElement>(null);
+  const unreadMessageRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<any>(null);
+  const [messageDetails, setMessageDetails] = useState({
+    chatId: 0,
+    receiverId: "",
+  });
+  const [isOpenRecentChat, setIsOpenRecentChat] = useState(false);
+  let firstUnreadIndex: any = null;
 
   const getDataPerUser = convos?.conversations?.filter(
     (chat: any) =>
-      (chat.senderId === user?.id || chat.receiverId === user?.id) &&
-      (chat.senderId === data?.user?.id || chat.receiverId === data?.user?.id)
+      (chat.senderId === user?.id && chat.receiverId === data?.user?.id) ||
+      (chat.senderId === data?.user?.id && chat.receiverId === user?.id)
   );
 
   const totalMessages =
@@ -75,6 +96,18 @@ const Chats = () => {
   const totalUsersData = convos?.totalSearchedData || 0;
   const totalConvosData = convos?.totalConvosData || 0;
   const totalConvos = convos?.conversations?.length || 0;
+
+  useEffect(() => {
+    if (!formInput.content || !user) return;
+    const handleTyping = () => {
+      userTypingPrivate({ receiverId: id, senderId: user?.id, user });
+    };
+    document.addEventListener("keydown", handleTyping);
+
+    return () => {
+      document.removeEventListener("keydown", handleTyping);
+    };
+  }, [userTypingPrivate, formInput, user, id]);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -96,20 +129,96 @@ const Chats = () => {
     loadingOnTakeRef.current = loadingOnTake;
   }, [loadingOnTake]);
 
+  const handleSeenMessage =
+    (receiverId: string, chatId: number) => async () => {
+      if (receiverId === id && isSeenSentMessage) {
+        setIsRefresh(true);
+      } else {
+        setTimeout(() => {
+          setIsRefresh(true);
+        }, 10000);
+      }
+      try {
+        const response = await api.patch(
+          `chat-messages/seen-message/${receiverId}/${chatId}`
+        );
+        if (response.status === 200) {
+          setMessageDetails({
+            chatId: 0,
+            receiverId: "",
+          });
+          firstUnreadIndex = null;
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (receiverId === id && isSeenSentMessage) {
+          setIsRefresh(false);
+        } else {
+          setTimeout(() => {
+            setIsRefresh(false);
+          }, 10000);
+        }
+        sendMessage({
+          toRefresh: false,
+          isSeenForSentMessage: false,
+        });
+      }
+    };
+
   useEffect(() => {
-    const handleInfiniteScroll = () => {
-      if (
-        chatContentRef.current &&
-        !loadingOnTakeRef.current &&
-        totalMessages < totalData
-      ) {
-        const { scrollTop, scrollHeight, clientHeight } =
-          chatContentRef.current;
-        if (scrollTop + scrollHeight - 1 <= clientHeight) {
+    if (!sentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !loadingOnTakeMessages &&
+          totalMessages < totalData
+        ) {
           setAddTakeMessages((prev: any) => prev + 10);
         }
+      },
+      {
+        threshold: 1.0,
       }
+    );
 
+    observer.observe(sentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [loadingOnTakeMessages, totalMessages, totalData, sentinelRef]);
+
+  useEffect(() => {
+    if (!unreadMessageRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          firstUnreadIndex !== -1 &&
+          messageDetails.receiverId &&
+          messageDetails.chatId !== 0
+        ) {
+          handleSeenMessage(messageDetails.receiverId, messageDetails.chatId)();
+        }
+      },
+      {
+        threshold: 1.0,
+      }
+    );
+
+    observer.observe(unreadMessageRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [unreadMessageRef, firstUnreadIndex, messageDetails, handleSeenMessage]);
+
+  useEffect(() => {
+    const handleInfiniteScroll = () => {
       if (chatContentRef.current) {
         const { scrollTop } = chatContentRef.current;
 
@@ -127,21 +236,20 @@ const Chats = () => {
         }
       }
     };
-    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
 
     recentChatRef?.current?.addEventListener("scroll", handleInfiniteScroll);
+    chatContentRef?.current?.addEventListener("scroll", handleInfiniteScroll);
     return () => {
-      chatContentRef?.current?.removeEventListener(
-        "scroll",
-        handleInfiniteScroll
-      );
-
       recentChatRef?.current?.removeEventListener(
         "scroll",
         handleInfiniteScroll
       );
+      chatContentRef?.current?.removeEventListener(
+        "scroll",
+        handleInfiniteScroll
+      );
     };
-  }, [totalMessages, totalData, totalConvosData, totalConvos]);
+  }, [totalMessages, totalData, totalConvosData, totalConvos, chatContentRef]);
 
   const handleBackToBottom = () => {
     if (chatContentRef.current) {
@@ -189,9 +297,18 @@ const Chats = () => {
   };
 
   const handleSendMessage = async () => {
+    if (messageDetails.receiverId && messageDetails.chatId !== 0) {
+      handleSeenMessage(messageDetails.receiverId, messageDetails.chatId)();
+    }
+    setFormInput({
+      content: "",
+      attachment: "",
+    });
+    messageRef.current = formInput?.content;
     sendMessage({
       toRefresh: true,
       receiverId: id,
+      isSeenForSentMessage: true,
     });
     setIsSending(true);
     setIsRefresh(true);
@@ -206,10 +323,6 @@ const Chats = () => {
       });
       if (response.status === 201) {
         setError("");
-        setFormInput({
-          content: "",
-          attachment: "",
-        });
         setTimeout(() => {
           chatContentRef.current.scrollTop =
             chatContentRef.current.scrollHeight;
@@ -225,9 +338,11 @@ const Chats = () => {
       sendMessage({
         toRefresh: false,
         receiverId: "",
+        isSeenForSentMessage: true,
       });
       setIsSending(false);
       setIsRefresh(false);
+      messageRef.current = null;
     }
   };
 
@@ -235,6 +350,7 @@ const Chats = () => {
     sendMessage({
       toRefresh: true,
       receiverId: id,
+      isSeenForSentMessage: true,
     });
     setIsSending(true);
     setIsRefresh(true);
@@ -255,25 +371,16 @@ const Chats = () => {
       sendMessage({
         toRefresh: false,
         receiverId: "",
+        isSeenForSentMessage: true,
       });
       setIsSending(false);
       setIsRefresh(false);
     }
   };
 
-  // const messages = convos?.conversations?.filter(
-  //   (chat: any) =>
-  //     (chat.senderId === user?.id || chat.receiverId === user?.id) &&
-  //     (chat.senderId === data?.user?.id || chat.receiverId === data?.user?.id)
-  // );
-
   const messages = convos?.conversations?.filter(
     (chat: any) =>
-      ((chat.senderId === user?.id || chat.receiverId === user?.id) &&
-        (chat.senderId === data?.user?.id ||
-          chat.receiverId === data?.user?.id) &&
-        chat.senderId === user?.id &&
-        chat.receiverId === data?.user?.id) ||
+      (chat.senderId === user?.id && chat.receiverId === data?.user?.id) ||
       (chat.senderId === data?.user?.id && chat.receiverId === user?.id)
   );
 
@@ -300,10 +407,38 @@ const Chats = () => {
     }, 500);
   };
 
+  const allMessages = messages
+    ? messages.flatMap((content: any) => content.messages)
+    : [];
+  firstUnreadIndex = allMessages.findLastIndex(
+    (msg: any) => msg.userId !== user.id && !msg.isSeen
+  );
+
+  useEffect(() => {
+    if (firstUnreadIndex !== -1) {
+      const unreadMessage = allMessages[firstUnreadIndex];
+      setMessageDetails({
+        chatId: unreadMessage.chatId,
+        receiverId: unreadMessage.userId,
+      });
+    }
+  }, [firstUnreadIndex]);
+
+  const handleOpenRecentChat = () => {
+    setIsOpenRecentChat(!isOpenRecentChat);
+  };
+
+  const isPrivateChatting =
+    privateChatIds?.receiverId === user?.id && privateChatIds?.senderId === id;
+
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80">
+      <div
+        className={`bg-white dark:bg-gray-700 border border-r border-gray-200 dark:border-gray-600 flex flex-col md:w-80 ${
+          isOpenRecentChat ? "" : "w-0"
+        }`}
+      >
         {/* Profile Header */}
         <div className="border p-4 border-b border-gray-200 dark:border-gray-600">
           <div>
@@ -311,7 +446,11 @@ const Chats = () => {
               <p className="text-2xl font-bold">Chats</p>
             </Link>
           </div>
-          <div className="w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500">
+          <div
+            className={`w-20 md:w-full mt-2 rounded-3xl py-3 pl-10 pr-3 relative bg-gray-200 dark:bg-gray-500 ${
+              isOpenRecentChat ? "" : "hidden md:block"
+            }`}
+          >
             <input
               type="search"
               className="focus:outline-none bg-transparent w-full"
@@ -334,7 +473,14 @@ const Chats = () => {
                     convo.senderId === user?.id ? convo.receiver : convo.sender
                   }
                   lastMessage={convo?.messages[0]?.content}
+                  unreadMessages={convo?.messages[0]?.chat?._count?.messages}
                   timeSent={convo?.messages[0]?.createdAt}
+                  isActive={
+                    (convo.senderId === user?.id &&
+                      convo.receiverId === data?.user?.id) ||
+                    (convo.senderId === data?.user?.id &&
+                      convo.receiverId === user?.id)
+                  }
                 />
               ))
             ) : (
@@ -353,7 +499,14 @@ const Chats = () => {
               <RecentChat />
             ) : convos?.searchedData?.length > 0 ? (
               convos?.searchedData?.map((user: any, index: number) => (
-                <RecentChatContent key={index} user={user} setSearchTerm={setSearchTerm} searchTerm={searchTerm} />
+                <>
+                  <RecentChatContent
+                    key={index}
+                    user={user}
+                    setSearchTerm={setSearchTerm}
+                    searchTerm={searchTerm}
+                  />
+                </>
               ))
             ) : (
               <p className="text-center font-bold text-lg mt-5 break-words px-10 w-20 md:w-full">
@@ -376,6 +529,17 @@ const Chats = () => {
               <ChatHeader />
             ) : (
               <>
+                <button
+                  type="button"
+                  className="mr-3 block md:hidden"
+                  onClick={handleOpenRecentChat}
+                >
+                  <i
+                    className={`far ${
+                      isOpenRecentChat ? "fa-arrow-left" : "fa-arrow-right"
+                    }`}
+                  ></i>
+                </button>
                 <Image
                   avatar={data?.user?.profile_pictures[0]?.avatar}
                   width={10}
@@ -409,22 +573,110 @@ const Chats = () => {
           ref={chatContentRef}
           className="flex-1 flex flex-col-reverse gap-4 p-4 overflow-y-auto bg-white dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
         >
-          {isSending && <p className="text-end text-sm">Sending...</p>}
+          {isSending && messageRef?.current && (
+            <div className="relative">
+              <p className="text-end text-xs absolute right-0 -bottom-4">
+                Sending...
+              </p>
+              <div className="flex justify-end group">
+                <div className="justify-center flex mr-1 items-center">
+                  <div className="group-hover:block hidden">
+                    <button className="px-3.5 py-1 hover:dark:bg-gray-600 hover:bg-gray-200 rounded-full">
+                      <i className="far fa-ellipsis-vertical"></i>
+                    </button>
+                  </div>
+                </div>
+                <div
+                  className={`xl:max-w-4xl 2xl:max-w-7xl sm:max-w-lg md:mx-w-xl lg:max-w-2xl max-w-[230px] text-white p-3 rounded-2xl dark:bg-blue-400/50 bg-blue-400/80 shadow-md`}
+                >
+                  <p className="text-sm whitespace-break-spaces break-words">
+                    {messageRef?.current}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {isPrivateChatting && (
+            <div className="relative pt-4">
+              <div className="text-start absolute left-0 -bottom-2 flex gap-1">
+                <div
+                  key={userTypingInfoPrivate?.id}
+                  className="flex items-center gap-1"
+                >
+                  <div className="flex items-center -ml-2">
+                    <Image
+                      avatar={
+                        userTypingInfoPrivate?.profile_pictures[0]?.avatar
+                      }
+                      alt={userTypingInfoPrivate?.name}
+                      width={5}
+                      height={5}
+                      title={userTypingInfoPrivate?.name}
+                    />
+                  </div>{" "}
+                  <div className="flex gap-1 items-center py-3 px-2 rounded-xl bg-gray-600 dark:bg-gray-300 w-fit">
+                    {Array.from(Array(3)).map((_, index) => (
+                      <span
+                        className="rounded-full p-1 dark:bg-gray-800 bg-gray-200 animate-bounce"
+                        key={index}
+                        style={{ animationDelay: 0.3 * index + "s" }}
+                      ></span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {loading || loadingConvos ? (
             <Content />
-          ) : messages && messages.length > 0 ? (
-            messages.map((content: any) =>
-              content.messages.map((message: any, index: number) => (
-                <ChatContent
-                  key={index}
-                  content={message?.content}
-                  avatar={data?.user?.profile_pictures[0]?.avatar}
-                  sender={message?.userId === user?.id}
-                  name={data?.user?.name}
-                  timeSent={message?.createdAt}
-                />
-              ))
-            )
+          ) : allMessages && allMessages.length > 0 ? (
+            allMessages.map((message: any, index: number) => {
+              const currentTime = new Date(message.createdAt);
+              const nextTime =
+                index < allMessages.length - 1
+                  ? new Date(allMessages[index + 1].createdAt)
+                  : null;
+
+              const isFirstInGroup =
+                !nextTime ||
+                currentTime.getMinutes() !== nextTime.getMinutes() ||
+                currentTime.toDateString() !== nextTime.toDateString();
+
+              return (
+                <div key={index}>
+                  {index === firstUnreadIndex && message.userId !== user.id && (
+                    <div
+                      className="flex justify-center mb-2"
+                      ref={unreadMessageRef}
+                    >
+                      <div className="w-full flex justify-center items-center gap-2">
+                        <div className="border-b w-2/6 border-gray-400"></div>
+                        <div className="text-gray-400 text-xs">
+                          Unread messages
+                        </div>
+                        <div className="border-b w-2/6 border-gray-400"></div>
+                      </div>
+                    </div>
+                  )}
+                  {isFirstInGroup && (
+                    <div className="flex justify-center text-gray-300 text-xs my-2">
+                      {formatChatTimestamp(currentTime)}
+                    </div>
+                  )}
+                  <ChatContent
+                    setPreviewData={setPreviewData}
+                    preview={preview}
+                    messageId={message?.id}
+                    content={message?.content}
+                    avatar={data?.user?.profile_pictures[0]?.avatar}
+                    sender={message?.userId === user?.id}
+                    name={data?.user?.name}
+                    timeSent={message?.createdAt}
+                    isNotSeen={message?.isSeen === false}
+                  />
+                </div>
+              );
+            })
           ) : (
             <p className="text-center mb-20 items-center">
               Start an conversation with <strong>{data?.user?.name}</strong>.{" "}
@@ -438,6 +690,7 @@ const Chats = () => {
               <i className="fa-duotone fa-solid fa-spinner-third text-center animate-spin"></i>
             </div>
           )}
+          <span ref={sentinelRef}></span>
         </div>
         {/* Message Input Area */}
         <div className="bg-white dark:bg-gray-700 px-4 py-2 gap-2 flex items-center relative">

@@ -4,6 +4,7 @@ export default function DeleteConfirmation({
   id,
   isOpen,
   onClose,
+  isLoading
 }: any) {
   if (!isOpen) {
     return null;
@@ -65,7 +66,7 @@ export default function DeleteConfirmation({
                 onClick={() => handleDeleteUser(id)}
                 className="hover:scale-105 inline-flex w-full items-center gap-1 justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
               >
-                <i className="far fa-trash"></i> Delete
+                {isLoading ? <><i className="far fa-spinner animate-spin"></i> Deleting...</> : <><i className="far fa-trash"></i> Delete</>}
               </button>
               <button
                 type="button"
